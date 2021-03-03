@@ -1,10 +1,7 @@
 package app.carte;
-import java.awt.Polygon;
 import java.awt.Color;
 
-// Voir la javadoc sur la classe Polygon
-
-public class Cellule extends Polygon {
+public class Cellule{
     
     public enum TypeCase{
     VIDE,
@@ -16,39 +13,49 @@ public class Cellule extends Polygon {
     FORET
     }
 
-    ///////////////////////////////////////// Attributs 
+    //////////////////////////////////////////////////////////////////// Attributs 
     
     TypeCase type;
     Color Couleur;
     
-    // Position dans la matrice 
+    //Position dans la matrice de la carte            
     int ligne;
     int colonne;
      
-    
-    ////////////////////////////////////////// Constructeurs 
+    //////////////////////////////////////////////////////////////////// Constructeurs 
     
     // Constructeur de base
     
     public Cellule(){
-        
         type = TypeCase.VIDE;
         ligne = 0;
         colonne = 0;
-        Couleur = this.getColor(this.type);
+        Couleur = this.getColor(this);
     }
     
-    /* Constructeur complet
-     * On va calculer les coordonées de chacun des points du polygône et les 
-     * stocker dans des tableaux x et y, en fonction de leurs ligne et de leur colonne*/
+    // Constructeur complet
+     
+    public Cellule(TypeCase unType, int uneLigne, int uneColonne){
+        type = unType;
+        ligne = uneLigne;
+        colonne = uneColonne;
+        Couleur = this.getColor(this);
+    }
     
+    //////////////////////////////////////////////////////////////////// Méthodes
     
+    public boolean equals(Cellule uneCellule){
+        return (this.type==uneCellule.type 
+                && this.ligne==uneCellule.ligne 
+                && this.colonne==uneCellule.colonne);
+    }
     
+    public boolean memeType(Cellule uneCellule){
+        return (this.type==uneCellule.type);
+    }
     
-    /////////////////////////////////////////// Méthodes
-    
-    public Color getColor(TypeCase unTypedeCase){
-        switch(unTypedeCase){
+    public Color getColor(Cellule uneCellule){
+        switch(uneCellule.type){
             case VIDE:
                 return Color.black;
             case EAU:
@@ -67,5 +74,9 @@ public class Cellule extends Polygon {
                 return null;
                 
         }
+    }
+    
+    public int[] getCoordMatrice(Cellule uneCellule){
+        return (new int[]{ligne,colonne});
     }
 }
