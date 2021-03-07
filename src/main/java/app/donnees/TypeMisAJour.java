@@ -2,5 +2,6 @@ package app.donnees;
 
 public enum TypeMisAJour {
     Cellules,
-    Peindre
+    Peindre,
+    Joueur
 }

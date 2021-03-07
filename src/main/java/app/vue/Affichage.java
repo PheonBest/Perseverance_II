@@ -14,6 +14,7 @@ import app.controleur.Controleur;
 import app.donnees.TypeMisAJour;
 import app.Options;
 import app.carte.Cellule;
+import app.sprites.Joueur;
 import app.utils.Observer;
 
 import java.awt.event.ActionEvent;
@@ -70,15 +71,18 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
     private void initialiser() {
         System.out.println("Initialisation");
+        jouer();
+    }
+
+    private void jouer() {
+        enJeu = true;
+        
         cardLayout.show(contenu, "Jeu");
         // L'animation de rotation de la matrice sera mise à jour
         // Toutes les 15 milisecondes
         timer = new Timer(Options.DELAI_ANIMATION, this);
         timer.start();
-    }
 
-    private void jouer() {
-        enJeu = true;
         controleur.jouer();
     }
 
@@ -110,6 +114,9 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         switch (type) {
             case Cellules:
                 ((Dessiner)jeu).majCellules((Cellule[][]) nouveau);
+                break;
+            case Joueur:
+                ((Dessiner)jeu).majJoueur((Joueur) nouveau);
                 break;
             case Peindre:
                 jeu.repaint();// Prévoit de mettre à jour le composant
