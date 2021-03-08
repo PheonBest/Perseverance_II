@@ -58,6 +58,9 @@ public class Donnees implements Observable {
         }
     }
 
+    public Cellule[][] getCellules() {
+        return cellules;
+    }
     public Joueur getJoueur() {
         return joueur;
     }

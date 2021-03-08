@@ -6,8 +6,10 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import app.Options;
+import app.carte.Cellule;
 import app.donnees.Donnees;
 import app.sprites.Joueur;
 import app.utils.ObtenirRessources;
@@ -69,10 +71,20 @@ public class Controleur {
             }
         }
         donnees.majJoueur(new Joueur(images, donnees.obtenirLargeur()/2, donnees.obtenirHauteur()/2));
+        donnees.getJoueur().definirBut(new Dimension(100,100));
 	}
 
 	public void rafraichir() {
+        donnees.getJoueur().move();
         donnees.getJoueur().rafraichirImage();
+        int dx = -donnees.getJoueur().getDx();
+        int dy = -donnees.getJoueur().getDy();
+        System.out.println("dx : "+dx+" _ dy : "+dy);
+        Cellule[][] cellules = donnees.getCellules();
+        for (int i=0; i < cellules.length; i++) {
+            for (int j=0; j < cellules[i].length; j++)
+                cellules[i][j].translate(dx, dy);
+        }
         donnees.notifyObserver();
 	}
     

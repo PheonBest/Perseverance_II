@@ -15,30 +15,30 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 public abstract class SpriteBase {
-    private int imageIndex = 0;
-    private int animationIndex = 0;
-	private int dureeImage;
-	private ArrayList<ArrayList<Image>> image = new ArrayList<ArrayList<Image>>();
+    protected int imageIndex = 0;
+    protected int animationIndex = 0;
+	protected int dureeImage;
+	protected ArrayList<ArrayList<Image>> image = new ArrayList<ArrayList<Image>>();
 
-	private double x;
-	private double y;
-	private double r; // angle d'orientation
+	protected double x;
+	protected double y;
+	protected double r; // angle d'orientation
 
-	private double dx;
-	private double dy;
-	private double dr;
+	protected int dx;
+	protected int dy;
+	protected double dr;
 
-	private boolean removable = false;
+	protected boolean removable = false;
 
-	private double largeur;
-	private double hauteur;
+	protected double largeur;
+	protected double hauteur;
 
-	private boolean movable = true;
-	private double[] coords; // Coordonnées de l'image par rapport au centre de rotation
+	protected boolean movable = true;
+	protected double[] coords; // Coordonnées de l'image par rapport au centre de rotation
 
-	private long temps;
+	protected long temps;
 
-    public SpriteBase(int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, double x, double y, double r, double dx, double dy, double dr) {
+    public SpriteBase(int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, double x, double y, double r, int dx, int dy, double dr) {
         this.image = image;
         this.x = x;
 		this.y = y;
@@ -82,19 +82,19 @@ public abstract class SpriteBase {
 		this.r = r;
 	}
 
-	public double getDx() {
+	public int getDx() {
 		return dx;
 	}
 
-	public void setDx(double dx) {
+	public void setDx(int dx) {
 		this.dx = dx;
 	}
 
-	public double getDy() {
+	public int getDy() {
 		return dy;
 	}
 
-	public void setDy(double dy) {
+	public void setDy(int dy) {
 		this.dy = dy;
 	}
 
@@ -114,23 +114,25 @@ public abstract class SpriteBase {
 		this.removable = removable;
 	}
 
+	public void updateCoords() {
+		x += dx;
+		y += dy;
+		r += dr;
+	}
+
     public void move() {
 
 		if(!movable)
 			return;
 		
-		x += dx;
-		y += dy;
-		r += dr;
+		updateCoords();
 
 	}
 	public void move(Dimension rotateAroundPoint) {
 		if(!movable)
 			return;
 			
-		x += dx;
-		y += dy;
-		r += dr;
+		updateCoords();
 
         /*
 		//Pour tourner un point "p" autour d'une origine "c",
