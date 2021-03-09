@@ -1,4 +1,4 @@
-package app.sprites;
+package app.avatar;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,24 +11,36 @@ import java.awt.Dimension;
 
 import app.Options;
 
-public class Joueur extends SpriteBase {
+public class Robot extends Avatar {
     
+    //------------------------------------------------------------------ Attributs
+    
+    // Paramètres vitaux du robots
     private double sante;
     private double batterie;
+    
+// ????????????????????
     private LinkedList<Dimension> but = new LinkedList<Dimension>();
+    
+    //  Position du robot dans la matrice de la carte
     private int row = 0;
     private int column = 0;
+    
+    // Position du robot sur la carte
     private int xFictif = 0;
     private int yFictif = 0;
     
-    public Joueur(int sante, int batterie, int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
+    //------------------------------------------------------------------ Constructeur
+    
+    public Robot(int sante, int batterie, int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
+        // Le robot est un avatar, il hérite donc de son constructeur et de ses conditions d'avatar
         super(animationIndex, dureeImage, image, coords, x, y, r, dx, dy, dr);
         xFictif = x;
         yFictif = y;
         this.sante = sante;
         this.batterie = batterie;
     }
-    public Joueur(ArrayList<ArrayList<Image>> image, int x, int y) {
+    public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
         this(Options.SANTE_MAX, Options.BATTERIE_MAX, 0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
     }
 
