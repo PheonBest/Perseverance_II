@@ -2,6 +2,7 @@ package app.controleur;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
@@ -71,7 +72,10 @@ public class Controleur {
             }
         }
         donnees.majJoueur(new Joueur(images, donnees.obtenirLargeur()/2, donnees.obtenirHauteur()/2));
-        donnees.getJoueur().definirBut(new Dimension(100,100));
+        LinkedList<Dimension> buts = new LinkedList<Dimension>();
+        buts.add(new Dimension(100,100));
+        buts.add(new Dimension(300,300));
+        donnees.getJoueur().definirBut(buts);
 	}
 
 	public void rafraichir() {
@@ -79,7 +83,7 @@ public class Controleur {
         donnees.getJoueur().rafraichirImage();
         int dx = -donnees.getJoueur().getDx();
         int dy = -donnees.getJoueur().getDy();
-        System.out.println("dx : "+dx+" _ dy : "+dy);
+        //System.out.println("dx : "+dx+" _ dy : "+dy);
         Cellule[][] cellules = donnees.getCellules();
         for (int i=0; i < cellules.length; i++) {
             for (int j=0; j < cellules[i].length; j++)

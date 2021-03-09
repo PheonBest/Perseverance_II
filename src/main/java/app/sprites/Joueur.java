@@ -1,6 +1,8 @@
 package app.sprites;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -13,7 +15,7 @@ public class Joueur extends SpriteBase {
     
     private double sante;
     private double batterie;
-    private Dimension but;
+    private LinkedList<Dimension> but = new LinkedList<Dimension>();
     private int row = 0;
     private int column = 0;
     private int xFictif = 0;
@@ -30,14 +32,17 @@ public class Joueur extends SpriteBase {
         this(Options.SANTE_MAX, Options.BATTERIE_MAX, 0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
     }
 
-    public void definirBut(Dimension but) {
+    public void definirBut(LinkedList<Dimension> but) {
         this.but = but;
-        float angle = (float) Math.atan2(but.getHeight() - y, but.getWidth() - x);
-        if(angle < 0){
-            angle += 360;
-        }
-        dx = (int) (-Math.cos(angle)*10);
-        dy = (int) (-Math.cos(angle)*10);
+        definirDirection(but.getFirst());
+        animationIndex = 2;
+    }
+
+    private void definirDirection(Dimension but) {
+        float angle = (float) Math.atan2(but.getHeight() - yFictif, but.getWidth() - xFictif);
+        //System.out.println(Math.toDegrees(angle));
+        dx = (int) (Math.cos(angle)*10); // 10 est la vitesse (pixel/itération de la boucle du jeu)
+        dy = (int) (Math.sin(angle)*10);
     }
 
     @Override
@@ -45,16 +50,23 @@ public class Joueur extends SpriteBase {
 
         r += dr;
 
-        if (but != null) {
+        if (!but.isEmpty()) {
             xFictif += dx;
             yFictif += dy;
-            
-            if (Math.abs(xFictif - but.getWidth()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
-                dx = (int) but.getWidth() - xFictif;
-            if (Math.abs(yFictif - but.getHeight()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
-                dy = (int) but.getHeight() - yFictif;
+            Dimension d = but.getFirst(); // On va jusqu'au centre de l'hexagone
+            if (Math.abs(xFictif - d.getWidth()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
+                dx = (int) d.getWidth() - xFictif;
+            if (Math.abs(yFictif - d.getHeight()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
+                dy = (int) d.getHeight() - yFictif;
             if (dx == dy && dy == 0) {
-                but = null;
+                but.removeFirst();
+                if (but.isEmpty()) // Si il ne reste plus de cases à parcourir
+                    animationIndex = 0; // On passe l'animation du joueur en mode "pause" (Idle)
+                else {
+                    definirDirection(but.getFirst());
+                    //System.out.println("Coords joueur : "+xFictif +" _ "+ yFictif);
+                    //System.out.println("Coords but : "+ but.getFirst().getWidth() +" _ "+ but.getFirst().getHeight());
+                }
             }
         }
     }
