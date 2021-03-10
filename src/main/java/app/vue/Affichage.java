@@ -14,7 +14,7 @@ import app.controleur.Controleur;
 import app.donnees.TypeMisAJour;
 import app.Options;
 import app.carte.Cellule;
-import app.sprites.Joueur;
+import app.avatar.Robot;
 import app.utils.Observer;
 
 import java.awt.event.ActionEvent;
@@ -30,6 +30,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private JPanel contenu = new JPanel();
     private JPanel jeu = new Dessiner();
     private JPanel modeDeJeu = new JPanel();
+    private JPanel chargement = new Chargement();
 
     private double largeur;
     private double hauteur;
@@ -54,6 +55,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         contenu.setLayout(cardLayout);
         contenu.add(modeDeJeu, "Mode de Jeu");
         contenu.add(jeu, "Jeu");
+        contenu.add(chargement, "Chargement");
         jeu.setBackground(Color.DARK_GRAY);
 
         this.setContentPane(contenu); // On définit le contenu de "JFrame" comme un "JPanel"
@@ -64,26 +66,24 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         // Si on obtient sa taille avant son affichage, la dimension retournée est (0,0)
         this.largeur = this.getContentPane().getSize().getWidth();
         this.hauteur = this.getContentPane().getSize().getHeight();
-        ((Dessiner)jeu).setLargeur(this.largeur);
-        ((Dessiner)jeu).setHauteur(this.hauteur);
+        ((Dessiner)jeu).majLargeur(this.largeur);
+        ((Dessiner)jeu).majHauteur(this.hauteur);
+        ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), (int)(this.hauteur/20.));
         initialiser();
     }
 
     private void initialiser() {
-        System.out.println("Initialisation");
-        jouer();
+        //System.out.println("Initialisation");
+        cardLayout.show(contenu, "Chargement");
+        controleur.charger();
     }
 
     private void jouer() {
         enJeu = true;
-        
-        cardLayout.show(contenu, "Jeu");
         // L'animation de rotation de la matrice sera mise à jour
         // Toutes les 15 milisecondes
         timer = new Timer(Options.DELAI_ANIMATION, this);
         timer.start();
-
-        controleur.jouer();
     }
 
     @Override
@@ -116,7 +116,16 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 ((Dessiner)jeu).majCellules((Cellule[][]) nouveau);
                 break;
             case Joueur:
-                ((Dessiner)jeu).majJoueur((Joueur) nouveau);
+                ((Dessiner)jeu).majJoueur((Robot) nouveau);
+                break;
+            case Avancement:
+                //System.out.println("A : "+(int) nouveau);
+                ((Chargement)chargement).majChargement((int) nouveau);
+                break;
+            case Scene:
+                if (((String) nouveau).equals("Jeu"))
+                    jouer();
+                cardLayout.show(contenu, (String) nouveau);
                 break;
             case Peindre:
                 jeu.repaint();// Prévoit de mettre à jour le composant

@@ -19,7 +19,7 @@ public class Robot extends Avatar {
     private double sante;
     private double batterie;
     
-// ????????????????????
+    // Trajectoire
     private LinkedList<Dimension> but = new LinkedList<Dimension>();
     
     //  Position du robot dans la matrice de la carte
@@ -55,6 +55,7 @@ public class Robot extends Avatar {
         //System.out.println(Math.toDegrees(angle));
         dx = (int) (Math.cos(angle)*10); // 10 est la vitesse (pixel/itération de la boucle du jeu)
         dy = (int) (Math.sin(angle)*10);
+        animationIndex = 2; // Marcher
     }
 
     @Override
@@ -70,7 +71,7 @@ public class Robot extends Avatar {
                 dx = (int) d.getWidth() - xFictif;
             if (Math.abs(yFictif - d.getHeight()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
                 dy = (int) d.getHeight() - yFictif;
-            if (dx == dy && dy == 0) {
+            if (dx == 0 && dy == 0) {
                 but.removeFirst();
                 if (but.isEmpty()) // Si il ne reste plus de cases à parcourir
                     animationIndex = 0; // On passe l'animation du joueur en mode "pause" (Idle)
@@ -79,6 +80,7 @@ public class Robot extends Avatar {
                     //System.out.println("Coords joueur : "+xFictif +" _ "+ yFictif);
                     //System.out.println("Coords but : "+ but.getFirst().getWidth() +" _ "+ but.getFirst().getHeight());
                 }
+                
             }
         }
     }

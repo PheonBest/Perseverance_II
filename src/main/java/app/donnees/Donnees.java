@@ -4,17 +4,26 @@ import java.util.ArrayList;
 
 import app.Options;
 import app.carte.Cellule;
-import app.sprites.Joueur;
+import app.avatar.Robot;
 import app.utils.Observable;
 import app.utils.Observer;
 
+import java.awt.Image;
+
 public class Donnees implements Observable {
 
-    private Joueur joueur;
+    private Robot joueur;
+    private String scene;
     private ArrayList<Observer> listObserver = new ArrayList<Observer>();
     private Cellule[][] cellules = { {} };
     private int largeur;
     private int hauteur;
+
+    // Images du joueur
+    // On les stocke car elles mettent un certain temps à charger
+    private ArrayList<ArrayList<Image>> images;
+
+    private int avancementChargement;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
@@ -30,6 +39,23 @@ public class Donnees implements Observable {
         }
     }
 
+    public void majAvancement(int avancementChargement) {
+        this.avancementChargement = avancementChargement;
+    }
+
+    public void majScene(String scene) {
+        this.scene = scene;
+    }
+    
+    public void majImagesJoueur(ArrayList<ArrayList<Image>> images) {
+        //(images.size());
+        this.images = images;
+    }
+
+    public ArrayList<ArrayList<Image>> getImagesJoueur() {
+        return images;
+    }
+
     public void majCellules(Cellule[][] cellules) {
         this.cellules = cellules;
     }
@@ -41,7 +67,8 @@ public class Donnees implements Observable {
     @Override
     public void addObserver(Observer obs) {
         this.listObserver.add(obs);
-        notifyObserver();
+        //notifyObserver(); // Pas besoin de notifier l'observeur lorsqu'il vient d'être ajouté
+        // Car l'observeur est ajouté dès le départ
     }
 
     @Override
@@ -50,21 +77,37 @@ public class Donnees implements Observable {
     }
 
     @Override
-    public void notifyObserver() {
+    public void notifyObserver(TypeMisAJour type) {
         for (Observer obs: listObserver) {
-            obs.update(TypeMisAJour.Cellules, cellules);
-            obs.update(TypeMisAJour.Joueur, joueur);
-            obs.update(TypeMisAJour.Peindre, null);
+            switch (type) {
+                case Cellules:
+                    obs.update(TypeMisAJour.Cellules, cellules);
+                    break;
+                case Joueur:
+                    obs.update(TypeMisAJour.Joueur, joueur);
+                    break;
+                case Avancement:
+                    //System.out.println(avancementChargement);
+                    obs.update(TypeMisAJour.Avancement, avancementChargement);
+                    break;
+                case Peindre:
+                    obs.update(TypeMisAJour.Peindre, null);// Prévoit de mettre à jour le composant
+                    // n'appelle pas la méthode paint() !
+                    break;
+                case Scene:
+                    obs.update(TypeMisAJour.Scene, scene);
+                    break;
+            }
         }
     }
 
     public Cellule[][] getCellules() {
         return cellules;
     }
-    public Joueur getJoueur() {
+    public Robot getJoueur() {
         return joueur;
     }
-    public void majJoueur(Joueur joueur) {
+    public void majJoueur(Robot joueur) {
         this.joueur = joueur;
     }
 

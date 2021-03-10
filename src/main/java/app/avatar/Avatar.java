@@ -27,18 +27,18 @@ public abstract class Avatar {
 	protected ArrayList<ArrayList<Image>> image = new ArrayList<ArrayList<Image>>();
 
     // Position de l'avatar
-	protected double x;
-	protected double y;
-	//protected double r; // angle d'orientation
+	protected double x; // Coordonnée x
+	protected double y; // Coordonnée y
+	protected double r; // angle d'orientation
 
     // Vitesse de déplacement de l'avatar
-	protected int dx;
-	protected int dy;
-	//protected double dr;
+	protected int dx; // Vitesse du joueur en pixels/itération de la boucle dans la direction x
+	protected int dy; // Vitesse du joueur en pixels/itération de la boucle dans la direction y
+	protected double dr; // Angle de rotation (inutile pour le robot, mais utile pour les autres potentiels Avatars (caractères animés))
 
-    // Autorisation de  déplacement de l'avatar
-	protected boolean removable = false;
-	protected boolean movable = true;
+    
+	protected boolean removable = false; // Condition d'existence de l'avatar
+	protected boolean movable = true; // Autorisation de  déplacement de l'avatar
     
     // Définition de la taille de l'avatar
 	protected double largeur;
@@ -52,14 +52,14 @@ public abstract class Avatar {
     
     // ----------------------------------------------------------------- Constructeur 
 
-    public Avatar(int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, double x, double y, /*double r,*/ int dx, int dy /*,double dr*/) {
+    public Avatar(int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, double x, double y, double r, int dx, int dy, double dr) {
         this.image = image;
         this.x = x;
 		this.y = y;
-		//this.r = r;
+		this.r = r;
 		this.dx = dx;
 		this.dy = dy;
-		//this.dr = dr;
+		this.dr = dr;
 
 		this.dureeImage = dureeImage;
 		this.temps = System.currentTimeMillis();
