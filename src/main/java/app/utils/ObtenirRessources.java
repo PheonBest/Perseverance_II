@@ -1,102 +1,125 @@
 package app.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
+
+import javax.imageio.ImageIO;
+
+import java.awt.Image;
 
 /**
  * list resources available from the classpath @ *
  */
 public class ObtenirRessources{
 
-    /**
-     * for all elements of java.class.path get a Collection of resources Pattern
-     * pattern = Pattern.compile(".*"); gets all resources
-     * 
-     * @param pattern
-     *            the pattern to match
-     * @return the resources in the order they are found
-     */
-    public static Collection<String> getResources(final Pattern pattern) {
-        final ArrayList<String> retval = new ArrayList<String>();
-        final String classPath = System.getProperty("java.class.path", ".");
-        final String[] classPathElements = classPath.split(System.getProperty("path.separator"));
-        for(final String element : classPathElements){
-            retval.addAll(getResources(element, pattern));
-        }
-        return retval;
-    }
-
-    private static Collection<String> getResources(final String element, final Pattern pattern) {
-        final ArrayList<String> retval = new ArrayList<String>();
-        final File file = new File(element);
-        if(file.isDirectory()){
-            retval.addAll(getResourcesFromDirectory(file, pattern));
-        } else{
-            retval.addAll(getResourcesFromJarFile(file, pattern));
-        }
-        return retval;
-    }
-
-    private static Collection<String> getResourcesFromJarFile(final File file, final Pattern pattern) {
-        final ArrayList<String> retval = new ArrayList<String>();
-        ZipFile zf;
-        try{
-            zf = new ZipFile(file);
-        } catch(final ZipException e){
-            throw new Error(e);
-        } catch(final IOException e){
-            throw new Error(e);
-        }
-        final Enumeration e = zf.entries();
-        while(e.hasMoreElements()){
-            final ZipEntry ze = (ZipEntry) e.nextElement();
-            final String fileName = ze.getName();
-            final boolean accept = pattern.matcher(fileName).matches();
-            if(accept){
-                retval.add(fileName);
-            }
-        }
-        try{
-            zf.close();
-        } catch(final IOException e1){
-            throw new Error(e1);
-        }
-        return retval;
-    }
-
-    private static Collection<String> getResourcesFromDirectory(final File directory, final Pattern pattern){
-        final ArrayList<String> retval = new ArrayList<String>();
-        final File[] fileList = directory.listFiles();
-        for(final File file : fileList){
-            if(file.isDirectory()){
-                retval.addAll(getResourcesFromDirectory(file, pattern));
-            } else{
-                try{
-                    final String fileName = file.getCanonicalPath();
-                    final boolean accept = pattern.matcher(fileName).matches();
-                    if(accept){
-                        retval.add(fileName);
+    public static List<String> getFilenamesForDirnameFromCP(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
+        List<String> filenames = new ArrayList<>();
+        
+        URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
+        if (url != null) {
+            if (url.getProtocol().equals("file")) {
+                File file = Paths.get(url.toURI()).toFile();
+                if (file != null) {
+                    File[] files = file.listFiles();
+                    System.out.println(files.length);
+                    if (files != null) {
+                        for (File filename : files) {
+                            final boolean accept = pattern.matcher(filename.toString()).matches();
+                            if(accept){
+                                System.out.println(filename.toString());
+                                filenames.add(filename.toString());
+                            }
+                        }
                     }
-                } catch(final IOException e){
-                    throw new Error(e);
+                }
+            } else if (url.getProtocol().equals("jar")) {
+                String dirname = directoryName + "/";
+                String path = url.getPath();
+                String jarPath = path.substring(5, path.indexOf("!"));
+                try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name()))) {
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String name = entry.getName();
+                        if (!dirname.equals(name)) {
+                        //if (name.startsWith(dirname) && !dirname.equals(name)) {
+                            URL resource = Thread.currentThread().getContextClassLoader().getResource(name);
+                            final boolean accept = pattern.matcher(resource.toString()).matches();
+                            if(accept){
+                                System.out.println(resource.toString());
+                                filenames.add(resource.toString());
+                            }
+                        }
+                    }
                 }
             }
         }
-        return retval;
+        return filenames;
     }
 
-    /**
-     * list the resources that match args[0]
-     * 
-     * @param args
-     *            args[0] is the pattern to match, or list all resources if
-     *            there are no args
-     */
+    public static List<Image> getImages(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
+        List<Image> images = new ArrayList<>();
+        
+        URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
+        if (url != null) {
+            if (url.getProtocol().equals("file")) {
+                final File file = Paths.get(url.toURI()).toFile();
+                if (file != null) {
+                    File[] files = file.listFiles();
+                    if (files != null) {
+                        for (File filename : files) {
+                            final boolean accept = pattern.matcher(filename.toString()).matches();
+                            if (accept) {
+                                //System.out.println(filename.toString());
+                                final Image img = ImageIO.read( new FileInputStream(filename));
+                                images.add(img);
+                            }
+                        }
+                    }
+                }
+            } else if (url.getProtocol().equals("jar")) {
+                String dirname = directoryName + "/";
+                String path = url.getPath();
+                String jarPath = path.substring(5, path.indexOf("!"));
+                try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name()))) {
+                    Enumeration<JarEntry> entries = jar.entries();
+                    List<JarEntry> sortedEntries = Collections.list(entries);
+                    sortedEntries.sort(new Comparator<JarEntry>(){
+                        @Override
+                        public int compare(JarEntry o1, JarEntry o2) {
+                            return o1.getName().compareTo(o2.getName());
+                        }
+                    });
+                    for(JarEntry entry: sortedEntries) {
+                        String name = entry.getName();
+                        if (!dirname.equals(name)) {
+                        //if (name.startsWith(dirname) && !dirname.equals(name)) {
+                            URL resource = Thread.currentThread().getContextClassLoader().getResource(name);
+                            final boolean accept = pattern.matcher(resource.toString()).matches();
+                            if (accept) {
+                                System.out.println(resource.toString());
+                                images.add(ImageIO.read(Thread.currentThread().getContextClassLoader().getResourceAsStream(name)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return images;
+    }
 }  

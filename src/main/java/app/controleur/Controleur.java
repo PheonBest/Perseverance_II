@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
@@ -21,8 +22,10 @@ import app.utils.ObtenirRessources;
 import app.utils.TailleImage;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 
 public class Controleur {
     
@@ -71,11 +74,9 @@ public class Controleur {
             ArrayList<ArrayList<Image>> images = new ArrayList<ArrayList<Image>>(4);
 
             Pattern pattern;
-            Collection<String> list;
-            Image img;
 
             int avancementChargement = 0;
-            int nombreImages = 0;
+            int nombreImages = 4*21;
             
             for (int i = 0; i < 4; i++) {
                 // On veut que le chemin vers le fichier
@@ -83,35 +84,20 @@ public class Controleur {
                 // On utilise les délimiteurs \b
                 // ex: \bRun\b
                 
-                pattern = Pattern.compile("^.*\\b"+Options.JOUEURS_IMAGES[i]+"\\b.*$");
-                list = ObtenirRessources.getResources(pattern);
-                /* System.out.println(pattern);
-                * System.out.println(list.size());
-                * for(final String name : list){
-                *     System.out.println(name);
-                * }
-                * System.out.println();
-                */
-                fileNames.add(list);
-                nombreImages += list.size();
-            }
-            for (int i = 0; i < fileNames.size(); i++) {
-                images.add(new ArrayList<Image>()); // Il faut initialiser les valeurs de l'ArrayList 2D
-                // Sinon: Index 0 out of bounds for length 0
-                for (String name: fileNames.get(i)) {
-                    if (name != null) {
-                        try {
-                            //images.get(i).add(ImageIO.read(getClass().getResourceAsStream(name)));
-                            img = ImageIO.read( new FileInputStream(name));
-                            images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null)))) );
-                            avancementChargement +=1;
-                            publish((int)(100.*avancementChargement/nombreImages)); // On publie l'avancement du chargement (résultat intermédiaire)
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                
+                pattern = Pattern.compile("^.*\\b"+Options.JOUEURS_IMAGES[i]+"\\b.*\\.(?:jpg|gif|png)");
+                final Collection<Image> tmp = ObtenirRessources.getImages(pattern, "app/res/robot/"+Options.JOUEURS_IMAGES[i]+"/");
+                images.add(new ArrayList<Image>());
+                for (Image img: tmp) {
+                    images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null)))) );
+                    avancementChargement +=1;
+                    System.out.println(avancementChargement);
+                    publish((int)(100.*avancementChargement/nombreImages)); // On publie l'avancement du chargement (résultat intermédiaire)
                 }
+                
+                
             }
+
             // On enregistre les images chargées dans la classe Données
             return images; // On renvoie un ArrayList<ArrayList<Image>> (résultat final du Worked Thread)
         }

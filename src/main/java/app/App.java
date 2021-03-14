@@ -14,7 +14,7 @@ public class App
     /* On utuilise un EDT: Event Dispatch Thread
      * La plupart des méthodes des objets Swing ne sont pas "thread safe"
      * Si on les invoque depuis plusieurs threads, on risque d'avoir
-     * des interférences de thread.
+     * des interférences de thread.h
      * 
      * Une partie des tâches sont événementielles (Actionlistener)
      * Une autre partie est planifiée (repaint, invokeLater, invokeAndWait)
