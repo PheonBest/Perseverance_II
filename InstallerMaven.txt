@@ -1,0 +1,16 @@
+Tutoriel Maven: https://mkyong.com/maven/how-to-install-maven-in-windows/
+
+OU:
+
+Pour installer maven: Le télécharger
+https://mirrors.ircam.fr/pub/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.zip
+Vous le dézippez dans un fichier, par exemple "C:\java\apache-maven-3.6.3"
+
+Ajouter une variable d'environnement nommée "MAVEN_HOME"
+(pour ça, vous allez dans la barre de recherche windows, vous tapez "variables d'environnement"
+ça ouvre une venêtre, vous cliquez sur variables d'environnement tout en bas
+Vous cliquez sur "Nouvelle..."
+Vous mettez:	Variable name: MAVEN_HOME
+		Variable value: C:\java\apache-maven-3.6.3
+
+Dans les variables systèmes, vous cliquez sur Path, puis Edit, et vous ajoutez %MAVEN_HOME%\bin

@@ -90,11 +90,9 @@ public class Controleur {
                 images.add(new ArrayList<Image>());
                 for (Image img: tmp) {
                     images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null)))) );
-                    avancementChargement +=1;
-                    System.out.println(avancementChargement);
-                    publish((int)(100.*avancementChargement/nombreImages)); // On publie l'avancement du chargement (résultat intermédiaire)
                 }
-                
+                avancementChargement +=tmp.size();
+                publish((int)(100.*avancementChargement/nombreImages)); // On publie l'avancement du chargement (résultat intermédiaire)
                 
             }
 
