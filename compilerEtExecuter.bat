@@ -1,1 +1,1 @@
-mvn compile exec:java
+cmd /k mvn compile exec:java

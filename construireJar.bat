@@ -1,1 +1,1 @@
-mvn package
+cmd /k mvn package
