@@ -1,5 +1,6 @@
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 
@@ -31,5 +32,15 @@ public class App
                 donnees.addObserver(affichage);
             }
         });
+        
+        
+        //test
+		List<String[]> dataLines = new ArrayList<>();
+		dataLines.add(new String[]{ "John", "Doe", "38", "Comment Data\nAnother line of comment data" });
+		dataLines.add(new String[]{ "Jane", "Doe, Jr.", "19", "She said \"I'm being quoted\"" });
+		CSV print = new CSV(dataLines);
+		try {print.givenDataArray_whenConvertToCSV_thenOutputCreated();
+			}catch(Exception e){e.printStackTrace();}
     }
+    
 }
