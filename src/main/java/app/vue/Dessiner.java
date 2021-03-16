@@ -6,13 +6,13 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import app.carte.Cellule;
-import app.sprites.Joueur;
+import app.avatar.Robot;
 
 public class Dessiner extends JPanel {
     private Cellule[][] cellules = {{}};
     private double largeurEcran;
     private double hauteurEcran;
-    private Joueur joueur;
+    private Robot joueur;
     public Dessiner() {
     }
 
@@ -26,21 +26,23 @@ public class Dessiner extends JPanel {
                     c.dessiner(gg);
             }
         }
-        
-        joueur.dessiner(g);
+        if (joueur != null)
+            joueur.dessiner(g);
     }
     public void majCellules(Cellule[][] cellules) {
         this.cellules = cellules.clone();
     }
-    public void setLargeur(double largeurEcran) {
-        this.largeurEcran = largeurEcran;
-    }
-    public void setHauteur(double hauteurEcran) {
-        this.hauteurEcran = hauteurEcran;
+
+    public void majJoueur(Robot nouveau) {
+        this.joueur = nouveau;
     }
 
-    public void majJoueur(Joueur nouveau) {
-        this.joueur = nouveau;
+    public void majLargeur(double largeurEcran) {
+        this.largeurEcran = largeurEcran;
+    }
+
+    public void majHauteur(double hauteurEcran) {
+        this.hauteurEcran = hauteurEcran;
     }
 
 }
