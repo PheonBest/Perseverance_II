@@ -1,4 +1,4 @@
-package app.audio;
+package app;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

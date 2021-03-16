@@ -1,8 +1,4 @@
-package app.utils;
+package app;
 
 public class CSV {
-	
-	public static void printCSV (cellule[][], 
-	
-    
 }

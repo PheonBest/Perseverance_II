@@ -1,4 +1,4 @@
-package app.donnees;
+package app;
 
 public enum TypeMisAJour {
     Cellules,
