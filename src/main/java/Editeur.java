@@ -1,19 +1,9 @@
-package app;
-
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import app.Options;
-import app.Cellule;
-import app.Cellule.TypeCase;
-import app.Donnees;
-
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Graphics;
-import java.awt.Color;
 
 public class Editeur extends JPanel {
     private JPanel carte = new Dessiner();
@@ -83,6 +73,7 @@ public class Editeur extends JPanel {
         ((Menu)menu).majBoutons(taillePinceau);
 
         //BoutonsHex
+        /*
         final TypeCase[] types = TypeCase.values();
         System.out.println(Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE);
         final int NOMBRE_COLONNES = (int) Math.ceil(types.length/Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE);
@@ -97,7 +88,9 @@ public class Editeur extends JPanel {
                 index++;
             }
         }
+        
         ((Menu)menu).majTypeCase(boutonsType);
+        */
         
     }
 

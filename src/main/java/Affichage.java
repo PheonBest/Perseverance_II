@@ -1,25 +1,15 @@
-package app;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Arrays;
-import javax.swing.Timer;
-
-import app.Controleur;
-import app.TypeMisAJour;
-import app.Options;
-import app.Cellule;
-import app.Robot;
-import app.Observer;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class Affichage extends JFrame implements Observer, ActionListener, KeyListener {
     private Controleur controleur;

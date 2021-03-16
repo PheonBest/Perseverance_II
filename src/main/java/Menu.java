@@ -1,10 +1,6 @@
-package app;
-
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
-
-import app.Cellule;
 
 import java.awt.Graphics;
 
@@ -20,9 +16,11 @@ public class Menu extends JPanel {
         super.paintComponent(g);
         for (BoutonCercle b: taillePinceau)
             b.dessiner(g);
+        /*
         for (Cellule c: boutonsType) {
             c.dessiner(g);
         }
+        */
     }
 
     public void majBoutons(ArrayList<BoutonCercle> taillePinceau) {

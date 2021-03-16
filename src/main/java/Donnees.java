@@ -1,12 +1,4 @@
-package app;
-
 import java.util.ArrayList;
-
-import app.Options;
-import app.Cellule;
-import app.Robot;
-import app.Observable;
-import app.Observer;
 
 import java.awt.Image;
 

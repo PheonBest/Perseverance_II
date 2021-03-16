@@ -1,5 +1,3 @@
-package app;
-
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 

@@ -1,4 +1,3 @@
-package app;
 
 public class Rotate {
     public static double[] rotatePointAroundCenter(double radianAngle, double xCoord, double yCoord, double xRotationPoint, double yRotationPoint) {

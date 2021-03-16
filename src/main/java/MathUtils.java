@@ -1,5 +1,3 @@
-package app;
-
 public class MathUtils {
 
 	  private final static double PI = Math.PI;

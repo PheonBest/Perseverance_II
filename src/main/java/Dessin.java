@@ -1,4 +1,3 @@
-package app;
 import java.awt.Graphics;
 
 public interface Dessin {

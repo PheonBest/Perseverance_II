@@ -18,7 +18,7 @@ app\audio\Sound.class
 app\utils\ObtenirRessources$1.class
 app\vue\Chargement.class
 app\carte\Cellule$1.class
-app\App.class
+app\class
 app\carte\Cellule.class
 app\App$1.class
 app\avatar\Avatar.class

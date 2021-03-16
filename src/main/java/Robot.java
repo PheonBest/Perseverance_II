@@ -1,15 +1,7 @@
-package app;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.JLabel;
-import java.awt.Image;
 import java.awt.Dimension;
-
-import app.Options;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Robot extends Avatar {
     

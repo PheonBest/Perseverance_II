@@ -1,26 +1,10 @@
-package app;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 
-import app.Options;
-import app.Dessin;
-
 public class Cellule extends Polygon implements Dessin {
-    
-    public enum TypeCase{
-        VIDE,
-        EAU, 
-        MONTAGNE,
-        DESERT,
-        SABLE_MOUVANTS,
-        NEIGE,
-        FORET
-    }
-
     //////////////////////////////////////////////////////////////////// Attributs 
     
     TypeCase type;

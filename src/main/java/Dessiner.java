@@ -1,12 +1,7 @@
-package app;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
-
-import app.Cellule;
-import app.Robot;
 
 public class Dessiner extends JPanel {
     private Cellule[][] cellules = {{}};

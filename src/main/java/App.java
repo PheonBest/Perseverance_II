@@ -1,13 +1,7 @@
-package app;
-
-import javax.swing.SwingUtilities;
-
-import app.Controleur;
-import app.Donnees;
-import app.Affichage;
-
 import java.awt.Dimension;
 import java.awt.Toolkit;
+
+import javax.swing.SwingUtilities;
 
 public class App 
 {

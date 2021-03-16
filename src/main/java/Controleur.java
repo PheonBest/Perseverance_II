@@ -1,31 +1,14 @@
-package app;
 
+import java.awt.Dimension;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import javax.imageio.ImageIO;
 import javax.swing.SwingWorker;
-
-import java.awt.Dimension;
-import java.awt.Image;
-import app.Options;
-import app.Cellule;
-import app.Donnees;
-import app.TypeMisAJour;
-import app.Robot;
-import app.ObtenirRessources;
-import app.TailleImage;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
 
 public class Controleur {
     
