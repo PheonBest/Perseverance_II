@@ -1,5 +1,4 @@
-package app.vue;
-
+package app;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -10,12 +9,12 @@ import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import javax.swing.Timer;
 
-import app.controleur.Controleur;
-import app.donnees.TypeMisAJour;
+import app.Controleur;
+import app.TypeMisAJour;
 import app.Options;
-import app.carte.Cellule;
-import app.avatar.Robot;
-import app.utils.Observer;
+import app.Cellule;
+import app.Robot;
+import app.Observer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +30,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private JPanel jeu = new Dessiner();
     private JPanel modeDeJeu = new JPanel();
     private JPanel chargement = new Chargement();
+    private JPanel editeur = new Editeur();
 
     private double largeur;
     private double hauteur;
@@ -56,6 +56,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         contenu.add(modeDeJeu, "Mode de Jeu");
         contenu.add(jeu, "Jeu");
         contenu.add(chargement, "Chargement");
+        contenu.add(editeur, "Editeur");
         jeu.setBackground(Color.DARK_GRAY);
 
         this.setContentPane(contenu); // On définit le contenu de "JFrame" comme un "JPanel"
@@ -68,14 +69,25 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.hauteur = this.getContentPane().getSize().getHeight();
         ((Dessiner)jeu).majLargeur(this.largeur);
         ((Dessiner)jeu).majHauteur(this.hauteur);
+        ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
+        
         ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), (int)(this.hauteur/20.));
         initialiser();
     }
 
     private void initialiser() {
         //System.out.println("Initialisation");
+
+        // Chargement et exécution du jeu
+        /*
         cardLayout.show(contenu, "Chargement");
         controleur.charger();
+        */
+        
+        // Exécuter l'éditeur
+        cardLayout.show(contenu, "Editeur");
+        timer = new Timer(Options.DELAI_ANIMATION, this);
+        timer.start();
     }
 
     private void jouer() {
@@ -113,7 +125,10 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     public void update(TypeMisAJour type, Object nouveau) {
         switch (type) {
             case Cellules:
-                ((Dessiner)jeu).majCellules((Cellule[][]) nouveau);
+                if (enJeu)
+                    ((Dessiner)jeu).majCellules((Cellule[][]) nouveau);
+                else
+                    ((Editeur)editeur).majCellules((Cellule[][]) nouveau);
                 break;
             case Joueur:
                 ((Dessiner)jeu).majJoueur((Robot) nouveau);
@@ -128,8 +143,11 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 cardLayout.show(contenu, (String) nouveau);
                 break;
             case Peindre:
-                jeu.repaint();// Prévoit de mettre à jour le composant
-                // n'appelle pas la méthode paint() !
+                if (enJeu)
+                    jeu.repaint();  // Prévoit de mettre à jour le composant
+                                    // n'appelle pas la méthode paint() !
+                else
+                    editeur.repaint();
                 break;
         }
         

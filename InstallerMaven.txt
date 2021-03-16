@@ -14,3 +14,12 @@ Vous mettez:	Variable name: MAVEN_HOME
 		Variable value: C:\java\apache-maven-3.6.3
 
 Dans les variables systèmes, vous cliquez sur Path, puis Edit, et vous ajoutez %MAVEN_HOME%\bin
+
+Attention!
+Il faut une version récente de Java8: 8y281 (1.8.281) (ou supérieure)
+On peut voir la version en cliquant sur verifierVariableEnvironnement.java
+Télécharger la nouvelle version ici:
+https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
+Puis changer les variables d'environnement:
+JAVA_HOME = C:\Program Files\Java\jdk
+JRE_HOME = C:\Program Files\Java\jdk\bin

@@ -1,12 +1,12 @@
-package app.vue;
+package app;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
-import app.carte.Cellule;
-import app.avatar.Robot;
+import app.Cellule;
+import app.Robot;
 
 public class Dessiner extends JPanel {
     private Cellule[][] cellules = {{}};
@@ -30,7 +30,7 @@ public class Dessiner extends JPanel {
             joueur.dessiner(g);
     }
     public void majCellules(Cellule[][] cellules) {
-        this.cellules = cellules.clone();
+        this.cellules = cellules;
     }
 
     public void majJoueur(Robot nouveau) {

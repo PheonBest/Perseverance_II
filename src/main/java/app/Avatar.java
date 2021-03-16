@@ -1,6 +1,6 @@
 // Cette classe a pour but de définir ce qu'est un avatar classique. C'est la classe mère de celle de joueur
 
-package app.avatar;
+package app;
 
 import java.awt.Dimension;
 import java.awt.Image;
@@ -11,12 +11,14 @@ import java.util.LinkedList;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import app.Dessin;
+
 //import app.utils.MathUtils;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
-public abstract class Avatar {
+public abstract class Avatar implements Dessin {
     
     // ----------------------------------------------------------------- Attributs
     

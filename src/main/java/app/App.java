@@ -2,9 +2,9 @@ package app;
 
 import javax.swing.SwingUtilities;
 
-import app.controleur.Controleur;
-import app.donnees.Donnees;
-import app.vue.Affichage;
+import app.Controleur;
+import app.Donnees;
+import app.Affichage;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;

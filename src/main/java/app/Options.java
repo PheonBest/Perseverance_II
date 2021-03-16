@@ -1,5 +1,7 @@
 package app;
 
+import java.awt.Font;
+
 public class Options {
 	public static final int LARGEUR_CARTE = 100;
 	public static final int HAUTEUR_CARTE = 100;
@@ -15,4 +17,12 @@ public class Options {
 	public static final int JOUEUR_DUREE_ANIMATION = 50;
 	public static final int JOUEUR_LARGEUR = 300;
 	public static final int JOUERUR_TOLERANCE_DEPLACEMENT = 5;
+
+    public static final int ESPACE_INTER_BOUTON = 70;
+	public static final int LARGEUR_BOUTON_CIRCULAIRE = 30;
+	public static final int LARGEUR_BOUTON_CASE = 30;
+	public static final double RAYON_BOUTON_CERCLE = 30;
+	public static final int NOMBRE_BOUTONS_TYPE_PAR_LIGNE = 4;
+
+	public static final Font police = new Font("Courier", Font.BOLD, 24);
 }

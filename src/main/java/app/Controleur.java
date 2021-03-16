@@ -1,4 +1,4 @@
-package app.controleur;
+package app;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,12 +14,12 @@ import javax.swing.SwingWorker;
 import java.awt.Dimension;
 import java.awt.Image;
 import app.Options;
-import app.carte.Cellule;
-import app.donnees.Donnees;
-import app.donnees.TypeMisAJour;
-import app.avatar.Robot;
-import app.utils.ObtenirRessources;
-import app.utils.TailleImage;
+import app.Cellule;
+import app.Donnees;
+import app.TypeMisAJour;
+import app.Robot;
+import app.ObtenirRessources;
+import app.TailleImage;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -46,19 +46,24 @@ public class Controleur {
 	}
 
 	public void rafraichir() {
-        donnees.getJoueur().move();
-        donnees.getJoueur().rafraichirImage();
-        int dx = -donnees.getJoueur().getDx();
-        int dy = -donnees.getJoueur().getDy();
-        //System.out.println("dx : "+dx+" _ dy : "+dy);
-        Cellule[][] cellules = donnees.getCellules();
-        for (int i=0; i < cellules.length; i++) {
-            for (int j=0; j < cellules[i].length; j++)
-                cellules[i][j].translate(dx, dy);
+        if (donnees.getScene() == "Jeu") { // Si on est en jeu
+            donnees.getJoueur().move();
+            donnees.getJoueur().rafraichirImage();
+            int dx = -donnees.getJoueur().getDx();
+            int dy = -donnees.getJoueur().getDy();
+            //System.out.println("dx : "+dx+" _ dy : "+dy);
+            Cellule[][] cellules = donnees.getCellules();
+            for (int i=0; i < cellules.length; i++) {
+                for (int j=0; j < cellules[i].length; j++)
+                    cellules[i][j].translate(dx, dy);
+            }
+            donnees.notifyObserver(TypeMisAJour.Cellules);
+            donnees.notifyObserver(TypeMisAJour.Joueur);
+            donnees.notifyObserver(TypeMisAJour.Peindre);
+        } else {
+            donnees.notifyObserver(TypeMisAJour.Cellules);
+            donnees.notifyObserver(TypeMisAJour.Peindre);
         }
-        donnees.notifyObserver(TypeMisAJour.Cellules);
-        donnees.notifyObserver(TypeMisAJour.Joueur);
-        donnees.notifyObserver(TypeMisAJour.Peindre);
 	}
     public void charger() {
         Charger threadWorkerChargement = new Charger();

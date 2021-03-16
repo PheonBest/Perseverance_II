@@ -1,12 +1,12 @@
-package app.donnees;
+package app;
 
 import java.util.ArrayList;
 
 import app.Options;
-import app.carte.Cellule;
-import app.avatar.Robot;
-import app.utils.Observable;
-import app.utils.Observer;
+import app.Cellule;
+import app.Robot;
+import app.Observable;
+import app.Observer;
 
 import java.awt.Image;
 
@@ -41,6 +41,10 @@ public class Donnees implements Observable {
 
     public void majAvancement(int avancementChargement) {
         this.avancementChargement = avancementChargement;
+    }
+
+    public String getScene() {
+        return scene;
     }
 
     public void majScene(String scene) {

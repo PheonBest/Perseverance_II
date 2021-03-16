@@ -1,6 +1,6 @@
-package app.utils;
+package app;
 
-import app.donnees.TypeMisAJour;
+import app.TypeMisAJour;
 
 public interface Observable {
     public void addObserver(Observer obs);
