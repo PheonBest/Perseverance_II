@@ -21,7 +21,7 @@ public class Controleur {
 	public void jouer() {
         donnees.majJoueur(new Robot(donnees.getImagesJoueur(), donnees.obtenirLargeur()/2, donnees.obtenirHauteur()/2));
         donnees.majScene("Jeu");
-        donnees.notifyObserver(TypeMisAJour.Scene);
+        donnees.notifierObserveur(TypeMisAJour.Scene);
         LinkedList<Dimension> buts = new LinkedList<Dimension>();
         buts.add(new Dimension(100,100));
         buts.add(new Dimension(300,300));
@@ -40,12 +40,12 @@ public class Controleur {
                 for (int j=0; j < cellules[i].length; j++)
                     cellules[i][j].translate(dx, dy);
             }
-            donnees.notifyObserver(TypeMisAJour.Cellules);
-            donnees.notifyObserver(TypeMisAJour.Joueur);
-            donnees.notifyObserver(TypeMisAJour.Peindre);
+            donnees.notifierObserveur(TypeMisAJour.Cellules);
+            donnees.notifierObserveur(TypeMisAJour.Joueur);
+            donnees.notifierObserveur(TypeMisAJour.Peindre);
         } else {
-            donnees.notifyObserver(TypeMisAJour.Cellules);
-            donnees.notifyObserver(TypeMisAJour.Peindre);
+            donnees.notifierObserveur(TypeMisAJour.Cellules);
+            donnees.notifierObserveur(TypeMisAJour.Peindre);
         }
 	}
     public void charger() {
@@ -95,7 +95,7 @@ public class Controleur {
             // pendant que le thread s'exécute
             int avancement = (int) historique.get(historique.size()-1);
             donnees.majAvancement(avancement);
-            donnees.notifyObserver(TypeMisAJour.Avancement);
+            donnees.notifierObserveur(TypeMisAJour.Avancement);
         }
 
         @Override

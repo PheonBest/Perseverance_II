@@ -31,6 +31,9 @@ public class Donnees implements Observable {
         }
     }
 
+    // Getters et setters
+    // Getters: Renvoie une donnée (attribut de Donnees.java)
+    // Setters: Définit une donnée (attribut de Donnees.java)
     public void majAvancement(int avancementChargement) {
         this.avancementChargement = avancementChargement;
     }
@@ -63,7 +66,7 @@ public class Donnees implements Observable {
     @Override
     public void addObserver(Observer obs) {
         this.listObserver.add(obs);
-        //notifyObserver(); // Pas besoin de notifier l'observeur lorsqu'il vient d'être ajouté
+        //notifierObserveur(); // Pas besoin de notifier l'observeur lorsqu'il vient d'être ajouté
         // Car l'observeur est ajouté dès le départ
     }
 
@@ -73,25 +76,25 @@ public class Donnees implements Observable {
     }
 
     @Override
-    public void notifyObserver(TypeMisAJour type) {
+    public void notifierObserveur(TypeMisAJour type) {
         for (Observer obs: listObserver) {
             switch (type) {
                 case Cellules:
-                    obs.update(TypeMisAJour.Cellules, cellules);
+                    obs.mettreAJour(TypeMisAJour.Cellules, cellules);
                     break;
                 case Joueur:
-                    obs.update(TypeMisAJour.Joueur, joueur);
+                    obs.mettreAJour(TypeMisAJour.Joueur, joueur);
                     break;
                 case Avancement:
                     //System.out.println(avancementChargement);
-                    obs.update(TypeMisAJour.Avancement, avancementChargement);
+                    obs.mettreAJour(TypeMisAJour.Avancement, avancementChargement);
                     break;
                 case Peindre:
-                    obs.update(TypeMisAJour.Peindre, null);// Prévoit de mettre à jour le composant
+                    obs.mettreAJour(TypeMisAJour.Peindre, null);// Prévoit de mettre à jour le composant
                     // n'appelle pas la méthode paint() !
                     break;
                 case Scene:
-                    obs.update(TypeMisAJour.Scene, scene);
+                    obs.mettreAJour(TypeMisAJour.Scene, scene);
                     break;
             }
         }

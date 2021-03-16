@@ -112,7 +112,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     }
 
     @Override
-    public void update(TypeMisAJour type, Object nouveau) {
+    public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
             case Cellules:
                 if (enJeu)

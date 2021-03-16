@@ -1,3 +1,3 @@
 public interface Observer {
-	public void update(TypeMisAJour type, Object nouveau);
+	public void mettreAJour(TypeMisAJour type, Object nouveau);
 }
