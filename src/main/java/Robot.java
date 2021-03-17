@@ -2,15 +2,15 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.awt.Graphics;
+import java.awt.*;
 
 public class Robot extends Avatar {
     
-    //------------------------------------------------------------------ Attributs
+    //-------------------------------------------------------------------------------------------------- Attributs
     
     // Paramètres vitaux du robots
     private double sante;
-    private double batterie;
+    private int batterie;
     
     // Trajectoire
     /* La classe dimension est une classe qui comporte comme attribut une hauteur et une largeur,
@@ -27,7 +27,7 @@ public class Robot extends Avatar {
     private int xFictif = 0;
     private int yFictif = 0;
     
-    //------------------------------------------------------------------ Constructeur
+    //--------------------------------------------------------------------------------------------------- Constructeurs
     
     public Robot(int sante, int batterie, int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
         // Le robot est un avatar, il hérite donc de son constructeur et de ses conditions d'avatar
@@ -42,7 +42,24 @@ public class Robot extends Avatar {
     public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
         this(Options.SANTE_MAX, Options.BATTERIE_MAX, 0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
     }
-
+    //---------------------------------------------------------------------------------------------------- Setters et getters
+    
+    public int getBatterie(){
+        return batterie;
+    }
+    
+    public void setBatterie(int nivBatterie){
+        if(nivBatterie <= 0){
+            batterie = 0;
+        }
+        else if(nivBatterie >= 100){
+            batterie = 100;
+        }
+        else batterie = nivBatterie;
+    }
+    
+    //---------------------------------------------------------------------------------------------------- Méthodes
+    
     public void definirBut(LinkedList<Dimension> liste) {
         this.but = liste;
         definirDirection(but.getFirst());
@@ -84,8 +101,23 @@ public class Robot extends Avatar {
             }
         }
     }
-
-    public void dessiner(Graphics g) {
+    
+    // ----------------------------------------------------------------------------------------------- Méthodes graphiques en rapport avec le robot
+    
+    public void dessiner(Graphics g, int Xb, int Yb) {
         super.dessiner(g);
+        
+        /////////////////////////// batterie : repère relatif à (Xb,Yb)
+        g.setColor(Color.black);
+        g.fillRect(Xb,Yb,118,48);
+        g.setColor(Color.white);
+        g.fillRect(Xb+3,Yb+3,112,42);
+        g.setColor(Color.black);
+        g.fillRect(Xb+6,Yb+6,106,36);
+        g.fillRect(Xb+6,Yb+19,112,10);
+        // Jauge de batterie (r,v,b)
+        g.setColor(new Color((float)(1.0-batterie*0.01), (float)(0.0+batterie*0.01), (float)(0.0)));
+        g.fillRect(Xb+9,Yb+9,batterie,30);
+    
     }
 }
