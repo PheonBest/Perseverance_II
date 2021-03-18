@@ -34,12 +34,10 @@ public class ObtenirRessources{
                 File file = Paths.get(url.toURI()).toFile();
                 if (file != null) {
                     File[] files = file.listFiles();
-                    System.out.println(files.length);
                     if (files != null) {
                         for (File filename : files) {
                             final boolean accept = pattern.matcher(filename.toString()).matches();
                             if(accept){
-                                System.out.println(filename.toString());
                                 filenames.add(filename.toString());
                             }
                         }
@@ -59,7 +57,6 @@ public class ObtenirRessources{
                             URL resource = Thread.currentThread().getContextClassLoader().getResource(name);
                             final boolean accept = pattern.matcher(resource.toString()).matches();
                             if(accept){
-                                System.out.println(resource.toString());
                                 filenames.add(resource.toString());
                             }
                         }
@@ -83,7 +80,6 @@ public class ObtenirRessources{
                         for (File filename : files) {
                             final boolean accept = pattern.matcher(filename.toString()).matches();
                             if (accept) {
-                                //System.out.println(filename.toString());
                                 final Image img = ImageIO.read( new FileInputStream(filename));
                                 images.add(img);
                             }
@@ -110,7 +106,6 @@ public class ObtenirRessources{
                             URL resource = Thread.currentThread().getContextClassLoader().getResource(name);
                             final boolean accept = pattern.matcher(resource.toString()).matches();
                             if (accept) {
-                                System.out.println(resource.toString());
                                 images.add(ImageIO.read(Thread.currentThread().getContextClassLoader().getResourceAsStream(name)));
                             }
                         }

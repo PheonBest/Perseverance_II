@@ -8,8 +8,13 @@ public class Donnees implements Observable {
     private String scene;
     private ArrayList<Observer> listObserver = new ArrayList<Observer>();
     private Cellule[][] cellules = { {} };
+    private BoutonCercle[] boutonsCercle = {};
+    private Cellule[] boutonsType = {};
     private int largeur;
     private int hauteur;
+    private Cellule derniereCellule = null;
+    private Cellule derniereCaseType = null;
+    private BoutonCercle dernierBouton = null;
 
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
@@ -86,12 +91,17 @@ public class Donnees implements Observable {
                     obs.mettreAJour(TypeMisAJour.Joueur, joueur);
                     break;
                 case Avancement:
-                    //System.out.println(avancementChargement);
                     obs.mettreAJour(TypeMisAJour.Avancement, avancementChargement);
                     break;
                 case Peindre:
                     obs.mettreAJour(TypeMisAJour.Peindre, null);// Prévoit de mettre à jour le composant
                     // n'appelle pas la méthode paint() !
+                    break;
+                case BoutonsType:
+                    obs.mettreAJour(TypeMisAJour.BoutonsType, boutonsType);
+                    break;
+                case BoutonsCercle:
+                    obs.mettreAJour(TypeMisAJour.BoutonsCercle, boutonsCercle);
                     break;
                 case Scene:
                     obs.mettreAJour(TypeMisAJour.Scene, scene);
@@ -100,10 +110,10 @@ public class Donnees implements Observable {
         }
     }
 
-    public Cellule[][] getCellules() {
+    public Cellule[][] obtenirCellules() {
         return cellules;
     }
-    public Robot getJoueur() {
+    public Robot obtenirJoueur() {
         return joueur;
     }
     public void majJoueur(Robot joueur) {
@@ -116,5 +126,42 @@ public class Donnees implements Observable {
 
     public int obtenirLargeur() {
         return largeur;
+    }
+
+
+    public Cellule obtenirDerniereCellule() {
+        return derniereCellule;
+    }
+    public Cellule obtenirDerniereCaseType() {
+        return derniereCaseType;
+    }
+    public BoutonCercle obtenirDernierBouton() {
+        return dernierBouton;
+    }
+
+    public void majDernierBouton(BoutonCercle b) {
+        dernierBouton = b;
+    }
+    public void majDerniereCaseType(Cellule c) {
+        derniereCaseType = c;
+    }
+    public void majDerniereCellule(Cellule c) {
+        derniereCellule = c;
+    }
+
+    public Cellule[] obtenirBoutonsType() {
+        return boutonsType;
+    }
+
+    public BoutonCercle[] obtenirBoutonsCercle() {
+        return boutonsCercle;
+    }
+
+    public void majBoutonsCercle(BoutonCercle[] boutonsCercle) {
+        this.boutonsCercle = boutonsCercle;
+    }
+
+    public void majBoutonsType(Cellule[] boutonsType) {
+        this.boutonsType = boutonsType;
     }
 }

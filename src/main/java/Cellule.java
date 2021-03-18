@@ -3,19 +3,22 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.BasicStroke;
+import java.awt.geom.AffineTransform;
 
 public class Cellule extends Polygon implements Dessin {
     //////////////////////////////////////////////////////////////////// Attributs 
     
-    TypeCase type;
-    Color couleur;
+    private TypeCase type;
+    private Color couleur;
     
     //Position dans la matrice de la carte            
-    int ligne;
-    int colonne;
+    private int ligne;
+    private int colonne;
 
-    double largeur;
-    double hauteur;
+    private double largeur;
+    private double hauteur;
+    private boolean sourisDessus = false;
      
     //////////////////////////////////////////////////////////////////// Constructeurs 
     
@@ -24,7 +27,7 @@ public class Cellule extends Polygon implements Dessin {
      * stocker dans des tableaux x et y, en fonction de leurs ligne et de leur colonn
      * */
     
-    public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille){
+    public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase){
         
         //Position dans la matrice de la carte
         ligne = uneLigne;
@@ -42,9 +45,8 @@ public class Cellule extends Polygon implements Dessin {
             {largeur/4,hauteur},
             {0,hauteur/2}
         };
-        for (int i=0; i < points.length; i++) {
+        for (int i=0; i < points.length; i++)
             addPoint((int)points[i][0],(int)points[i][1]);
-        }
 
         // On place le polygone
         double xInit = -largeur/2;
@@ -58,33 +60,49 @@ public class Cellule extends Polygon implements Dessin {
         // Calcul des coordonnées
         // Pour que 2 hexagones se touches, on enlève à x un quart de la largeur d'une case
         // Donc on multiplie LARGEUR_CASE par 3/4 = 0.75
-        int xCoord = (int)(xInit + colonne*(0.75*largeur+Options.ESPACE_INTER_CASE));
-        int yCoord = (int)(yInit + compensationY + ligne*(hauteur+Options.ESPACE_INTER_CASE));
+        int xCoord = (int)(xInit + colonne*(0.75*largeur+espaceInterCase));
+        int yCoord = (int)(yInit + compensationY + ligne*(hauteur+espaceInterCase));
 
         // Déplacement du polygone
         translate(xCoord, yCoord);
 
         // Déplacement du symbole
     }
+
+    public Cellule(int uneLigne, int uneColonne){
+        this(TypeCase.VIDE, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
+    }
     
     public void dessiner(Graphics g) {
         // On dessine le polygone
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(couleur);
-        g2d.fillPolygon(this);
-    }
-
-    public Cellule(int uneLigne, int uneColonne){
-        this(TypeCase.VIDE, uneLigne, uneColonne, 1);
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        if (sourisDessus) {
+            final double[] CENTRE = {xpoints[0]+largeur/4, ypoints[0]+hauteur/2};
+            final double[] COIN_EN_HAUT_A_GAUCHE = {xpoints[0]-largeur/4, ypoints[0]};
+            final double deltaLargeur = largeur*(Options.RATIO_TAILLE_SELECTION-1)/2.;
+            final double deltaHauteur = hauteur*(Options.RATIO_TAILLE_SELECTION-1)/2.;
+            translate((int)(-COIN_EN_HAUT_A_GAUCHE[0]), (int)(-COIN_EN_HAUT_A_GAUCHE[1]));
+            AffineTransform at = g2d.getTransform();
+            // On a un décalage de quart de largeur entre le polygone initial, et le polygone aggrandi
+            at.translate(COIN_EN_HAUT_A_GAUCHE[0]-deltaLargeur*Options.RATIO_TAILLE_SELECTION/2.,COIN_EN_HAUT_A_GAUCHE[1]-deltaHauteur*Options.RATIO_TAILLE_SELECTION/2.);
+            at.scale(Options.RATIO_TAILLE_SELECTION, Options.RATIO_TAILLE_SELECTION);
+            g2d.setTransform(at);
+            g2d.setColor(couleur);
+            g2d.fillPolygon(this);
+            translate((int)(COIN_EN_HAUT_A_GAUCHE[0]), (int)(COIN_EN_HAUT_A_GAUCHE[1]));
+            /*
+            g2d = (Graphics2D) g.create();
+            g2d.setColor(Color.RED);
+            g2d.fillPolygon(this);
+            */
+        } else {
+            g2d.setColor(couleur);
+            g2d.fillPolygon(this);
+        }
     }
     
     //////////////////////////////////////////////////////////////////// Méthodes
-    
-    public boolean equals(Cellule uneCellule){
-        return (this.type==uneCellule.type 
-                && this.ligne==uneCellule.ligne 
-                && this.colonne==uneCellule.colonne);
-    }
     
     public boolean memeType(Cellule uneCellule){
         return (this.type==uneCellule.type);
@@ -125,4 +143,17 @@ public class Cellule extends Polygon implements Dessin {
         // Sinon, la case n'est pas visible
         return false;
 	}
+
+    public void majSourisDessus(boolean sourisDessus){
+        this.sourisDessus = sourisDessus;
+    }
+
+    public TypeCase obtenirType() {
+        return type;
+    }
+
+    public void majType(TypeCase unType) {
+        type = unType;
+        couleur = this.getColor();
+    }
 }
