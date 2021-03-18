@@ -9,8 +9,10 @@ public class Robot extends Avatar {
     //-------------------------------------------------------------------------------------------------- Attributs
     
     // Paramètres vitaux du robots
-    private double sante;
     private int batterie;
+    // 3 voyants : Roues, Bras Mécatro, Capteurs
+    private Voyants[] tabVoyants = new Voyants[3]; 
+    public boolean GAME_OVER = false;
     
     // Trajectoire
     /* La classe dimension est une classe qui comporte comme attribut une hauteur et une largeur,
@@ -29,18 +31,23 @@ public class Robot extends Avatar {
     
     //--------------------------------------------------------------------------------------------------- Constructeurs
     
-    public Robot(int sante, int batterie, int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
+    public Robot(int batterie, int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
         // Le robot est un avatar, il hérite donc de son constructeur et de ses conditions d'avatar
         super(animationIndex, dureeImage, image, coords, x, y, r, dx, dy, dr);
         xFictif = x;
         yFictif = y;
-        this.sante = sante;
         this.batterie = batterie;
+        this.tabVoyants[0]=new Voyants("Roues",Options.ALERTE_MIN);
+        this.tabVoyants[1]=new Voyants("Bras mécatronique",Options.ALERTE_MIN);
+        this.tabVoyants[2]=new Voyants("Capteurs",Options.ALERTE_MIN);
     }
     
     // Place un robot neuf sur la carte
     public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
-        this(Options.SANTE_MAX, Options.BATTERIE_MAX, 0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
+        this(Options.BATTERIE_MAX, 0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
+        this.tabVoyants[0]=new Voyants("Roues",Options.ALERTE_MIN);
+        this.tabVoyants[1]=new Voyants("Bras mécatronique",Options.ALERTE_MIN);
+        this.tabVoyants[2]=new Voyants("Capteurs",Options.ALERTE_MIN);
     }
     //---------------------------------------------------------------------------------------------------- Setters et getters
     
@@ -49,16 +56,39 @@ public class Robot extends Avatar {
     }
     
     public void setBatterie(int nivBatterie){
-        if(nivBatterie <= 0){
-            batterie = 0;
+        if(nivBatterie <= Options.BATTERIE_MIN){
+            batterie = Options.BATTERIE_MIN;
+            GAME_OVER = true;
         }
-        else if(nivBatterie >= 100){
-            batterie = 100;
+        else if(nivBatterie >= Options.BATTERIE_MAX){
+            batterie = Options.BATTERIE_MIN;
         }
         else batterie = nivBatterie;
     }
     
+    
     //---------------------------------------------------------------------------------------------------- Méthodes
+    
+    public void reparer(int indiceVoyant){
+        // TODO quand on aura installé la logique de prix de réparation
+    }
+    
+    public void degradation(int indiceVoyant){
+        if(indiceVoyant>=0 && indiceVoyant<tabVoyants.length){
+            int etatActuel = tabVoyants[indiceVoyant].getEtat();
+            tabVoyants[indiceVoyant].setEtat(etatActuel+1);
+        }
+        // test GameOver
+        int pannes =0;
+        for(int i=0;i<tabVoyants.length;i++){
+            if(tabVoyants[i].getEtat()==Options.ALERTE_MAX){
+                pannes += 1;
+            }
+        }
+        if(pannes>=Options.PANNES_MAX){
+            this.GAME_OVER = true;
+        }
+    }
     
     public void definirBut(LinkedList<Dimension> liste) {
         this.but = liste;
@@ -104,10 +134,17 @@ public class Robot extends Avatar {
     
     // ----------------------------------------------------------------------------------------------- Méthodes graphiques en rapport avec le robot
     
-    public void dessiner(Graphics g, int Xb, int Yb) {
+    public void paintControlPanel(Graphics g, int Xp, int Yp) {
         super.dessiner(g);
+        // Panneau de contrôle : Origine(Xp,Yp)
+        g.setColor(new Color(175,175,175));
+        g.fill3DRect(Xp,Yp,500,100,true);
+        g.setColor(Color.black);
+        g.drawString("---------------------------------- PANNEAU DE CONTRÔLE ----------------------------------",Xp+30,Yp+15);
         
-        /////////////////////////// batterie : repère relatif à (Xb,Yb)
+        //Batterie : Origine(Xb,Yb)
+        int Xb = Xp+10;
+        int Yb = Yp+40;
         g.setColor(Color.black);
         g.fillRect(Xb,Yb,118,48);
         g.setColor(Color.white);
@@ -115,9 +152,16 @@ public class Robot extends Avatar {
         g.setColor(Color.black);
         g.fillRect(Xb+6,Yb+6,106,36);
         g.fillRect(Xb+6,Yb+19,112,10);
-        // Jauge de batterie (r,v,b)
+        // Jauge de batterie de couleur ajustable
         g.setColor(new Color((float)(1.0-batterie*0.01), (float)(0.0+batterie*0.01), (float)(0.0)));
         g.fillRect(Xb+9,Yb+9,batterie,30);
-    
+        
+        // Voyants : Origine(Xv,Yv) ( centre du 1er voyant ) 
+        int Xv = Xb + 200;
+        int Yv = Yb + 24;
+        for(int i=0;i<tabVoyants.length;i++){
+           tabVoyants[i].setPositionR(Xv+i*100,Yv,25); 
+           tabVoyants[i].dessinerVoyant(g);
+        }
     }
 }
