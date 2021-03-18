@@ -14,11 +14,10 @@ public class Dessiner extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         
-        Graphics2D gg = (Graphics2D) g.create();
         for (int i=0; i < cellules.length; i++) {
             for (Cellule c: cellules[i]) {
                 if (c.estVisible(largeurEcran,hauteurEcran))
-                    c.dessiner(gg);
+                    c.dessiner(g);
             }
         }
         if (joueur != null)

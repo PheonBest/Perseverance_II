@@ -6,6 +6,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -20,7 +22,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private JPanel jeu = new Dessiner();
     private JPanel modeDeJeu = new JPanel();
     private JPanel chargement = new Chargement();
-    private JPanel editeur = new Editeur();
+    private JPanel editeur;
 
     private double largeur;
     private double hauteur;
@@ -28,19 +30,29 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private Timer timer;
 
     public Affichage(int largeur, int hauteur, Controleur controleur) {
+        
         this.controleur = controleur;
+        editeur = new Editeur(controleur);
+
+        // Gestion des évènements
         super.setFocusable(true);
         this.addKeyListener(this);
         contenu.addKeyListener(this);
         contenu.setLayout(cardLayout);
-        this.setTitle("Perseverance II");
-        this.setSize(largeur, hauteur);
-
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
                 System.exit(0);
             }
         });
+        contenu.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent ev) {
+                controleur.click(ev.getX(), ev.getY());
+            }
+        });
+
+        this.setTitle("Perseverance II");
+        this.setSize(largeur, hauteur);
+        this.setLocationRelativeTo(null);
 
         contenu.setLayout(cardLayout);
         contenu.add(modeDeJeu, "Mode de Jeu");
@@ -48,6 +60,8 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         contenu.add(chargement, "Chargement");
         contenu.add(editeur, "Editeur");
         jeu.setBackground(Color.DARK_GRAY);
+
+        
 
         this.setContentPane(contenu); // On définit le contenu de "JFrame" comme un "JPanel"
         this.setVisible(true);
@@ -62,20 +76,19 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
         
         ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), (int)(this.hauteur/20.));
-        initialiser();
     }
 
-    private void initialiser() {
+    public void initialiser() {
         //System.out.println("Initialisation");
 
         // Chargement et exécution du jeu
-        /*
-        cardLayout.show(contenu, "Chargement");
-        controleur.charger();
-        */
+        
+        // cardLayout.show(contenu, "Chargement");
+        // controleur.charger();
         
         // Exécuter l'éditeur
         cardLayout.show(contenu, "Editeur");
+        controleur.editer();
         timer = new Timer(Options.DELAI_ANIMATION, this);
         timer.start();
     }
@@ -114,6 +127,12 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
+            case BoutonsCercle:
+                ((Editeur)editeur).majBoutonsCercle((BoutonCercle[]) nouveau);
+                break;
+            case BoutonsType:
+                ((Editeur)editeur).majBoutonsType((Cellule[]) nouveau);
+                break;
             case Cellules:
                 if (enJeu)
                     ((Dessiner)jeu).majCellules((Cellule[][]) nouveau);
@@ -124,12 +143,13 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 ((Dessiner)jeu).majJoueur((Robot) nouveau);
                 break;
             case Avancement:
-                //System.out.println("A : "+(int) nouveau);
                 ((Chargement)chargement).majChargement((int) nouveau);
                 break;
             case Scene:
                 if (((String) nouveau).equals("Jeu"))
                     jouer();
+                else if (((String) nouveau).equals("Editeur de carte"))
+                    controleur.editer();
                 cardLayout.show(contenu, (String) nouveau);
                 break;
             case Peindre:
@@ -140,6 +160,5 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                     editeur.repaint();
                 break;
         }
-        
     }
 }
