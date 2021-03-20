@@ -1,15 +1,19 @@
 
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 import javax.swing.CellEditor;
 import javax.swing.SwingWorker;
+import java.awt.MouseInfo;
 
 public class Controleur {
     
@@ -21,17 +25,28 @@ public class Controleur {
     }
 
 	public void jouer() {
-        donnees.majJoueur(new Robot(donnees.getImagesJoueur(), donnees.obtenirLargeur()/2, donnees.obtenirHauteur()/2));
+        donnees.majJoueur(new Robot(donnees.getImagesJoueur(), 0, 0));
         donnees.majScene("Jeu");
         donnees.notifierObserveur(TypeMisAJour.Scene);
         LinkedList<Dimension> buts = new LinkedList<Dimension>();
-        buts.add(new Dimension(100,100));
-        buts.add(new Dimension(300,300));
+
+        buts.add(donnees.obtenirCellules()[0][0].obtenirCentre());
+        buts.add(donnees.obtenirCellules()[3][3].obtenirCentre());
         donnees.obtenirJoueur().definirBut(buts);
 	}
 
 	public void rafraichir() {
-        if (donnees.getScene() == "Jeu") { // Si on est en jeu
+        // Si on est dans l'éditeur de carte
+        // et qu'on maintient le click sur la carte (par sur le menu !)
+        // On veut continuer à dessiner
+        if (donnees.getScene().equals("Editeur de carte") && donnees.obtenirStatutSouris().obtenirX() < donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU) {
+            if (donnees.obtenirStatutSouris().obtenirClicGauche()) {
+                
+                click((int)(MouseInfo.getPointerInfo().getLocation().getX() - donnees.obtenirPositionFenetre().getX()), (int)(MouseInfo.getPointerInfo().getLocation().getY() - donnees.obtenirPositionFenetre().getY()));
+                //click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY());
+            }
+        }
+        if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
             donnees.obtenirJoueur().move();
             donnees.obtenirJoueur().rafraichirImage();
             donnees.notifierObserveur(TypeMisAJour.Joueur);
@@ -129,6 +144,7 @@ public class Controleur {
     }
 
     public void click(int x, int y) {
+        //System.out.println("Clic en "+x/donnees.obtenirZoom()+" "+y/donnees.obtenirZoom());
         boolean estModifie = false;
         //Gestion de la carte
 
@@ -136,16 +152,18 @@ public class Controleur {
         // OU
         // Si on est en jeu ou dans l'éditeur de carte, et qu'on a cliqué sur la carte
         final double COIN_GAUCHE_MENU = donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU;
+        System.out.println(donnees.obtenirCellules()[1][1].getBounds2D());
+        System.out.println((x - donnees.obtenirLargeur()/2)+" "+(y - donnees.obtenirHauteur()/2));
         if (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && x < COIN_GAUCHE_MENU)) {
             Cellule[][] cellules = donnees.obtenirCellules();
             for (int i=0; i < cellules.length; i++) {
                 for (int j=0; j < cellules[i].length; j++) {
-                    if (cellules[i][j].contains(x, y)) {
+                    if (cellules[i][j].contains((x - donnees.obtenirLargeur()/2)/donnees.obtenirZoom(), (y - donnees.obtenirHauteur()/2)/donnees.obtenirZoom())) {
                         if (donnees.obtenirDerniereCellule() == cellules[i][j]) { // On compare les pointeurs (références) des 2 objets
                             //cellules[i][j].majSourisDessus(false);
                             donnees.majDerniereCellule(null);
                         } else {
-                            System.out.println("Case "+i+" "+j);
+                            //System.out.println("Case "+i+" "+j);
                             /*
                             cellules[i][j].majSourisDessus(true);
                             if (donnees.obtenirDerniereCellule() != null)
@@ -306,5 +324,68 @@ public class Controleur {
         donnees.notifierObserveur(TypeMisAJour.BoutonsCercle);
         donnees.notifierObserveur(TypeMisAJour.BoutonsType);
         donnees.notifierObserveur(TypeMisAJour.Peindre);
+    }
+
+    public void interactionClavier(int code) {
+        switch (code) {
+            case KeyEvent.VK_UP:
+                bougerEcran(0, +1);
+                break;
+            case KeyEvent.VK_DOWN:
+                bougerEcran(0, -1);
+                break;
+            case KeyEvent.VK_LEFT:
+                bougerEcran(+1, 0);
+                break;
+            case KeyEvent.VK_RIGHT :
+                bougerEcran(-1, 0);
+                break;
+        }
+    }
+    
+    private void bougerEcran(int dx, int dy) {
+        //System.out.println("dx : "+dx+" _ dy : "+dy);
+        Cellule[][] cellules = donnees.obtenirCellules();
+        for (int i=0; i < cellules.length; i++) {
+            for (int j=0; j < cellules[i].length; j++)
+                cellules[i][j].translate((int)(dx*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()), (int)(dy*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()));
+        }
+        donnees.notifierObserveur(TypeMisAJour.Cellules);
+        donnees.notifierObserveur(TypeMisAJour.Peindre);
+    }
+
+    public void ajusterZoom(int notches, Point point) {
+        // convert target coordinates to zoomTarget coordinates
+        if (notches < 1)
+            donnees.majZoom(-donnees.obtenirZoom()*notches/Options.MULTIPLICATEUR_ZOOM);
+        else
+            donnees.majZoom(donnees.obtenirZoom()*notches*Options.MULTIPLICATEUR_ZOOM);
+        donnees.majCentreZoom(point);
+        donnees.notifierObserveur(TypeMisAJour.CentreZoom);
+        donnees.notifierObserveur(TypeMisAJour.Zoom);
+        donnees.notifierObserveur(TypeMisAJour.Peindre);
+    }
+
+    public void majStatutSouris(MouseEvent ev, boolean clic) {
+        // Si on est dans l'éditeur de carte
+        if (donnees.getScene() == "Editeur de carte") {
+            // Si on arrête de cliquer
+            if (!clic)
+                donnees.majStatutSouris(ev, clic);
+            
+                // Si on clique sur la carte (pas sur le menu)
+            else if (ev.getX() < donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU)
+                donnees.majStatutSouris(ev, clic);
+            
+            // Si on clique sur le menu (pas sur la carte)
+            else
+                click(ev.getX(),ev.getY());
+        } else if (clic)
+            click(ev.getX(),ev.getY());
+            
+    }
+
+    public void majPositionFenetre(Point location) {
+        donnees.majPositionFenetre(location);
     }
 }

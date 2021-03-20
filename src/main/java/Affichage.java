@@ -1,5 +1,6 @@
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -8,12 +9,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.awt.Point;
 
-public class Affichage extends JFrame implements Observer, ActionListener, KeyListener {
+public class Affichage extends JFrame implements Observer, ActionListener, KeyListener, MouseWheelListener {
     private Controleur controleur;
     private CardLayout cardLayout = new CardLayout();
     private boolean enJeu = false;
@@ -37,6 +40,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         // Gestion des évènements
         super.setFocusable(true);
         this.addKeyListener(this);
+        contenu.addMouseWheelListener(this);
         contenu.addKeyListener(this);
         contenu.setLayout(cardLayout);
         this.addWindowListener(new WindowAdapter() {
@@ -46,7 +50,10 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         });
         contenu.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent ev) {
-                controleur.click(ev.getX(), ev.getY());
+                controleur.majStatutSouris(ev, true);
+            }
+            public void mouseReleased(MouseEvent ev) {
+                controleur.majStatutSouris(ev, false);
             }
         });
 
@@ -66,6 +73,11 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.setContentPane(contenu); // On définit le contenu de "JFrame" comme un "JPanel"
         this.setVisible(true);
 
+        Point coinEnHautAGauche = getLocation();
+        Insets bordures = getInsets();
+        Point coinEnHautAGaucheSansBordures = new Point((int)(coinEnHautAGauche.getX()+bordures.left),(int)(coinEnHautAGauche.getY()+bordures.top));
+        controleur.majPositionFenetre(coinEnHautAGaucheSansBordures);
+
         // On définit la largeur et la hauteur du contenu du "JFrame" après l'avoir
         // affiché
         // Si on obtient sa taille avant son affichage, la dimension retournée est (0,0)
@@ -83,14 +95,16 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
         // Chargement et exécution du jeu
         
-        // cardLayout.show(contenu, "Chargement");
-        // controleur.charger();
+        cardLayout.show(contenu, "Chargement");
+        controleur.charger();
         
         // Exécuter l'éditeur
+        /*
         cardLayout.show(contenu, "Editeur");
         controleur.editer();
         timer = new Timer(Options.DELAI_ANIMATION, this);
         timer.start();
+        */
     }
 
     private void jouer() {
@@ -109,8 +123,8 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // TODO Auto-generated method stub
-
+        int code = e.getKeyCode();
+        controleur.interactionClavier(code);
     }
 
     @Override
@@ -152,6 +166,18 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                     controleur.editer();
                 cardLayout.show(contenu, (String) nouveau);
                 break;
+            case CentreZoom:
+                if (enJeu)
+                    ((Dessiner) jeu).majCentreZoom((Point) nouveau);
+                else
+                    ((Editeur) editeur).majCentreZoom((Point) nouveau);
+                break;
+            case Zoom:
+                if (enJeu)
+                    ((Dessiner) jeu).majZoom((Double) nouveau);
+                else
+                    ((Editeur) editeur).majZoom((Double) nouveau);
+                break;
             case Peindre:
                 if (enJeu)
                     jeu.repaint();  // Prévoit de mettre à jour le composant
@@ -160,5 +186,10 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                     editeur.repaint();
                 break;
         }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        controleur.ajusterZoom(e.getWheelRotation(), e.getPoint());
     }
 }

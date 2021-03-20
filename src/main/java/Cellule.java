@@ -5,6 +5,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.BasicStroke;
 import java.awt.geom.AffineTransform;
+import java.awt.Dimension;
 
 public class Cellule extends Polygon implements Dessin {
     //////////////////////////////////////////////////////////////////// Attributs 
@@ -75,9 +76,11 @@ public class Cellule extends Polygon implements Dessin {
     
     public void dessiner(Graphics g) {
         // On dessine le polygone
-        Graphics2D g2d = (Graphics2D) g.create();
+        Graphics2D g2d = (Graphics2D) g;
+        //Graphics2D g2d = (Graphics2D) g.create();
         
         if (sourisDessus) {
+            final AffineTransform ANCIENNE_TRANSFORMATION = g2d.getTransform();
             final double[] CENTRE = {xpoints[0]+largeur/4, ypoints[0]+hauteur/2};
             final double[] COIN_EN_HAUT_A_GAUCHE = {xpoints[0]-largeur/4, ypoints[0]};
             final double deltaLargeur = largeur*(Options.RATIO_TAILLE_SELECTION-1)/2.;
@@ -91,11 +94,7 @@ public class Cellule extends Polygon implements Dessin {
             g2d.setColor(couleur);
             g2d.fillPolygon(this);
             translate((int)(COIN_EN_HAUT_A_GAUCHE[0]), (int)(COIN_EN_HAUT_A_GAUCHE[1]));
-            /*
-            g2d = (Graphics2D) g.create();
-            g2d.setColor(Color.RED);
-            g2d.fillPolygon(this);
-            */
+            g2d.setTransform(ANCIENNE_TRANSFORMATION);
         } else {
             g2d.setColor(couleur);
             g2d.fillPolygon(this);
@@ -134,11 +133,11 @@ public class Cellule extends Polygon implements Dessin {
         return (new int[]{ligne,colonne});
     }
 
-	public boolean estVisible(double largeurEcran, double hauteurEcran) {
+	public boolean estVisible(double largeurEcran, double hauteurEcran, double zoom) {
 		Rectangle b = getBounds();
         // Si la case est visible à l'écran:
-        if (    (b.x + largeur > 0 && b.x - largeur < largeurEcran)
-                && (b.y + hauteur > 0 && b.y - hauteur < hauteurEcran))
+        if (    ((b.x + largeur)*zoom > 0 && (b.x - largeur)*zoom < largeurEcran)
+                && ((b.y + hauteur)*zoom > 0 && (b.y - hauteur)*zoom < hauteurEcran))
             return true;
         // Sinon, la case n'est pas visible
         return false;
@@ -155,5 +154,9 @@ public class Cellule extends Polygon implements Dessin {
     public void majType(TypeCase unType) {
         type = unType;
         couleur = this.getColor();
+    }
+
+    public Dimension obtenirCentre() {
+        return new Dimension((int)(xpoints[0]+largeur/4),(int)(ypoints[0]+largeur/2));
     }
 }

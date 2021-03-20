@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
 
 public class Donnees implements Observable {
 
@@ -15,12 +17,16 @@ public class Donnees implements Observable {
     private Cellule derniereCellule = null;
     private Cellule derniereCaseType = null;
     private BoutonCercle dernierBouton = null;
+    private double zoom = 1.;
+    private Point centreZoom;
+    private StatutSouris statutSouris = new StatutSouris();
 
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
     private ArrayList<ArrayList<Image>> images;
 
     private int avancementChargement;
+    private Point positionFenetre;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
@@ -31,8 +37,10 @@ public class Donnees implements Observable {
         */
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
         for (int i=0; i < cellules.length; i++) {
-            for (int j=0; j < cellules[i].length; j++)
+            for (int j=0; j < cellules[i].length; j++) {
                 cellules[i][j] = new Cellule(i,j);
+                cellules[i][j].translate(-largeur/2, -hauteur /2); // Décalage de l'affichage
+            }
         }
     }
 
@@ -103,6 +111,12 @@ public class Donnees implements Observable {
                 case BoutonsCercle:
                     obs.mettreAJour(TypeMisAJour.BoutonsCercle, boutonsCercle);
                     break;
+                case CentreZoom:
+                    obs.mettreAJour(TypeMisAJour.CentreZoom, centreZoom);
+                    break;
+                case Zoom:
+                    obs.mettreAJour(TypeMisAJour.Zoom, zoom);
+                    break;
                 case Scene:
                     obs.mettreAJour(TypeMisAJour.Scene, scene);
                     break;
@@ -163,5 +177,44 @@ public class Donnees implements Observable {
 
     public void majBoutonsType(Cellule[] boutonsType) {
         this.boutonsType = boutonsType;
+    }
+
+    public void majZoom(double zoom) {
+        this.zoom = zoom;
+    }
+
+    public double obtenirZoom() {
+        return zoom;
+    }
+
+    public void majCentreZoom(Point centreZoom) {
+        this.centreZoom = centreZoom;
+    }
+
+    public void majStatutSouris(MouseEvent e, boolean clic) {
+        if (clic)
+            statutSouris.majClicGauche(true);
+        else   
+            statutSouris.majClicGauche(false);
+
+        statutSouris.majX(e.getX());
+        statutSouris.majY(e.getY());
+    }
+
+    public void majStatutSouris(MouseEvent e) {
+        statutSouris.majX(e.getX());
+        statutSouris.majY(e.getY());
+    }
+
+    public StatutSouris obtenirStatutSouris() {
+        return this.statutSouris;
+    }
+
+    public void majPositionFenetre(Point location) {
+        this.positionFenetre = location;
+    }
+
+    public Point obtenirPositionFenetre() {
+        return positionFenetre;
     }
 }

@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -46,5 +47,13 @@ public class Editeur extends JPanel {
     }
     public void majBoutonsCercle(BoutonCercle[] boutonsCercle) {
         ((Menu)menu).majBoutonsCercle(boutonsCercle);
+    }
+
+    public void majZoom(double zoom) {
+        ((Dessiner)carte).majZoom(zoom);
+    }
+
+    public void majCentreZoom(Point centreZoom) {
+        ((Dessiner)carte).majCentreZoom(centreZoom);
     }
 }
