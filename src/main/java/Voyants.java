@@ -9,8 +9,8 @@ public class Voyants{
     
     // On chosit de définir 3 états : bleu, orange et rouge
     // chaque état a sa propre couleur
-    public int etat;
-    public Color couleur;
+    private int etat;
+    private Color couleur;
     
     // position DU CENTRE 
     public int x;
@@ -24,59 +24,21 @@ public class Voyants{
     // Constructeur principal
     public Voyants(String unNom, int unEtat, int xv, int yv, int rv){
         this.nom = unNom;
-        // L'état est un nombre entre 0 et 2
-        if(unEtat>=Options.ALERTE_MAX){
-            this.etat = Options.ALERTE_MAX;
-        }
-        else if(unEtat<=Options.ALERTE_MIN){
-            this.etat = Options.ALERTE_MIN;
-        }
-        else this.etat = unEtat;
-        // La couleur est définie selon l'état
-        // l'état est un niveau d'alerte : 0=ok 2=gros problème
-        switch(this.etat){
-            case 0 : 
-                this.couleur = new Color(0,200,200);
-                break;
-            case 1 : 
-                this.couleur = Color.orange;
-                break;
-            case 2 :
-                this.couleur = Color.red;
-                break;
-        }
-        this.x = xv;
-        this.y = yv;
-        this.r = rv;
+        setEtat(unEtat);
+        setPositionR(xv,yv,rv);
     }
     
-    // Constructeur de voyants "neufs" 
+    // Constructeur de voyants sans positions
     public Voyants(String unNom, int unEtat){
-         this.nom = unNom;
-        // L'état est un nombre entre 1 et 3
-        if(unEtat>=Options.ALERTE_MAX){
-            this.etat = Options.ALERTE_MAX;
-        }
-        else if(unEtat<=Options.ALERTE_MIN){
-            this.etat = Options.ALERTE_MIN;
-        }
-        else this.etat = unEtat;
-        // La couleur est définie selon l'état
-        // l'état est un niveau d'alerte : 1=ok 3=gros problème
-        switch(this.etat){
-            case 0 : 
-                this.couleur = new Color(0,200,200);
-                break;
-            case 1 : 
-                this.couleur = Color.orange;
-                break;
-            case 2 :
-                this.couleur = Color.red;
-                break;
-        }
-        this.x = 0;
-        this.y = 0;
-        this.r = 0;
+        this.nom = unNom;
+        setEtat(unEtat);
+        setPositionR(0,0,0);
+    }
+    // Constructeur de voyants sans positions ni états
+    public Voyants(String unNom){
+        this.nom = unNom;
+        setEtat(Options.ALERTE_MIN);
+        setPositionR(0,0,0);
     }
     //------------------------------------------------------------------ setters et getters
     

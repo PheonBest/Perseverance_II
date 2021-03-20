@@ -14,9 +14,12 @@ public class Options {
     
     // Paramètres du robot
     public static final int BATTERIE_MAX = 100;
-    public static final int BATTERIE_MIN = 100;
+    public static final int BATTERIE_MIN = 0;
+    public static final double DELTA_BATTERIE_PAR_KM = 10.0;
     public static final int ALERTE_MAX = 2;
     public static final int ALERTE_MIN = 0;
+    public static final int USURE_MIN = 0;
+    public static final int USURE_MAX = 100;
     public static final int PANNES_MAX = 2;
     
     // Animation robot
@@ -31,6 +34,7 @@ public class Options {
 	public static final double RAYON_BOUTON_CERCLE = 20;
 	public static final int NOMBRE_BOUTONS_TYPE_PAR_LIGNE = 4;
 
+    
 	public static final double RATIO_LARGEUR_MENU = 5.; // La largeur du menu correspond à largeurEcran/RATIO_LARGEUR_MENU
 
 	public static final Font police = new Font("Courier", Font.BOLD, 24);

@@ -10,8 +10,14 @@ public class Robot extends Avatar {
     
     // Paramètres vitaux du robots
     private int batterie;
-    // 3 voyants : Roues, Bras Mécatro, Capteurs
+    // 3 voyants principaux: Jambes, Bras Mécatro, Capteurs
     private Voyants[] tabVoyants = new Voyants[3]; 
+    // Plusieurs éléments désignés par ces voyants
+    private ComposantRobot[] jambes = new ComposantRobot[2];
+    private ComposantRobot[] bras = new ComposantRobot[2];
+    private ComposantRobot[] capteurs = new ComposantRobot[3];
+    private double kmTot;
+    private double comptKm;
     public boolean GAME_OVER = false;
     
     // Trajectoire
@@ -31,49 +37,109 @@ public class Robot extends Avatar {
     
     //--------------------------------------------------------------------------------------------------- Constructeurs
     
-    public Robot(int batterie, int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
+    // Constructeur complet 
+    public Robot(int nivBatterie, int listeEtats[], int listeUsures[],int nbKmParcourus, int compteurKm , int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
         // Le robot est un avatar, il hérite donc de son constructeur et de ses conditions d'avatar
         super(animationIndex, dureeImage, image, coords, x, y, r, dx, dy, dr);
         xFictif = x;
         yFictif = y;
-        this.batterie = batterie;
-        this.tabVoyants[0]=new Voyants("Roues",Options.ALERTE_MIN);
-        this.tabVoyants[1]=new Voyants("Bras mécatronique",Options.ALERTE_MIN);
-        this.tabVoyants[2]=new Voyants("Capteurs",Options.ALERTE_MIN);
+        this.batterie = nivBatterie;
+        this.kmTot = nbKmParcourus;
+        this.comptKm = compteurKm;
+        
+        tabVoyants[0] = new Voyants("Jambes mécatroniques");
+        tabVoyants[1] = new Voyants("Bras mécatroniques");
+        tabVoyants[2] = new Voyants("Capteurs");
+        
+        
+        for(int i=0; i<(jambes.length + bras.length + capteurs.length); i++){
+            if(i<jambes.length){
+                this.jambes[i]= new ComposantRobot("Jambes mécatronique"+i, listeEtats[i],listeUsures[i]);
+            }else if(i>=jambes.length && i<bras.length){
+                this.bras[i-jambes.length]= new ComposantRobot("Bras mécatronique"+(i-jambes.length), listeEtats[i-jambes.length],listeUsures[i-jambes.length]);
+            }else this.capteurs[i-jambes.length-bras.length]= new ComposantRobot("Bras mécatronique"+(i-jambes.length-bras.length) ,listeEtats[i-jambes.length-bras.length],listeUsures[i-jambes.length-bras.length]);
+        }
+        
     }
     
-    // Place un robot neuf sur la carte
+    // Constructeur "Robot neuf"
     public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
-        this(Options.BATTERIE_MAX, 0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
-        this.tabVoyants[0]=new Voyants("Roues",Options.ALERTE_MIN);
-        this.tabVoyants[1]=new Voyants("Bras mécatronique",Options.ALERTE_MIN);
-        this.tabVoyants[2]=new Voyants("Capteurs",Options.ALERTE_MIN);
+        this(Options.BATTERIE_MAX, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
     }
     //---------------------------------------------------------------------------------------------------- Setters et getters
     
     public int getBatterie(){
         return batterie;
     }
-    
+     public int getEtatVoyanti(int indice){ // indice varie entre 0 et 2
+        if(indice>=0 && indice<=2){
+            return tabVoyants[indice].getEtat();
+        }
+        else{
+            System.out.println("Erreur : les indices des voyants doivent être compris en 0 et 2");
+            return 0;
+        }
+    }
+    public double getKmParcourus(){
+        return this.kmTot;
+    }
+   
     public void setBatterie(int nivBatterie){
         if(nivBatterie <= Options.BATTERIE_MIN){
             batterie = Options.BATTERIE_MIN;
             GAME_OVER = true;
         }
         else if(nivBatterie >= Options.BATTERIE_MAX){
-            batterie = Options.BATTERIE_MIN;
+            batterie = Options.BATTERIE_MAX;
         }
         else batterie = nivBatterie;
     }
+    public void setEtatVoyanti(int indice, int nivAlerte){
+        if(indice>=0 && indice<=2){
+            tabVoyants[indice].setEtat(nivAlerte);
+        }
+        else System.out.println("Erreur : les indices des voyants doivent être compris en 0 et 2");
+    }
+    public void setCompteurkm(int nb){
+        if(nb>=0){
+            this.comptKm = nb;
+        }else this.comptKm=0;
+    }
     
     
-    //---------------------------------------------------------------------------------------------------- Méthodes
+    //---------------------------------------------------------------------------------------------------- Méthodes de fonctionnalités du robot
+    public void actualiseTabV(){
+        int sEtatJambes = (Options.ALERTE_MAX-Options.ALERTE_MIN)*jambes.length;
+        int sEtatBras = (Options.ALERTE_MAX-Options.ALERTE_MIN)*bras.length;
+        int sEtatCapteurs = (Options.ALERTE_MAX-Options.ALERTE_MIN)*capteurs.length;
+        int s=0;
+        for(int i=0; i<jambes.length; i++){
+            s += jambes[i].voyant.getEtat();
+        }
+        // TODO POUR CE VOYANT ET POUR LES AUTRES
+        
+        
+    }
     
+    public void recharger(){
+        // TODO 
+    }
     public void reparer(int indiceVoyant){
         // TODO quand on aura installé la logique de prix de réparation
     }
+    public void actualiseCptKm(Dimension but){
+        comptKm += Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight());
+        kmTot += comptKm;
+        
+        fatigue();
+        
+    }
     
-    public void degradation(int indiceVoyant){
+    public void fatigue(){
+        batterie = Options.BATTERIE_MAX - (int)(comptKm/Options.DELTA_BATTERIE_PAR_KM);
+        //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
+    }
+    public void pbDeclare(int indiceVoyant){
         if(indiceVoyant>=0 && indiceVoyant<tabVoyants.length){
             int etatActuel = tabVoyants[indiceVoyant].getEtat();
             tabVoyants[indiceVoyant].setEtat(etatActuel+1);
@@ -88,7 +154,19 @@ public class Robot extends Avatar {
         if(pannes>=Options.PANNES_MAX){
             this.GAME_OVER = true;
         }
-    }
+    }///////////////////////////////////////////////////   REPRENDRE ICI
+    /*public boolean pbAleatoire(){
+        boolean pb = false;
+        if(kmTot>=1000){
+            int chance = (int)(Math.random()*100.0) + 1;
+            if(chance<= 5
+            
+            // AJOUTER CAS EN FONCTION DU TYPE DE LA CASE ACTUELLE
+        }
+        return pb;
+    }*/
+    
+    //---------------------------------------------------------------------------------------------------- Méthodes pour les déplacments du robot
     
     public void definirBut(LinkedList<Dimension> liste) {
         this.but = liste;
@@ -104,6 +182,16 @@ public class Robot extends Avatar {
         dy = (int) (Math.sin(angle)*10);
         animationIndex = 2; // Image qui montre le robot marcher 
     }
+    
+    @Override
+    public void move(){
+		if(!movable){
+			System.out.println("Le joueur ne peut pas être déplacé");
+            return;
+        }
+		
+		updateCoords();
+	}
 
     @Override
     public void updateCoords() {
