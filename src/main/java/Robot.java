@@ -11,7 +11,7 @@ public class Robot extends Avatar {
     // Paramètres vitaux du robots
     private int batterie;
     // 3 voyants principaux: Jambes, Bras Mécatro, Capteurs
-    private Voyants[] tabVoyants = new Voyants[3]; 
+    private Voyants[] voyantsPrincipaux = new Voyants[3]; 
     // Plusieurs éléments désignés par ces voyants
     private ComposantRobot[] jambes = new ComposantRobot[2];
     private ComposantRobot[] bras = new ComposantRobot[2];
@@ -47,9 +47,9 @@ public class Robot extends Avatar {
         this.kmTot = nbKmParcourus;
         this.comptKm = compteurKm;
         
-        tabVoyants[0] = new Voyants("Jambes mécatroniques");
-        tabVoyants[1] = new Voyants("Bras mécatroniques");
-        tabVoyants[2] = new Voyants("Capteurs");
+        voyantsPrincipaux[0] = new Voyants("Jambes mécatroniques");
+        voyantsPrincipaux[1] = new Voyants("Bras mécatroniques");
+        voyantsPrincipaux[2] = new Voyants("Capteurs");
         
         
         for(int i=0; i<(jambes.length + bras.length + capteurs.length); i++){
@@ -73,7 +73,7 @@ public class Robot extends Avatar {
     }
      public int getEtatVoyanti(int indice){ // indice varie entre 0 et 2
         if(indice>=0 && indice<=2){
-            return tabVoyants[indice].getEtat();
+            return voyantsPrincipaux[indice].getEtat();
         }
         else{
             System.out.println("Erreur : les indices des voyants doivent être compris en 0 et 2");
@@ -96,7 +96,7 @@ public class Robot extends Avatar {
     }
     public void setEtatVoyanti(int indice, int nivAlerte){
         if(indice>=0 && indice<=2){
-            tabVoyants[indice].setEtat(nivAlerte);
+            voyantsPrincipaux[indice].setEtat(nivAlerte);
         }
         else System.out.println("Erreur : les indices des voyants doivent être compris en 0 et 2");
     }
@@ -108,16 +108,36 @@ public class Robot extends Avatar {
     
     
     //---------------------------------------------------------------------------------------------------- Méthodes de fonctionnalités du robot
-    public void actualiseTabV(){
-        int sEtatJambes = (Options.ALERTE_MAX-Options.ALERTE_MIN)*jambes.length;
-        int sEtatBras = (Options.ALERTE_MAX-Options.ALERTE_MIN)*bras.length;
-        int sEtatCapteurs = (Options.ALERTE_MAX-Options.ALERTE_MIN)*capteurs.length;
-        int s=0;
-        for(int i=0; i<jambes.length; i++){
-            s += jambes[i].voyant.getEtat();
-        }
-        // TODO POUR CE VOYANT ET POUR LES AUTRES
+    // Actualise les voyants principaux
+    public void actualiseVP(){
+        // On calcul la somme des états possible pour un liste de composants de même types et la somme réelle des états dans une même liste
+        int sEtatJambes = (Options.ALERTE_MAX-Options.ALERTE_MIN+1)*jambes.length;
+        int sEtatBras = (Options.ALERTE_MAX-Options.ALERTE_MIN+1)*bras.length;
+        int sEtatCapteurs = (Options.ALERTE_MAX-Options.ALERTE_MIN+1)*capteurs.length;
+        int sj=0;
+        int sb=0;
+        int sc=0;
+        for(int i=0; i<jambes.length; i++){ sj += jambes[i].voyant.getEtat();}
+        for(int i=0; i<bras.length; i++){sb += bras[i].voyant.getEtat();}
+        for(int i=0; i<capteurs.length; i++){sc += capteurs[i].voyant.getEtat();}
         
+        // On définit le 1/3 de la somme des états d'une liste de composants
+        double rj = (sEtatJambes/((double)(Options.ALERTE_MAX-Options.ALERTE_MIN+1)));
+        double rb = (sEtatBras/((double)(Options.ALERTE_MAX-Options.ALERTE_MIN+1)));
+        double rc = (sEtatCapteurs/((double)(Options.ALERTE_MAX-Options.ALERTE_MIN+1)));
+        
+        // On fait le ratio entre la somme des états actuels et la somme des états possibles pour que l'état du voyant principal correspondant soit représentatif de la réalité
+        if(sj>=0 && sj<=rj) this.voyantsPrincipaux[0].setEtat(Options.ALERTE_MIN);
+        if(sj>rj && sj<=2*rj) this.voyantsPrincipaux[0].setEtat(Options.ALERTE_MOY);
+        if(sj>2*rj && sj<= sEtatJambes) this.voyantsPrincipaux[0].setEtat(Options.ALERTE_MAX);
+        
+        if(sb>=0 && sb<=rb) this.voyantsPrincipaux[1].setEtat(Options.ALERTE_MIN);
+        if(sb>rb && sb<=2*rb) this.voyantsPrincipaux[1].setEtat(Options.ALERTE_MOY);
+        if(sb>2*rb && sb<= sEtatBras) this.voyantsPrincipaux[1].setEtat(Options.ALERTE_MAX);
+        
+        if(sc>=0 && sc<=rc) this.voyantsPrincipaux[2].setEtat(Options.ALERTE_MIN);
+        if(sc>rc && sc<=2*rc) this.voyantsPrincipaux[2].setEtat(Options.ALERTE_MOY);
+        if(sc>2*rc && sc<= sEtatCapteurs) this.voyantsPrincipaux[2].setEtat(Options.ALERTE_MAX);
         
     }
     
@@ -130,33 +150,15 @@ public class Robot extends Avatar {
     public void actualiseCptKm(Dimension but){
         comptKm += Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight());
         kmTot += comptKm;
-        
-        fatigue();
-        
     }
     
     public void fatigue(){
         batterie = Options.BATTERIE_MAX - (int)(comptKm/Options.DELTA_BATTERIE_PAR_KM);
         //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
     }
-    public void pbDeclare(int indiceVoyant){
-        if(indiceVoyant>=0 && indiceVoyant<tabVoyants.length){
-            int etatActuel = tabVoyants[indiceVoyant].getEtat();
-            tabVoyants[indiceVoyant].setEtat(etatActuel+1);
-        }
-        // test GameOver
-        int pannes =0;
-        for(int i=0;i<tabVoyants.length;i++){
-            if(tabVoyants[i].getEtat()==Options.ALERTE_MAX){
-                pannes += 1;
-            }
-        }
-        if(pannes>=Options.PANNES_MAX){
-            this.GAME_OVER = true;
-        }
-    }///////////////////////////////////////////////////   REPRENDRE ICI
-    /*public boolean pbAleatoire(){
-        boolean pb = false;
+    
+    ///////////////////////////////////////////////////   REPRENDRE ICI
+    /*public void usureJambe(){
         if(kmTot>=1000){
             int chance = (int)(Math.random()*100.0) + 1;
             if(chance<= 5
@@ -247,9 +249,9 @@ public class Robot extends Avatar {
         // Voyants : Origine(Xv,Yv) ( centre du 1er voyant ) 
         int Xv = Xb + 200;
         int Yv = Yb + 24;
-        for(int i=0;i<tabVoyants.length;i++){
-           tabVoyants[i].setPositionR(Xv+i*100,Yv,25); 
-           tabVoyants[i].dessinerVoyant(g);
+        for(int i=0;i<voyantsPrincipaux.length;i++){
+           voyantsPrincipaux[i].setPositionR(Xv+i*100,Yv,25); 
+           voyantsPrincipaux[i].dessinerVoyant(g);
         }
     }
 }

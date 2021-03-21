@@ -17,6 +17,7 @@ public class Options {
     public static final int BATTERIE_MIN = 0;
     public static final double DELTA_BATTERIE_PAR_KM = 10.0;
     public static final int ALERTE_MAX = 2;
+    public static final int ALERTE_MOY = 1;
     public static final int ALERTE_MIN = 0;
     public static final int USURE_MIN = 0;
     public static final int USURE_MAX = 100;
