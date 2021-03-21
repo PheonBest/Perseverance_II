@@ -51,4 +51,6 @@ public class Options {
 											  
     public static final int INCREMENT_DE_DEPLACEMENT = 15; // Ajout de l'incrément à chaque appui sur une touche de déplacement (dans l'éditeur de carte)
     public static final double MULTIPLICATEUR_ZOOM = 1.1;
+
+    public static final String NOM_DOSSIER_SYMBOLE = "symboles";
 }

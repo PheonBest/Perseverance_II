@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -24,6 +24,8 @@ public class Donnees implements Observable {
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
     private ArrayList<ArrayList<Image>> images;
+    //Images des symboles
+    private HashMap<String, Image> imagesSymboles;
 
     private int avancementChargement;
     private Point positionFenetre;
@@ -216,5 +218,13 @@ public class Donnees implements Observable {
 
     public Point obtenirPositionFenetre() {
         return positionFenetre;
+    }
+
+    public void majImagesSymboles(HashMap<String, Image> imagesSymboles) {
+        this.imagesSymboles = imagesSymboles;
+    }
+
+    public HashMap<String, Image> getImagesSymboles() {
+        return imagesSymboles;
     }
 }

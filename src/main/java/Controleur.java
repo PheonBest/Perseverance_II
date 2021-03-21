@@ -4,12 +4,15 @@ import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.swing.CellEditor;
 import javax.swing.SwingWorker;
@@ -71,6 +74,22 @@ public class Controleur {
         }
 	}
     public void charger() {
+
+        // Chargement des images des symboles (rapide)
+        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_SYMBOLE+"\\b.*\\.(?:jpg|gif|png)");
+
+        try {
+            HashMap<String, Image> imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
+            donnees.majImagesSymboles(imagesSymboles);
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+        
+        for (String i : donnees.getImagesSymboles().keySet())
+            System.out.println("Nom de l'image : " + i + "\nimage: " + donnees.getImagesSymboles().get(i)+"\n");
+
+        // Chargement des images du joueur
+        ArrayList<ArrayList<Image>> images = new ArrayList<ArrayList<Image>>(4);
         Charger threadWorkerChargement = new Charger();
         threadWorkerChargement.execute();
     }
@@ -80,7 +99,6 @@ public class Controleur {
         @Override
         protected ArrayList<ArrayList<Image>> doInBackground() throws Exception {
             // Chargement des images du joueur
-            ArrayList<Collection<String>> fileNames = new ArrayList<Collection<String> >(4); 
             ArrayList<ArrayList<Image>> images = new ArrayList<ArrayList<Image>>(4);
 
             Pattern pattern;
