@@ -94,7 +94,6 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         //System.out.println("Initialisation");
 
         // Chargement et exécution du jeu
-        
         cardLayout.show(contenu, "Chargement");
         controleur.charger();
         
