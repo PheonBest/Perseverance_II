@@ -66,20 +66,13 @@ public class Robot extends Avatar {
     public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
         this(Options.BATTERIE_MAX, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
     }
+    
     //---------------------------------------------------------------------------------------------------- Setters et getters
     
     public int getBatterie(){
         return batterie;
     }
-     public int getEtatVoyanti(int indice){ // indice varie entre 0 et 2
-        if(indice>=0 && indice<=2){
-            return voyantsPrincipaux[indice].getEtat();
-        }
-        else{
-            System.out.println("Erreur : les indices des voyants doivent être compris en 0 et 2");
-            return 0;
-        }
-    }
+    
     public double getKmParcourus(){
         return this.kmTot;
     }
@@ -94,20 +87,20 @@ public class Robot extends Avatar {
         }
         else batterie = nivBatterie;
     }
-    public void setEtatVoyanti(int indice, int nivAlerte){
-        if(indice>=0 && indice<=2){
-            voyantsPrincipaux[indice].setEtat(nivAlerte);
-        }
-        else System.out.println("Erreur : les indices des voyants doivent être compris en 0 et 2");
-    }
+    
     public void setCompteurkm(int nb){
         if(nb>=0){
             this.comptKm = nb;
         }else this.comptKm=0;
     }
     
+    public void resetCompteurkm(){
+        this.comptKm=0;
+    }
+    
     
     //---------------------------------------------------------------------------------------------------- Méthodes de fonctionnalités du robot
+    
     // Actualise les voyants principaux
     public void actualiseVP(){
         // On calcul la somme des états possible pour un liste de composants de même types et la somme réelle des états dans une même liste
@@ -140,33 +133,41 @@ public class Robot extends Avatar {
         if(sc>2*rc && sc<= sEtatCapteurs) this.voyantsPrincipaux[2].setEtat(Options.ALERTE_MAX);
         
     }
+
+    public void actualiseBatterie(){
+        batterie = Options.BATTERIE_MAX - (int)(comptKm*Options.CONSO_BATTERIE_PAR_KM);
+        //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
+    }
     
-    public void recharger(){
-        // TODO 
-    }
-    public void reparer(int indiceVoyant){
-        // TODO quand on aura installé la logique de prix de réparation
-    }
     public void actualiseCptKm(Dimension but){
         comptKm += Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight());
         kmTot += comptKm;
     }
     
-    public void fatigue(){
-        batterie = Options.BATTERIE_MAX - (int)(comptKm/Options.DELTA_BATTERIE_PAR_KM);
-        //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
+    public void rechargerBat(){
+        setBatterie(Options.BATTERIE_MAX);
     }
     
-    ///////////////////////////////////////////////////   REPRENDRE ICI
-    /*public void usureJambe(){
-        if(kmTot>=1000){
-            int chance = (int)(Math.random()*100.0) + 1;
-            if(chance<= 5
-            
-            // AJOUTER CAS EN FONCTION DU TYPE DE LA CASE ACTUELLE
+    public void usureJambes(double nbKm){
+        // définition du tiers d'usure pour adapter les voyants des composants à leur usure en fonction d'un facteur chance
+        double r3u = (Options.USURE_MAX-Options.USURE_MIN)/3.0;
+        int chance;
+        // à partir d'une certaine usure, les jambes risquent de disfonctionner ( indépendamment entre elles)
+        for(int i=0; i<jambes.length; i++){
+            jambes[i].setUsure(jambes[i].getUsure() + (int)(nbKm*Options.USURE_PAR_KM));
+            chance = (int)(Math.random()*100 + 1);
+        
+            if (jambes[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION) jambes[i].degraderC();
         }
-        return pb;
-    }*/
+    }
+    
+    public void usureBras(double nbKm){
+         // TODO 
+    }
+    public void usureCapteurs(double nbKm){
+         // TODO 
+    }
+    
     
     //---------------------------------------------------------------------------------------------------- Méthodes pour les déplacments du robot
     
@@ -185,16 +186,18 @@ public class Robot extends Avatar {
         animationIndex = 2; // Image qui montre le robot marcher 
     }
     
+    // Cette méthode permet le déplacement du robot si il en a le droit, et actualise les composants en rapport avec le déplacement.
     @Override
     public void move(){
 		if(!movable){
 			System.out.println("Le joueur ne peut pas être déplacé");
             return;
         }
-		
 		updateCoords();
+        actualiseBatterie();
 	}
 
+    // Cette méthode est utilisée dans move(), elle actualise les coordonées, les km parcourus et l'usure des jambes
     @Override
     public void updateCoords() {
 
@@ -209,6 +212,8 @@ public class Robot extends Avatar {
             if (Math.abs(yFictif - d.getHeight()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
                 dy = (int) d.getHeight() - yFictif;
             if (dx == 0 && dy == 0) {
+                actualiseCptKm(d);
+                usureJambes(comptKm);
                 but.removeFirst();
                 if (but.isEmpty()) // Si il ne reste plus de cases à parcourir, le robot est arrivé à la case demandée
                     animationIndex = 0; // On passe l'animation du joueur en mode "pause" (Idle)

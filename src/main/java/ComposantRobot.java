@@ -43,6 +43,7 @@ public class ComposantRobot{
     }
     
     //------------------------------------------------------------------ Autres méthodes
+    
     public void degraderC(){
         this.voyant.setEtat(this.voyant.getEtat()+1);
     }
