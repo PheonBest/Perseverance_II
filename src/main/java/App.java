@@ -42,8 +42,20 @@ public class App
 		CSV print = new CSV(dataLines);
 		try {print.givenDataArray_whenConvertToCSV_thenOutputCreated();
 			}catch(Exception e){e.printStackTrace();}*/
-		String [][] carte = {{"Terre", "Sable", "Pierre"}, {"Sable","Eau", "Sable"}, {"Terre", "Eau","Sable"}};
+		String [][] carte = {{"Terre;coucou", "Sable;null", "Pierre;null"}, {"Sable;vent","Eau;null", "Sable;bacterie"}, {"Terre;null", "Eau;null","Sable;null"}};
 		CSV c1 = new CSV(carte);
+		
+		String videtexture = "type;symbole";
+		String [] ds = videtexture.split(";");
+		System.out.println(ds[0]+"  "+ds[1]);
+		
+		String [][]records = c1.lecture();
+		for(int i=0;i<records.length;i++){
+			for(int j=0;j<records[i].length;j++){
+				System.out.print(" "+records[i][j]);
+			}
+			System.out.println();
+		}
     }
     
 }

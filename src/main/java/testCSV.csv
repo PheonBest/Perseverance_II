@@ -1,3 +1,3 @@
-Terre,Sable,Pierre
-Sable,Eau,Sable
-Terre,Eau,Sable
+Terre;null,Sable;null,Pierre;null
+Sable;vent,Eau;null,Sable;bacterie
+Terre;null,Eau;null,Sable;null

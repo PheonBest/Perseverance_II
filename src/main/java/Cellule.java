@@ -25,7 +25,7 @@ public class Cellule extends Polygon implements Dessin {
     
     /* Constructeur complet
      * On va calculer les coordonées de chacun des points du polygône et les 
-     * stocker dans des tableaux x et y, en fonction de leurs ligne et de leur colonn
+     * stocker dans des tableaux x et y, en fonction de leurs ligne et de leur colonne
      * */
     
     public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase){
