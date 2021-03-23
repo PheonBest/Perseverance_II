@@ -35,12 +35,14 @@ public class App
         
         
         //test
-		List<String[]> dataLines = new ArrayList<>();
-		dataLines.add(new String[]{ "John", "Doe", "38", "Comment Data\nAnother line of comment data" });
-		dataLines.add(new String[]{ "Jane", "Doe, Jr.", "19", "She said \"I'm being quoted\"" });
+		/*List<String[]> dataLines = new ArrayList<>();
+		dataLines.add(new String[]{ "Terre", "Sable", "Eau","Terre" });
+		dataLines.add(new String[]{ "Sable", "Terre", "Eau", "Pierre" });
 		CSV print = new CSV(dataLines);
 		try {print.givenDataArray_whenConvertToCSV_thenOutputCreated();
-			}catch(Exception e){e.printStackTrace();}
+			}catch(Exception e){e.printStackTrace();}*/
+		String [][] carte = {{"Terre", "Sable", "Pierre"}, {"Sable","Eau", "Sable"}, {"Terre", "Eau","Sable"}};
+		CSV c1 = new CSV(carte);
     }
     
 }
