@@ -18,7 +18,6 @@ public class Robot extends Avatar {
     private ComposantRobot[] capteurs = new ComposantRobot[3];
     private double kmTot;
     private double comptKm;
-    public boolean GAME_OVER = false;
     
     // Trajectoire
     /* La classe dimension est une classe qui comporte comme attribut une hauteur et une largeur,
@@ -47,19 +46,19 @@ public class Robot extends Avatar {
         this.kmTot = nbKmParcourus;
         this.comptKm = compteurKm;
         
-        voyantsPrincipaux[0] = new Voyants("Jambes mécatroniques");
-        voyantsPrincipaux[1] = new Voyants("Bras mécatroniques");
+        // Construction des composants - listeEtats et listeUsures doivent être de listes de 7 int
+        this.jambes[0] = new ComposantRobot("Jambe droite",listeEtats[0],listeUsures[0]);
+        this.jambes[1] = new ComposantRobot("Jambe gauche",listeEtats[1],listeUsures[1]);
+        this.bras[0] = new ComposantRobot("Bras droit",listeEtats[2],listeUsures[2]);
+        this.bras[1] = new ComposantRobot("Bras gauche",listeEtats[3],listeUsures[3]);
+        this.capteurs[0] = new ComposantRobot("Température du microprocesseur",listeEtats[4],listeUsures[4]);
+        this.capteurs[1] = new ComposantRobot("Capteurs visuels",listeEtats[5],listeUsures[5]);
+        this.capteurs[2] = new ComposantRobot("Capteurs de pression",listeEtats[6],listeUsures[6]);
+        
+        voyantsPrincipaux[0] = new Voyants("Jambes");
+        voyantsPrincipaux[1] = new Voyants("Bras");
         voyantsPrincipaux[2] = new Voyants("Capteurs");
-        
-        
-        for(int i=0; i<(jambes.length + bras.length + capteurs.length); i++){
-            if(i<jambes.length){
-                this.jambes[i]= new ComposantRobot("Jambes mécatronique"+i, listeEtats[i],listeUsures[i]);
-            }else if(i>=jambes.length && i<bras.length){
-                this.bras[i-jambes.length]= new ComposantRobot("Bras mécatronique"+(i-jambes.length), listeEtats[i-jambes.length],listeUsures[i-jambes.length]);
-            }else this.capteurs[i-jambes.length-bras.length]= new ComposantRobot("Bras mécatronique"+(i-jambes.length-bras.length) ,listeEtats[i-jambes.length-bras.length],listeUsures[i-jambes.length-bras.length]);
-        }
-        
+        actualiseVP();
     }
     
     // Constructeur "Robot neuf"
@@ -80,7 +79,6 @@ public class Robot extends Avatar {
     public void setBatterie(int nivBatterie){
         if(nivBatterie <= Options.BATTERIE_MIN){
             batterie = Options.BATTERIE_MIN;
-            GAME_OVER = true;
         }
         else if(nivBatterie >= Options.BATTERIE_MAX){
             batterie = Options.BATTERIE_MAX;
@@ -168,6 +166,41 @@ public class Robot extends Avatar {
          // TODO 
     }
     
+    public boolean isDead(){
+        boolean GAME_OVER = false;
+        int nbVrouges;
+        
+        // GAME OVER si la batterie tombe à 0
+        if(getBatterie()== Options.BATTERIE_MIN) GAME_OVER = true;
+        
+        // GAME OVER si 2 des voyants principaux deviennent rouges
+        nbVrouges =0;
+        for( int i=0; i<voyantsPrincipaux.length; i++){
+            if(voyantsPrincipaux[i].getEtat()==Options.ALERTE_MAX) nbVrouges+=1;
+        }
+        if(nbVrouges >= Options.PANNES_MAX)  GAME_OVER = true;
+        
+        // GAME OVER si 2 composants même type sont rouges
+        nbVrouges = 0;
+        for( int i=0; i<jambes.length; i++){
+            if(jambes[i].voyant.getEtat() == Options.ALERTE_MAX) nbVrouges+=1;
+        }
+        if(nbVrouges >= Options.PANNES_MAX)  GAME_OVER = true;
+        
+        nbVrouges =0;
+        for( int i=0; i<bras.length; i++){
+            if(bras[i].voyant.getEtat() == Options.ALERTE_MAX) nbVrouges+=1;
+        }
+        if(nbVrouges >= Options.PANNES_MAX)  GAME_OVER = true;
+        
+        nbVrouges =0;
+        for( int i=0; i<jambes.length; i++){
+            if(jambes[i].voyant.getEtat() == Options.ALERTE_MAX) nbVrouges+=1;
+        }
+        if(nbVrouges >= Options.PANNES_MAX)  GAME_OVER = true;
+        
+        return GAME_OVER;
+    }
     
     //---------------------------------------------------------------------------------------------------- Méthodes pour les déplacments du robot
     
@@ -194,7 +227,6 @@ public class Robot extends Avatar {
             return;
         }
 		updateCoords();
-        actualiseBatterie();
 	}
 
     // Cette méthode est utilisée dans move(), elle actualise les coordonées, les km parcourus et l'usure des jambes
@@ -214,7 +246,10 @@ public class Robot extends Avatar {
             if (dx == 0 && dy == 0) {
                 actualiseCptKm(d);
                 usureJambes(comptKm);
+                actualiseBatterie();
+                actualiseVP();
                 but.removeFirst();
+                
                 if (but.isEmpty()) // Si il ne reste plus de cases à parcourir, le robot est arrivé à la case demandée
                     animationIndex = 0; // On passe l'animation du joueur en mode "pause" (Idle)
                 else {
@@ -228,6 +263,8 @@ public class Robot extends Avatar {
     }
     
     // ----------------------------------------------------------------------------------------------- Méthodes graphiques en rapport avec le robot
+    // Ces méthodes seront à afficher dans un jPanel
+    
     
     public void paintControlPanel(Graphics g, int Xp, int Yp) {
         super.dessiner(g);
@@ -259,4 +296,9 @@ public class Robot extends Avatar {
            voyantsPrincipaux[i].dessinerVoyant(g);
         }
     }
+    
+    public void paintFullContropPanel(Graphics g, int Xp, int Yp){
+            
+        }
+        
 }
