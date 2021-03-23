@@ -4,5 +4,7 @@ public enum TypeMisAJour {
     Peindre,
     Joueur,
     Avancement,
-    Scene
+    Scene,
+    BoutonsType,
+    BoutonsCercle, Zoom, CentreZoom
 }

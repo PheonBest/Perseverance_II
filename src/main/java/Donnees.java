@@ -1,6 +1,8 @@
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
 
 public class Donnees implements Observable {
 
@@ -8,14 +10,25 @@ public class Donnees implements Observable {
     private String scene;
     private ArrayList<Observer> listObserver = new ArrayList<Observer>();
     private Cellule[][] cellules = { {} };
+    private BoutonCercle[] boutonsCercle = {};
+    private Cellule[] boutonsType = {};
     private int largeur;
     private int hauteur;
+    private Cellule derniereCellule = null;
+    private Cellule derniereCaseType = null;
+    private BoutonCercle dernierBouton = null;
+    private double zoom = 1.;
+    private Point centreZoom;
+    private StatutSouris statutSouris = new StatutSouris();
 
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
     private ArrayList<ArrayList<Image>> images;
+    //Images des symboles
+    private HashMap<String, Image> imagesSymboles;
 
     private int avancementChargement;
+    private Point positionFenetre;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
@@ -26,8 +39,10 @@ public class Donnees implements Observable {
         */
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
         for (int i=0; i < cellules.length; i++) {
-            for (int j=0; j < cellules[i].length; j++)
+            for (int j=0; j < cellules[i].length; j++) {
                 cellules[i][j] = new Cellule(i,j);
+                cellules[i][j].translate(-largeur/2, -hauteur /2); // Décalage de l'affichage
+            }
         }
     }
 
@@ -86,12 +101,23 @@ public class Donnees implements Observable {
                     obs.mettreAJour(TypeMisAJour.Joueur, joueur);
                     break;
                 case Avancement:
-                    //System.out.println(avancementChargement);
                     obs.mettreAJour(TypeMisAJour.Avancement, avancementChargement);
                     break;
                 case Peindre:
                     obs.mettreAJour(TypeMisAJour.Peindre, null);// Prévoit de mettre à jour le composant
                     // n'appelle pas la méthode paint() !
+                    break;
+                case BoutonsType:
+                    obs.mettreAJour(TypeMisAJour.BoutonsType, boutonsType);
+                    break;
+                case BoutonsCercle:
+                    obs.mettreAJour(TypeMisAJour.BoutonsCercle, boutonsCercle);
+                    break;
+                case CentreZoom:
+                    obs.mettreAJour(TypeMisAJour.CentreZoom, centreZoom);
+                    break;
+                case Zoom:
+                    obs.mettreAJour(TypeMisAJour.Zoom, zoom);
                     break;
                 case Scene:
                     obs.mettreAJour(TypeMisAJour.Scene, scene);
@@ -100,10 +126,10 @@ public class Donnees implements Observable {
         }
     }
 
-    public Cellule[][] getCellules() {
+    public Cellule[][] obtenirCellules() {
         return cellules;
     }
-    public Robot getJoueur() {
+    public Robot obtenirJoueur() {
         return joueur;
     }
     public void majJoueur(Robot joueur) {
@@ -116,5 +142,89 @@ public class Donnees implements Observable {
 
     public int obtenirLargeur() {
         return largeur;
+    }
+
+
+    public Cellule obtenirDerniereCellule() {
+        return derniereCellule;
+    }
+    public Cellule obtenirDerniereCaseType() {
+        return derniereCaseType;
+    }
+    public BoutonCercle obtenirDernierBouton() {
+        return dernierBouton;
+    }
+
+    public void majDernierBouton(BoutonCercle b) {
+        dernierBouton = b;
+    }
+    public void majDerniereCaseType(Cellule c) {
+        derniereCaseType = c;
+    }
+    public void majDerniereCellule(Cellule c) {
+        derniereCellule = c;
+    }
+
+    public Cellule[] obtenirBoutonsType() {
+        return boutonsType;
+    }
+
+    public BoutonCercle[] obtenirBoutonsCercle() {
+        return boutonsCercle;
+    }
+
+    public void majBoutonsCercle(BoutonCercle[] boutonsCercle) {
+        this.boutonsCercle = boutonsCercle;
+    }
+
+    public void majBoutonsType(Cellule[] boutonsType) {
+        this.boutonsType = boutonsType;
+    }
+
+    public void majZoom(double zoom) {
+        this.zoom = zoom;
+    }
+
+    public double obtenirZoom() {
+        return zoom;
+    }
+
+    public void majCentreZoom(Point centreZoom) {
+        this.centreZoom = centreZoom;
+    }
+
+    public void majStatutSouris(MouseEvent e, boolean clic) {
+        if (clic)
+            statutSouris.majClicGauche(true);
+        else   
+            statutSouris.majClicGauche(false);
+
+        statutSouris.majX(e.getX());
+        statutSouris.majY(e.getY());
+    }
+
+    public void majStatutSouris(MouseEvent e) {
+        statutSouris.majX(e.getX());
+        statutSouris.majY(e.getY());
+    }
+
+    public StatutSouris obtenirStatutSouris() {
+        return this.statutSouris;
+    }
+
+    public void majPositionFenetre(Point location) {
+        this.positionFenetre = location;
+    }
+
+    public Point obtenirPositionFenetre() {
+        return positionFenetre;
+    }
+
+    public void majImagesSymboles(HashMap<String, Image> imagesSymboles) {
+        this.imagesSymboles = imagesSymboles;
+    }
+
+    public HashMap<String, Image> getImagesSymboles() {
+        return imagesSymboles;
     }
 }

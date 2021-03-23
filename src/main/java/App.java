@@ -13,7 +13,7 @@ public class App
      * 
      * Une partie des tâches sont événementielles (Actionlistener)
      * Une autre partie est planifiée (repaint, invokeLater, invokeAndWait)
-     * Si les tâches à distirbuer ne son pas prises en charge,
+     * Si les tâches à distribuer ne son pas prises en charge,
      * les événements non gérés sont sauvegardés et l'interface
      * Utilisateur ne répond plus.
      */
@@ -30,6 +30,7 @@ public class App
                 Controleur controleur = new Controleur(donnees);
                 Affichage affichage = new Affichage(largeur, hauteur, controleur);
                 donnees.addObserver(affichage);
+                affichage.initialiser();
             }
         });
         
