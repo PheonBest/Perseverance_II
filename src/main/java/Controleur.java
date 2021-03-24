@@ -45,8 +45,8 @@ public class Controleur {
         if (donnees.getScene().equals("Editeur de carte") && donnees.obtenirStatutSouris().obtenirX() < donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU) {
             if (donnees.obtenirStatutSouris().obtenirClicGauche()) {
                 
-                click((int)(MouseInfo.getPointerInfo().getLocation().getX() - donnees.obtenirPositionFenetre().getX()), (int)(MouseInfo.getPointerInfo().getLocation().getY() - donnees.obtenirPositionFenetre().getY()));
-                //click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY());
+                //click((int)(MouseInfo.getPointerInfo().getLocation().getX() - donnees.obtenirPositionFenetre().getX()), (int)(MouseInfo.getPointerInfo().getLocation().getY() - donnees.obtenirPositionFenetre().getY()));
+                click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY());
             }
         }
         if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
@@ -73,6 +73,7 @@ public class Controleur {
             }
         }
 	}
+    
     public void charger() {
 
         // Chargement des images des symboles (rapide)
@@ -170,13 +171,11 @@ public class Controleur {
         // OU
         // Si on est en jeu ou dans l'éditeur de carte, et qu'on a cliqué sur la carte
         final double COIN_GAUCHE_MENU = donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU;
-        System.out.println(donnees.obtenirCellules()[1][1].getBounds2D());
-        System.out.println((x - donnees.obtenirLargeur()/2)+" "+(y - donnees.obtenirHauteur()/2));
-        if (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && x < COIN_GAUCHE_MENU)) {
+        if (donnees.getScene() != null && (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && x < COIN_GAUCHE_MENU))) {
             Cellule[][] cellules = donnees.obtenirCellules();
             for (int i=0; i < cellules.length; i++) {
                 for (int j=0; j < cellules[i].length; j++) {
-                    if (cellules[i][j].contains((x - donnees.obtenirLargeur()/2)/donnees.obtenirZoom(), (y - donnees.obtenirHauteur()/2)/donnees.obtenirZoom())) {
+                    if (cellules[i][j].contains((x - donnees.obtenirLargeur()/2 + 8)/donnees.obtenirZoom(), (y - donnees.obtenirHauteur()/2 + 20)/donnees.obtenirZoom())) {
                         if (donnees.obtenirDerniereCellule() == cellules[i][j]) { // On compare les pointeurs (références) des 2 objets
                             //cellules[i][j].majSourisDessus(false);
                             donnees.majDerniereCellule(null);
@@ -253,7 +252,7 @@ public class Controleur {
         //Gestion du menu de l'éditeur de carte
 
         // Si on est dans l'éditeur de carte, et qu'on a cliqué sur le menu
-        if (donnees.getScene().equals("Editeur de carte") && x >= COIN_GAUCHE_MENU) {
+        if (donnees.getScene() != null && donnees.getScene().equals("Editeur de carte") && x >= COIN_GAUCHE_MENU) {
             x -= COIN_GAUCHE_MENU; // Les coordonnées des boutons sont relatives au coin en haut à gauche du menu. Donc on soustrait sa coordonnée x.
             Cellule[] boutonsType = donnees.obtenirBoutonsType();
             for (int i=0; i < boutonsType.length; i++) {
@@ -401,6 +400,10 @@ public class Controleur {
         } else if (clic)
             click(ev.getX(),ev.getY());
             
+    }
+
+    public void majStatutSouris(MouseEvent ev) {
+        donnees.majStatutSouris(ev);
     }
 
     public void majPositionFenetre(Point location) {

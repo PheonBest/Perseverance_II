@@ -10,6 +10,7 @@ public class Donnees implements Observable {
     private String scene;
     private ArrayList<Observer> listObserver = new ArrayList<Observer>();
     private Cellule[][] cellules = { {} };
+    private Cellule[][] cellulesFixes = { {} };
     private BoutonCercle[] boutonsCercle = {};
     private Cellule[] boutonsType = {};
     private int largeur;

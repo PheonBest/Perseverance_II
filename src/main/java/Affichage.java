@@ -11,12 +11,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.awt.Point;
 
-public class Affichage extends JFrame implements Observer, ActionListener, KeyListener, MouseWheelListener {
+public class Affichage extends JFrame implements Observer, ActionListener, KeyListener, MouseWheelListener, MouseMotionListener, MouseListener {
     private Controleur controleur;
     private CardLayout cardLayout = new CardLayout();
     private boolean enJeu = false;
@@ -40,20 +42,16 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         // Gestion des évènements
         super.setFocusable(true);
         this.addKeyListener(this);
+
         contenu.addMouseWheelListener(this);
+        contenu.addMouseListener(this);
+        contenu.addMouseMotionListener(this);
         contenu.addKeyListener(this);
         contenu.setLayout(cardLayout);
+
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
                 System.exit(0);
-            }
-        });
-        contenu.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent ev) {
-                controleur.majStatutSouris(ev, true);
-            }
-            public void mouseReleased(MouseEvent ev) {
-                controleur.majStatutSouris(ev, false);
             }
         });
 
@@ -85,6 +83,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.hauteur = this.getContentPane().getSize().getHeight();
         ((Dessiner)jeu).majLargeur(this.largeur);
         ((Dessiner)jeu).majHauteur(this.hauteur);
+        ((Dessiner)jeu).majEnJeu(true);
         ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
         
         ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), (int)(this.hauteur/20.));
@@ -93,12 +92,13 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     public void initialiser() {
         //System.out.println("Initialisation");
 
+        
         // Chargement et exécution du jeu
         cardLayout.show(contenu, "Chargement");
         controleur.charger();
         
-        // Exécuter l'éditeur
         /*
+        // Exécuter l'éditeur
         cardLayout.show(contenu, "Editeur");
         controleur.editer();
         timer = new Timer(Options.DELAI_ANIMATION, this);
@@ -190,5 +190,45 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         controleur.ajusterZoom(e.getWheelRotation(), e.getPoint());
+    }
+
+    @Override
+    // On veut mettre à jour la position de la souris
+    // Lorsque le clic est maintenu.
+    // Cet évènement appelle mouseDragged, et non pas mouseMoved
+    public void mouseDragged(MouseEvent ev) {
+        controleur.majStatutSouris(ev);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent ev) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent ev) {
+        controleur.majStatutSouris(ev, true);
+    }
+    
+    @Override
+    public void mouseReleased(MouseEvent ev) {
+        controleur.majStatutSouris(ev, false);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        // TODO Auto-generated method stub
+        
     }
 }

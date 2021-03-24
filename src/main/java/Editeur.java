@@ -19,14 +19,17 @@ public class Editeur extends JPanel {
         carte.setBackground(Color.DARK_GRAY);
         menu.setBackground(Color.LIGHT_GRAY);
         
+        //((Dessiner)carte).majEnJeu(true); // Affichage de la minimap
+
         add(carte);
         add(menu);
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        carte.repaint();
         menu.repaint();
+        carte.repaint();
+        
     }
 
     public void initialiser(int largeur, int hauteur) {

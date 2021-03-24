@@ -74,22 +74,27 @@ public class Cellule extends Polygon implements Dessin {
         this(TypeCase.VIDE, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
     }
     
-    public void dessiner(Graphics g) {
+    public void dessiner(Graphics g, double agrandissement) {
         // On dessine le polygone
         Graphics2D g2d = (Graphics2D) g;
         //Graphics2D g2d = (Graphics2D) g.create();
         
-        if (sourisDessus) {
+        if (sourisDessus || agrandissement != 1) {
+            double facteurDeTaille = Options.RATIO_TAILLE_SELECTION;
+            if (agrandissement != 1)
+                facteurDeTaille = agrandissement;
+
+            
             final AffineTransform ANCIENNE_TRANSFORMATION = g2d.getTransform();
             final double[] CENTRE = {xpoints[0]+largeur/4, ypoints[0]+hauteur/2};
             final double[] COIN_EN_HAUT_A_GAUCHE = {xpoints[0]-largeur/4, ypoints[0]};
-            final double deltaLargeur = largeur*(Options.RATIO_TAILLE_SELECTION-1)/2.;
-            final double deltaHauteur = hauteur*(Options.RATIO_TAILLE_SELECTION-1)/2.;
+            final double DELTA_LARGEUR = largeur*(facteurDeTaille-1)/2.;
+            final double DELTA_HAUTEUR = hauteur*(facteurDeTaille-1)/2.;
+
             translate((int)(-COIN_EN_HAUT_A_GAUCHE[0]), (int)(-COIN_EN_HAUT_A_GAUCHE[1]));
             AffineTransform at = g2d.getTransform();
-            // On a un décalage de quart de largeur entre le polygone initial, et le polygone aggrandi
-            at.translate(COIN_EN_HAUT_A_GAUCHE[0]-deltaLargeur*Options.RATIO_TAILLE_SELECTION/2.,COIN_EN_HAUT_A_GAUCHE[1]-deltaHauteur*Options.RATIO_TAILLE_SELECTION/2.);
-            at.scale(Options.RATIO_TAILLE_SELECTION, Options.RATIO_TAILLE_SELECTION);
+            at.translate(COIN_EN_HAUT_A_GAUCHE[0]-DELTA_LARGEUR*facteurDeTaille/2.,COIN_EN_HAUT_A_GAUCHE[1]-DELTA_HAUTEUR*facteurDeTaille/2.);
+            at.scale(facteurDeTaille, facteurDeTaille);
             g2d.setTransform(at);
             g2d.setColor(couleur);
             g2d.fillPolygon(this);
@@ -99,6 +104,10 @@ public class Cellule extends Polygon implements Dessin {
             g2d.setColor(couleur);
             g2d.fillPolygon(this);
         }
+    }
+
+    public void dessiner(Graphics g) {
+        dessiner(g, 1);
     }
     
     //////////////////////////////////////////////////////////////////// Méthodes
