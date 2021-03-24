@@ -83,17 +83,33 @@ public class Dessiner extends JPanel {
             // On dessine la minimap sur un rectangle
             g2d.setTransform(ancienneTransformation);
             g2d.setColor(Color.gray);
-            g2d.fillRoundRect(  (int)(Options.POSITION_X_MINIMAP*largeurEcran - 3./2.*Options.DIMENSIONS_CASES[0]),
-                                (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - 3./2.*Options.DIMENSIONS_CASES[1]),
-                                (int)(tailleMinimap[0] + 3./2.*Options.DIMENSIONS_CASES[0]),
-                                (int)(tailleMinimap[1] + 3./2.*Options.DIMENSIONS_CASES[1]),
+            
+            g2d.fillRoundRect(  (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - Options.DIMENSIONS_CASES[0]),
+                                (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - (hauteurEcran/2)*Options.ZOOM_MINIMAP - Options.DIMENSIONS_CASES[1]),
+                                (int)(tailleMinimap[0] + Options.DIMENSIONS_CASES[0]),
+                                (int)(tailleMinimap[1] + Options.DIMENSIONS_CASES[1]),
                                 15,
                                 15);
 
-            //On dessine la minimap
+            // On dessine la minimap
+            
+            // POSITION X DE LA MINIMAP
+            // Sa position en x est la même que celle du rectangle ci-dessus.
+            // Cependant, les cellules de la carte sont déplacées en même temps que le joueur.
+            // Donc on annule ce déplacement. Or ce déplacement est le même pour toutes les cases. On s'intérésse donc ici à la case en [0,0]
+            // Lorsque le joueur n'a pas bougé, le déplacement doit être nul.
+            // Les coordonnées du coin en haut à gauche de la première cellule valent [xpoints[0] + Options.LARGEUR_CASE/4,ypoints[0]]
+            // On prend en compte le décalage (demi largeur d'écran)
+            // D'où le déplacement -(cellules[0][0].xpoints[0] + largeurEcran/2 + Options.LARGEUR_CASE/4)
+            // Or on applique un facteur de zoom à ce décalage
+            // D'où l'annulation du décalage -(cellules[0][0].xpoints[0] + largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP)
+
+            // POSITION Y DE LA MINIMAP
+            // Sa position en y est la même que celle du rectangle ci-dessus.
+            // De la même manière que pour la coordonnée x, on annule le décalage en y: -(cellules[0][0].ypoints[0] + hauteurEcran/2)*Options.ZOOM_MINIMAP
             ancienneTransformation.translate(
-                (Options.POSITION_X_MINIMAP*largeurEcran - (cellules[0][0].xpoints[0] + largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP + 2*Options.DIMENSIONS_CASES[0]),
-                (Options.POSITION_Y_MINIMAP*hauteurEcran - (cellules[0][0].ypoints[0] + hauteurEcran/2)*Options.ZOOM_MINIMAP + 3./2.*Options.DIMENSIONS_CASES[1])
+                (Options.POSITION_X_MINIMAP*largeurEcran - (cellules[0][0].xpoints[0] + largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP),
+                (Options.POSITION_Y_MINIMAP*hauteurEcran - (cellules[0][0].ypoints[0] + hauteurEcran/2)*Options.ZOOM_MINIMAP)
             );
 
             ancienneTransformation.scale(Options.ZOOM_MINIMAP, Options.ZOOM_MINIMAP);

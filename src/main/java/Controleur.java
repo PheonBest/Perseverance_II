@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import javax.sound.sampled.AudioInputStream;
 import javax.swing.CellEditor;
 import javax.swing.SwingWorker;
 import java.awt.MouseInfo;
@@ -76,8 +77,28 @@ public class Controleur {
     
     public void charger() {
 
+        // Chargement des musiques
+        // Les formats supportés sont:
+        // .aifc, .aiff, .au, .snd, .wav
+        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_MUSIQUES+"\\b.*\\.(?:aifc|aiff|au|snd|wav)");
+        try {
+            HashMap<String, AudioInputStream> musiques = ObtenirRessources.getAudioAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_MUSIQUES+"/");
+            donnees.majListeMusiques(musiques);
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+        pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_EFFETS+"\\b.*\\.(?:aifc|aiff|au|snd|wav)");
+        try {
+            HashMap<String, AudioInputStream> effets = ObtenirRessources.getAudioAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_MUSIQUES+"/");
+            donnees.majListeEffets(effets);
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+
+        
+
         // Chargement des images des symboles (rapide)
-        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_SYMBOLE+"\\b.*\\.(?:jpg|gif|png)");
+        pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_SYMBOLE+"\\b.*\\.(?:jpg|gif|png)");
 
         try {
             HashMap<String, Image> imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
@@ -147,6 +168,8 @@ public class Controleur {
                 ArrayList<ArrayList<Image>> imagesJoueur = (ArrayList<ArrayList<Image>>) get();
                 donnees.majImagesJoueur(imagesJoueur);
                 jouer();
+                majMusique(0);
+                boucleMusique();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -408,5 +431,48 @@ public class Controleur {
 
     public void majPositionFenetre(Point location) {
         donnees.majPositionFenetre(location);
+    }
+
+    // MUSIQUE
+    public void majVolumeEffets(int volumeEffets) {
+        donnees.majVolumeEffets( volumeEffets );
+    }
+    public void majVolumeMusique(int volumeMusique) {
+        donnees.majVolumeMusique( volumeMusique );
+    }
+    public void majEtatMusique(boolean musiqueEtat) {
+        donnees.majEtatMusique( musiqueEtat );
+    }
+    public void majEtatEffets(boolean etatEffets) {
+        donnees.majEtatEffets( etatEffets );
+    }
+    public void majMusique(String musique) {
+        if (donnees.obtenirEtatMusique()) {
+            donnees.majMusique(musique);
+        }
+    }
+    public void majMusique(int indexMusique) {
+        if (donnees.obtenirEtatMusique()) {
+            donnees.majMusique(indexMusique);
+        }
+    }
+    public void boucleMusique() {
+        if (donnees.obtenirEtatMusique()) {
+            donnees.boucleMusique();
+        }
+    }
+    public void jouerEffet(String effet) {
+        if (donnees.obtenirEtatEffets()) {
+            donnees.majEffet(effet);
+        }
+    }
+    public void jouerEffet(int indexEffet) {
+        if (donnees.obtenirEtatEffets()) {
+            donnees.majEffet(indexEffet);
+        }
+    }
+    public void musiqueSuivante() {
+        donnees.musiqueSuivante();
+        donnees.boucleMusique();
     }
 }

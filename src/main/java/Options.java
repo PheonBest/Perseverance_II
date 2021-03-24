@@ -64,4 +64,15 @@ public class Options {
         (int) (Options.LARGEUR_CASE*Options.ZOOM_MINIMAP*Options.AGRANDISSEMENT_CELLULE_MINICARTE),
         (int) (Options.LARGEUR_CASE*Options.RATIO_LARGEUR_HAUTEUR*Options.ZOOM_MINIMAP*Options.AGRANDISSEMENT_CELLULE_MINICARTE)
     };
+
+    // Musique
+    public static final int EFFETS_VOLUME_MIN = 0;
+	public static final int EFFETS_VOLUME_MAX = 100;
+    public static final int EFFETS_VOLUME_INIT = 80;
+
+    public static final int MUSIQUE_VOLUME_MIN = 0;
+	public static final int MUSIQUE_VOLUME_MAX = 100;
+    public static final int MUSIQUE_VOLUME_INIT = 100;
+    public static final String NOM_DOSSIER_MUSIQUES = "musiques";
+    public static final String NOM_DOSSIER_EFFETS = "effets";
 }
