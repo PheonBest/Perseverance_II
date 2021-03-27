@@ -1,8 +1,15 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.LineUnavailableException;
+
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class Donnees implements Observable {
 
@@ -10,6 +17,7 @@ public class Donnees implements Observable {
     private String scene;
     private ArrayList<Observer> listObserver = new ArrayList<Observer>();
     private Cellule[][] cellules = { {} };
+    private Cellule[][] cellulesFixes = { {} };
     private BoutonCercle[] boutonsCercle = {};
     private Cellule[] boutonsType = {};
     private int largeur;
@@ -20,6 +28,7 @@ public class Donnees implements Observable {
     private double zoom = 1.;
     private Point centreZoom;
     private StatutSouris statutSouris = new StatutSouris();
+    
 
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
@@ -29,6 +38,12 @@ public class Donnees implements Observable {
 
     private int avancementChargement;
     private Point positionFenetre;
+
+    // Lecteurs de sons
+    private Son lecteurMusique;
+    private Son lecteurEffets;
+    private boolean etatMusique = true;
+    private boolean etatEffets = true;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
@@ -226,5 +241,98 @@ public class Donnees implements Observable {
 
     public HashMap<String, Image> getImagesSymboles() {
         return imagesSymboles;
+    }
+
+    // MUSIQUE
+    public void majVolumeEffets(int volumeEffets) {
+        lecteurEffets.setVolume(volumeEffets);
+    }
+
+    public void majVolumeMusique(int volumeEffets) {
+        lecteurMusique.setVolume(volumeEffets);
+    }
+
+    public void majEtatMusique(boolean etatMusique) {
+        this.etatMusique = etatMusique;
+        if (!etatMusique)
+            lecteurMusique.stop();
+        else {
+            lecteurMusique.resume();
+            lecteurMusique.loop();
+        }
+    }
+
+    public void majEtatEffets(boolean etatEffets) {
+        this.etatEffets = etatEffets;
+        if (!etatEffets)
+            lecteurEffets.stop();
+    }
+
+    public boolean obtenirEtatMusique() {
+        return etatMusique;
+    }
+    public boolean obtenirEtatEffets() {
+        return etatEffets;
+    }
+
+    public void majMusique(int indexMusique) {
+        try {
+            lecteurMusique.play(indexMusique);
+        } catch (IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void majMusique(String musique) {
+        try {
+            lecteurMusique.play(musique);
+        } catch (IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void boucleMusique() {
+        lecteurMusique.loop();
+    }
+
+    public void majEffet(int indexEffet) {
+        try {
+            lecteurEffets.play(indexEffet);
+        } catch (IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void majEffet(String effet) {
+        try {
+            lecteurEffets.play(effet);
+        } catch (IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void musiqueSuivante() {
+        try {
+            lecteurMusique.play();
+        } catch (IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void majListeEffets(HashMap<String, AudioInputStream> effets) {
+        try {
+            lecteurEffets = new Son(effets, Options.MUSIQUE_VOLUME_INIT, true); // "true": créée un nouveau clip à chaque effet audio
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
+    public void majListeMusiques(HashMap<String, AudioInputStream> musiques) {
+        try {
+            lecteurMusique = new Son(musiques, Options.MUSIQUE_VOLUME_INIT, false); // "false": ne créée pas un nouveau clip à chaque musique
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
     }
 }

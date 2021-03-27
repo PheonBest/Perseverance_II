@@ -55,4 +55,24 @@ public class Options {
     public static final double MULTIPLICATEUR_ZOOM = 1.1;
 
     public static final String NOM_DOSSIER_SYMBOLE = "symboles";
+    public static final int INCREMENT_MINIMAP = 6;
+    public static final double ZOOM_MINIMAP = 0.02;
+    public static final double AGRANDISSEMENT_CELLULE_MINICARTE = 4;
+    public static final double POSITION_X_MINIMAP = 9./10.; // e.g: 11/12 de la largeur de l'écran
+    public static final double POSITION_Y_MINIMAP = 1./10.; //  e.g: 1/10 de la hauteur de l'écran
+    public static final int[] DIMENSIONS_CASES =  {
+        (int) (Options.LARGEUR_CASE*Options.ZOOM_MINIMAP*Options.AGRANDISSEMENT_CELLULE_MINICARTE),
+        (int) (Options.LARGEUR_CASE*Options.RATIO_LARGEUR_HAUTEUR*Options.ZOOM_MINIMAP*Options.AGRANDISSEMENT_CELLULE_MINICARTE)
+    };
+
+    // Musique
+    public static final int EFFETS_VOLUME_MIN = 0;
+	public static final int EFFETS_VOLUME_MAX = 100;
+    public static final int EFFETS_VOLUME_INIT = 80;
+
+    public static final int MUSIQUE_VOLUME_MIN = 0;
+	public static final int MUSIQUE_VOLUME_MAX = 100;
+    public static final int MUSIQUE_VOLUME_INIT = 100;
+    public static final String NOM_DOSSIER_MUSIQUES = "musiques";
+    public static final String NOM_DOSSIER_EFFETS = "effets";
 }

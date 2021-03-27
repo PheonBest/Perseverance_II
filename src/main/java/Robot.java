@@ -68,6 +68,10 @@ public class Robot extends Avatar {
     
     //---------------------------------------------------------------------------------------------------- Setters et getters
     
+    public Dimension getCoordonnees() {
+        return new Dimension(xFictif,yFictif);
+    }
+    
     public int getBatterie(){
         return batterie;
     }
