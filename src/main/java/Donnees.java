@@ -48,6 +48,7 @@ public class Donnees implements Observable {
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
         this.hauteur = hauteur;
+
         /*
         Si il y a une carte, la charger.
         Sinon:

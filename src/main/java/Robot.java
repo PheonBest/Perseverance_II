@@ -73,7 +73,11 @@ public class Robot extends Avatar {
     }
     
     public int getBatterie(){
-        return batterie;
+        return this.batterie;
+    }
+
+    public Voyants[] getVP(){
+        return this.voyantsPrincipaux;
     }
     
     public double getKmParcourus(){
@@ -208,12 +212,14 @@ public class Robot extends Avatar {
     
     //---------------------------------------------------------------------------------------------------- Méthodes pour les déplacments du robot
     
+    // La case à atteindre est définie par une série de sous-but
     public void definirBut(LinkedList<Dimension> liste) {
         this.but = liste;
         definirDirection(but.getFirst());
         animationIndex = 2; //  Image qui montre le robot marcher 
     }
-
+    
+    // 
     private void definirDirection(Dimension caseCiblee) {
         float angle = (float) Math.atan2(caseCiblee.getHeight() - yFictif, caseCiblee.getWidth() - xFictif);
         //System.out.println(Math.toDegrees(angle));
@@ -266,43 +272,4 @@ public class Robot extends Avatar {
         }
     }
     
-    // ----------------------------------------------------------------------------------------------- Méthodes graphiques en rapport avec le robot
-    // Ces méthodes seront à afficher dans un jPanel
-    
-    
-    public void paintControlPanel(Graphics g, int Xp, int Yp) {
-        super.dessiner(g);
-        // Panneau de contrôle : Origine(Xp,Yp)
-        g.setColor(new Color(175,175,175));
-        g.fill3DRect(Xp,Yp,500,100,true);
-        g.setColor(Color.black);
-        g.drawString("---------------------------------- PANNEAU DE CONTRÔLE ----------------------------------",Xp+30,Yp+15);
-        
-        //Batterie : Origine(Xb,Yb)
-        int Xb = Xp+10;
-        int Yb = Yp+40;
-        g.setColor(Color.black);
-        g.fillRect(Xb,Yb,118,48);
-        g.setColor(Color.white);
-        g.fillRect(Xb+3,Yb+3,112,42);
-        g.setColor(Color.black);
-        g.fillRect(Xb+6,Yb+6,106,36);
-        g.fillRect(Xb+6,Yb+19,112,10);
-        // Jauge de batterie de couleur ajustable
-        g.setColor(new Color((float)(1.0-batterie*0.01), (float)(0.0+batterie*0.01), (float)(0.0)));
-        g.fillRect(Xb+9,Yb+9,batterie,30);
-        
-        // Voyants : Origine(Xv,Yv) ( centre du 1er voyant ) 
-        int Xv = Xb + 200;
-        int Yv = Yb + 24;
-        for(int i=0;i<voyantsPrincipaux.length;i++){
-           voyantsPrincipaux[i].setPositionR(Xv+i*100,Yv,25); 
-           voyantsPrincipaux[i].dessinerVoyant(g);
-        }
-    }
-    
-    public void paintFullContropPanel(Graphics g, int Xp, int Yp){
-            
-        }
-        
 }

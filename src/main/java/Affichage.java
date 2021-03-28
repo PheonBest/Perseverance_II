@@ -24,10 +24,10 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private boolean enJeu = false;
 
     private JPanel contenu = new JPanel();
-    private JPanel jeu = new Dessiner();
     private JPanel modeDeJeu = new JPanel();
     private JPanel chargement = new Chargement();
     private JPanel editeur;
+    private Dessiner jeu = new Dessiner();
 
     private double largeur;
     private double hauteur;
@@ -38,7 +38,9 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         
         this.controleur = controleur;
         editeur = new Editeur(controleur);
+        jeu = new Dessiner(controleur.getDonnees().obtenirJoueur());
 
+        
         // Gestion des évènements
         super.setFocusable(true);
         this.addKeyListener(this);
@@ -58,7 +60,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.setTitle("Perseverance II");
         this.setSize(largeur, hauteur);
         this.setLocationRelativeTo(null);
-
+        
         contenu.setLayout(cardLayout);
         contenu.add(modeDeJeu, "Mode de Jeu");
         contenu.add(jeu, "Jeu");
@@ -87,6 +89,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
         
         ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), (int)(this.hauteur/20.));
+        
     }
 
     public void initialiser() {

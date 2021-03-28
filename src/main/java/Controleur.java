@@ -475,4 +475,7 @@ public class Controleur {
         donnees.musiqueSuivante();
         donnees.boucleMusique();
     }
+    public Donnees getDonnees(){
+        return this.donnees;
+    }
 }

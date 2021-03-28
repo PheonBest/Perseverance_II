@@ -16,6 +16,7 @@ public class Dessiner extends JPanel {
     private double largeurEcran;
     private double hauteurEcran;
     private Robot joueur;
+    private ControlPanel panneauDeControle;
     private double zoom = 1.;
     private Point centreZoom = new Point(0,0);
     private boolean enJeu = false;
@@ -38,7 +39,17 @@ public class Dessiner extends JPanel {
                                                 {-1,-1}
                                             };
 
-    public Dessiner() {
+    public Dessiner(){
+    }
+    
+    public Dessiner(Robot unRobot) {
+        this();
+        if(unRobot!=null){
+            joueur = unRobot;
+            panneauDeControle = new ControlPanel(10,10,joueur);
+            panneauDeControle.setLayout(null);
+            add(panneauDeControle);
+        }
     }
 
     public void paintComponent(Graphics g) {
