@@ -367,19 +367,21 @@ public class Controleur {
     }
 
     public void interactionClavier(int code) {
-        switch (code) {
-            case KeyEvent.VK_UP:
-                bougerEcran(0, +1);
-                break;
-            case KeyEvent.VK_DOWN:
-                bougerEcran(0, -1);
-                break;
-            case KeyEvent.VK_LEFT:
-                bougerEcran(+1, 0);
-                break;
-            case KeyEvent.VK_RIGHT :
-                bougerEcran(-1, 0);
-                break;
+        if (donnees.getScene().equals("Editeur de carte")) {
+            switch (code) {
+                case KeyEvent.VK_UP:
+                    bougerEcran(0, +1);
+                    break;
+                case KeyEvent.VK_DOWN:
+                    bougerEcran(0, -1);
+                    break;
+                case KeyEvent.VK_LEFT:
+                    bougerEcran(+1, 0);
+                    break;
+                case KeyEvent.VK_RIGHT :
+                    bougerEcran(-1, 0);
+                    break;
+            }
         }
     }
     

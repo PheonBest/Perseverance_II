@@ -95,10 +95,10 @@ public class Dessiner extends JPanel {
             g2d.setTransform(ancienneTransformation);
             g2d.setColor(Color.gray);
             
-            g2d.fillRoundRect(  (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - Options.DIMENSIONS_CASES[0]),
-                                (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - (hauteurEcran/2)*Options.ZOOM_MINIMAP - Options.DIMENSIONS_CASES[1]),
-                                (int)(tailleMinimap[0] + Options.DIMENSIONS_CASES[0]),
-                                (int)(tailleMinimap[1] + Options.DIMENSIONS_CASES[1]),
+            g2d.fillRoundRect(  (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[0]),
+                                (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - (hauteurEcran/2)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[1]),
+                                (int)(tailleMinimap[0] + 9./4.*Options.DIMENSIONS_CASES[0]),
+                                (int)(tailleMinimap[1] + 9./4.*Options.DIMENSIONS_CASES[1]),
                                 15,
                                 15);
 
