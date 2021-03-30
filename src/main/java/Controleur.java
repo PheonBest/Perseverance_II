@@ -69,13 +69,14 @@ public class Controleur {
         donnees.majScene("Jeu");
         donnees.notifierObserveur(TypeMisAJour.Scene);
         donnees.notifierObserveur(TypeMisAJour.Cellules);
-        LinkedList<Dimension> buts = new LinkedList<Dimension>();
-
-        /*
-        buts.add(donnees.obtenirCellules()[0][0].obtenirCentre());
-        buts.add(donnees.obtenirCellules()[3][3].obtenirCentre());
+        LinkedList<int[]> buts = new LinkedList<int[]>();
+        
+        buts.add(donnees.obtenirCellules()[4][2].obtenirCentre());
+        buts.add(donnees.obtenirCellules()[4][3].obtenirCentre());
+        buts.add(donnees.obtenirCellules()[4][4].obtenirCentre());
+        buts.add(donnees.obtenirCellules()[4][5].obtenirCentre());
+        
         donnees.obtenirJoueur().definirBut(buts);
-        */
 	}
 
 	public void rafraichir() {
@@ -254,15 +255,19 @@ public class Controleur {
                     if (donnees.obtenirDerniereCompetence() == b) { // On compare les pointeurs (références) des 2 objets
                         donnees.obtenirDerniereCompetence().majSourisDessus(false);
                         donnees.majDerniereCompetence(null);
-                        if (donnees.obtenirRayonDeSelection() != 0)
+                        if (donnees.obtenirRayonDeSelection() != 0) {
                             donnees.majRayonDeSelection(0);
+                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                        }
                     } else { // On sélectionne la compétence
                         b.majSourisDessus(true);
-                        if (donnees.obtenirRayonDeSelection() != 0)
+                        if (donnees.obtenirRayonDeSelection() != 0) {
                             donnees.majRayonDeSelection(0);
+                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                        }
                         switch (b.obtenirEffet()) {
                             case "Drone":
-                                donnees.majRayonDeSelection(7);
+                                donnees.majRayonDeSelection(4);
                                 donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
                                 break;
                             case "Réparation":
@@ -485,9 +490,12 @@ public class Controleur {
 
     public void ajusterZoom(int notches, Point point) {
         // convert target coordinates to zoomTarget coordinates
-        if (notches < 1)
-            donnees.majZoom(-donnees.obtenirZoom()*notches/Options.MULTIPLICATEUR_ZOOM);
-        else
+        if (notches < 1) {
+            double tmpZoom = -donnees.obtenirZoom()*notches/Options.MULTIPLICATEUR_ZOOM;
+            if (tmpZoom < 0.01)
+                tmpZoom = 0.01;
+            donnees.majZoom(tmpZoom);
+        } else
             donnees.majZoom(donnees.obtenirZoom()*notches*Options.MULTIPLICATEUR_ZOOM);
         donnees.majCentreZoom(point);
         donnees.notifierObserveur(TypeMisAJour.CentreZoom);

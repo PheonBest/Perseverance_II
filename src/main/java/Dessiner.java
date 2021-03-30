@@ -67,7 +67,11 @@ public class Dessiner extends JPanel {
         at.scale(zoom, zoom);
         
         // Obtention de la cellule sur laquelle le joueur est
-        Cellule[] voisins = Voisins.obtenirVoisins(cellules, 6, 6, 4);
+        Cellule[] voisins = {};
+        if (joueur != null && rayonDeSelection > 0) {
+            Dimension caseJoueur = joueur.obtenirCase();
+            voisins = Voisins.obtenirVoisins(cellules, (int)caseJoueur.getWidth(), (int)caseJoueur.getHeight(), rayonDeSelection);
+        }
         // On dessine les cellules de la carte
         g2d.setTransform(at);
         for (int i=0; i < cellules.length; i++) {
