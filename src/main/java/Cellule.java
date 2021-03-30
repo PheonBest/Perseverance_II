@@ -169,8 +169,8 @@ public class Cellule extends Polygon implements Dessin {
         couleur = this.getColor();
     }
 
-    public Dimension obtenirCentre() {
-        return new Dimension((int)(xpoints[0]+largeur/4),(int)(ypoints[0]+largeur/2));
+    public int[] obtenirCentre() {
+        return new int[] {(int)(xpoints[0]+largeur/4),(int)(ypoints[0]+largeur/2), ligne, colonne};
     }
 
     public String toString() {
