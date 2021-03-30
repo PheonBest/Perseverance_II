@@ -70,6 +70,10 @@ public class Cellule extends Polygon implements Dessin {
         // Déplacement du symbole
     }
 
+    public Cellule(TypeCase type, int uneLigne, int uneColonne){
+        this(type, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
+    }
+
     public Cellule(int uneLigne, int uneColonne){
         this(TypeCase.VIDE, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
     }
@@ -167,5 +171,9 @@ public class Cellule extends Polygon implements Dessin {
 
     public Dimension obtenirCentre() {
         return new Dimension((int)(xpoints[0]+largeur/4),(int)(ypoints[0]+largeur/2));
+    }
+
+    public String toString() {
+        return type.name()+";null";
     }
 }

@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioInputStream;
@@ -9,6 +10,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 
 public class Donnees implements Observable {
@@ -29,6 +31,8 @@ public class Donnees implements Observable {
     private Point centreZoom;
     private StatutSouris statutSouris = new StatutSouris();
     
+    // CSV des cartes
+    private HashMap<String, InputStream> cartes;
 
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
@@ -49,10 +53,9 @@ public class Donnees implements Observable {
         this.largeur = largeur;
         this.hauteur = hauteur;
 
-        /*
-        Si il y a une carte, la charger.
-        Sinon:
-        */
+        /* Création d'une carte
+        List<String[]> data = new ArrayList<String[]>();
+
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
         for (int i=0; i < cellules.length; i++) {
             for (int j=0; j < cellules[i].length; j++) {
@@ -60,6 +63,23 @@ public class Donnees implements Observable {
                 cellules[i][j].translate(-largeur/2, -hauteur /2); // Décalage de l'affichage
             }
         }
+
+        String[] strings = new String[cellules[0].length];
+        for (int i=0; i < cellules.length; i++) {
+            for (int j=0; j < cellules[i].length; j++) {
+                strings[j] = cellules[i][j].toString();
+                //System.out.print(cellules[i][j].toString()+" ");
+            }
+            //System.out.println();
+            data.add(strings);
+        }
+        try {
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(data, "new");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        */
     }
 
     // Getters et setters
@@ -134,6 +154,9 @@ public class Donnees implements Observable {
                     break;
                 case Zoom:
                     obs.mettreAJour(TypeMisAJour.Zoom, zoom);
+                    break;
+                case Cartes:
+                    obs.mettreAJour(TypeMisAJour.Cartes, cartes);
                     break;
                 case Scene:
                     obs.mettreAJour(TypeMisAJour.Scene, scene);
@@ -335,5 +358,17 @@ public class Donnees implements Observable {
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }
+    }
+
+    public void majCartes(HashMap<String, InputStream> cartes) {
+        /*
+        for (String i : cartes.keySet())
+            System.out.println("Nom du CSV : " + i);
+        */
+        this.cartes = cartes;
+    }
+
+    public HashMap<String, InputStream> obtenirCartes() {
+        return cartes;
     }
 }

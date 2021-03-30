@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.awt.Color;
@@ -38,18 +39,19 @@ public class Dessiner extends JPanel {
                                                 {-1,+1},
                                                 {-1,-1}
                                             };
+    private LinkedList<BoutonCercle> competences = new LinkedList<BoutonCercle>();
+    private boolean affichagePanneauDeControle;
 
-    public Dessiner(){
-    }
-    
-    public Dessiner(Robot unRobot) {
-        this();
-        if(unRobot!=null){
-            joueur = unRobot;
-            panneauDeControle = new ControlPanel(10,10,joueur);
+    public Dessiner(boolean affichagePanneauDeControle){
+        this.affichagePanneauDeControle = affichagePanneauDeControle;
+        if (affichagePanneauDeControle) {
+            panneauDeControle = new ControlPanel(10,10);
             panneauDeControle.setLayout(null);
             add(panneauDeControle);
         }
+    }
+    public Dessiner(){
+        this(false);
     }
 
     public void paintComponent(Graphics g) {
@@ -191,8 +193,10 @@ public class Dessiner extends JPanel {
         */
     }
 
-    public void majJoueur(Robot nouveau) {
-        this.joueur = nouveau;
+    public void majJoueur(Robot joueur) {
+        this.joueur = joueur;
+        if (affichagePanneauDeControle)
+            panneauDeControle.majJoueur(joueur);
     }
 
     public void majLargeur(double largeurEcran) {
@@ -216,8 +220,10 @@ public class Dessiner extends JPanel {
     }
 
     private void majTailleMinimap() {
-        tailleMinimap[0] = (int)((cellules[0][cellules[0].length-1].xpoints[0] - cellules[0][0].xpoints[0])*Options.ZOOM_MINIMAP);
-        tailleMinimap[1] = (int)((cellules[cellules.length-1][0].ypoints[0]    - cellules[0][0].ypoints[0])*Options.ZOOM_MINIMAP);
+        if (cellules.length > 1) {
+            tailleMinimap[0] = (int)((cellules[0][cellules[0].length-1].xpoints[0] - cellules[0][0].xpoints[0])*Options.ZOOM_MINIMAP);
+            tailleMinimap[1] = (int)((cellules[cellules.length-1][0].ypoints[0]    - cellules[0][0].ypoints[0])*Options.ZOOM_MINIMAP);
+        }
     }
 
     private TypeCase obtenirCelluleRepresentative(Cellule[] echantillon) {

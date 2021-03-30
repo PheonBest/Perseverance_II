@@ -38,7 +38,7 @@ public abstract class Avatar implements Dessin {
 	protected double hauteur;
 
     //****************************************************************** Coordonnées de l'image par rapport au centre de rotation - à revoir ...
-    protected double[] coords; 
+    protected double[] coords;
 
     // Variable de temps surlaquelle évolue l'avatar
 	protected long temps;

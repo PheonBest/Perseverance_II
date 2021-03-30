@@ -1,8 +1,10 @@
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,6 +17,8 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -34,7 +38,6 @@ public class ObtenirRessources{
 
     public static List<String> getFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
         List<String> filenames = new ArrayList<>();
-        
         URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
         if (url != null) {
             if (url.getProtocol().equals("file")) {
@@ -75,11 +78,23 @@ public class ObtenirRessources{
     }
 
     public static HashMap<String, Image> getImagesAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
+        HashMap<String, InputStream> readers = getStreamsAndFilenames(pattern, directoryName);
         HashMap<String, Image> images = new HashMap<String, Image>();
+        for(Map.Entry<String, InputStream> entry : readers.entrySet()) {
+            images.put(entry.getKey(), ImageIO.read(entry.getValue()));
+        }
+        return images;
+    }
+
+    public static HashMap<String, InputStream> getStreamsAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
+        HashMap<String, InputStream> streams = new HashMap<String, InputStream>();
         Pattern filenamePattern = Pattern.compile("[ \\w-]+?(?=\\.)");
         Matcher filenameMatcher;
 
         URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
+        if (url == null)
+            url = new File(directoryName).toURI().toURL();
+        
         if (url != null) {
             if (url.getProtocol().equals("file")) {
                 final File file = Paths.get(url.toURI()).toFile();
@@ -89,7 +104,6 @@ public class ObtenirRessources{
                         for (File filename : files) {
                             final boolean accept = pattern.matcher(filename.toString()).matches();
                             if (accept) {
-                                final Image img = ImageIO.read( new FileInputStream(filename));
                                 // On veut récupèrer le nom du fichier
                                 // Or on obtient le chemin
                                 // ex: G:\Documents\GitHub\Perseverance_Trip\Perseverance_II\target\classes\res\symboles\checkbox.png
@@ -99,7 +113,7 @@ public class ObtenirRessources{
                                 
                                 filenameMatcher = filenamePattern.matcher(filename.toString());
                                 if (filenameMatcher.find())
-                                    images.put(filenameMatcher.group(0), img);
+                                    streams.put(filenameMatcher.group(0), new FileInputStream(filename));
                             }
                         }
                     }
@@ -133,14 +147,14 @@ public class ObtenirRessources{
                                 
                                 filenameMatcher = filenamePattern.matcher(resource.toString());
                                 if (filenameMatcher.find())
-                                    images.put(filenameMatcher.group(0), ImageIO.read(Thread.currentThread().getContextClassLoader().getResourceAsStream(name)));
+                                    streams.put(filenameMatcher.group(0), Thread.currentThread().getContextClassLoader().getResourceAsStream(name));
                             }
                         }
                     }
                 }
             }
         }
-        return images;
+        return streams;
     }
 
     public static HashMap<String, AudioInputStream> getAudioAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {

@@ -13,7 +13,7 @@ public class Editeur extends JPanel {
 
     public Editeur(Controleur controleur) {
         this.controleur = controleur;
-        carte =  new Dessiner(controleur.getDonnees().obtenirJoueur());
+        carte =  new Dessiner();
         
         setLayout(null);
         menu.setLayout(null);
@@ -29,9 +29,6 @@ public class Editeur extends JPanel {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        menu.repaint();
-        carte.repaint();
-        
     }
 
     public void initialiser(int largeur, int hauteur) {

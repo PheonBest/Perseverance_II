@@ -2,6 +2,7 @@ import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.BasicStroke;
+import java.awt.Image;
 
 public class BoutonCercle implements Dessin {
     private boolean sourisDessus = false;
@@ -9,12 +10,21 @@ public class BoutonCercle implements Dessin {
     private int y;
     private double rayon;
     private int taillePinceau;
+    private Image image;
     
     public BoutonCercle(int x, int y, double rayon, int taillePinceau) {
         this.x = x;
         this.y = y;
         this.rayon = rayon;
+        this.image = image;
         this.taillePinceau = taillePinceau;
+    }
+
+    public BoutonCercle(int x, int y, double rayon, Image image) {
+        this.x = x;
+        this.y = y;
+        this.rayon = rayon;
+        this.image = image;
     }
 
     public void dessiner(Graphics g) {
@@ -38,6 +48,9 @@ public class BoutonCercle implements Dessin {
             g2d.fillOval(x-(int)(1.15*rayon),y-(int)(1.15*rayon),(int)(2*1.15*rayon),(int)(2*1.15*rayon));
         else
             g2d.fillOval(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
+
+        // On dessine l'éventuelle image par-dessus le cercle
+        g2d.drawImage(image, x, y, null);
     }
 
     public void majSourisDessus(boolean sourisDessus) {

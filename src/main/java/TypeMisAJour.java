@@ -6,5 +6,8 @@ public enum TypeMisAJour {
     Avancement,
     Scene,
     BoutonsType,
-    BoutonsCercle, Zoom, CentreZoom
+    BoutonsCercle,
+    Zoom,
+    CentreZoom,
+    Cartes
 }

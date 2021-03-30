@@ -7,6 +7,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -21,13 +23,13 @@ import java.awt.Point;
 public class Affichage extends JFrame implements Observer, ActionListener, KeyListener, MouseWheelListener, MouseMotionListener, MouseListener {
     private Controleur controleur;
     private CardLayout cardLayout = new CardLayout();
-    private boolean enJeu = false;
+    private String scene = "";
 
     private JPanel contenu = new JPanel();
-    private JPanel modeDeJeu = new JPanel();
+    private JPanel modeDeJeu;
     private JPanel chargement = new Chargement();
     private JPanel editeur;
-    private Dessiner jeu = new Dessiner();
+    private Dessiner jeu = new Dessiner(true);
 
     private double largeur;
     private double hauteur;
@@ -37,8 +39,9 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     public Affichage(int largeur, int hauteur, Controleur controleur) {
         
         this.controleur = controleur;
+        modeDeJeu = new ModeDeJeu(controleur);
         editeur = new Editeur(controleur);
-        jeu = new Dessiner(controleur.getDonnees().obtenirJoueur());
+        jeu.setLayout(null);
 
         
         // Gestion des évènements
@@ -62,10 +65,10 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.setLocationRelativeTo(null);
         
         contenu.setLayout(cardLayout);
-        contenu.add(modeDeJeu, "Mode de Jeu");
+        contenu.add(modeDeJeu, "Choix du mode");
         contenu.add(jeu, "Jeu");
         contenu.add(chargement, "Chargement");
-        contenu.add(editeur, "Editeur");
+        contenu.add(editeur, "Editeur de carte");
         jeu.setBackground(Color.DARK_GRAY);
 
         
@@ -107,14 +110,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         timer = new Timer(Options.DELAI_ANIMATION, this);
         timer.start();
         */
-    }
-
-    private void jouer() {
-        enJeu = true;
-        // L'animation de rotation de la matrice sera mise à jour
-        // Toutes les 15 milisecondes
-        timer = new Timer(Options.DELAI_ANIMATION, this);
-        timer.start();
+        
     }
 
     @Override
@@ -150,9 +146,9 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 ((Editeur)editeur).majBoutonsType((Cellule[]) nouveau);
                 break;
             case Cellules:
-                if (enJeu)
+                if (scene.equals("Jeu"))
                     ((Dessiner)jeu).majCellules((Cellule[][]) nouveau);
-                else
+                else if (scene.equals("Editeur de carte"))
                     ((Editeur)editeur).majCellules((Cellule[][]) nouveau);
                 break;
             case Joueur:
@@ -162,29 +158,40 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 ((Chargement)chargement).majChargement((int) nouveau);
                 break;
             case Scene:
-                if (((String) nouveau).equals("Jeu"))
-                    jouer();
-                else if (((String) nouveau).equals("Editeur de carte"))
-                    controleur.editer();
+                scene = (String) nouveau;
+                if (((String) nouveau).equals("Jeu")) {
+                    // L'animation sera mise à jour
+                    // Toutes les 15 milisecondes
+                    timer = new Timer(Options.DELAI_ANIMATION, this);
+                    timer.start();
+                } else if (((String) nouveau).equals("Editeur de carte")) {
+                    timer = new Timer(Options.DELAI_ANIMATION, this);
+                    timer.start();
+                } else if (timer != null && timer.isRunning()) {
+                    timer.stop();
+                }
                 cardLayout.show(contenu, (String) nouveau);
                 break;
             case CentreZoom:
-                if (enJeu)
+                if (scene.equals("Jeu"))
                     ((Dessiner) jeu).majCentreZoom((Point) nouveau);
-                else
+                else if (scene.equals("Editeur de carte"))
                     ((Editeur) editeur).majCentreZoom((Point) nouveau);
                 break;
             case Zoom:
-                if (enJeu)
+                if (scene.equals("Jeu"))
                     ((Dessiner) jeu).majZoom((Double) nouveau);
-                else
+                else if (scene.equals("Editeur de carte"))
                     ((Editeur) editeur).majZoom((Double) nouveau);
                 break;
+            case Cartes:
+                ((ModeDeJeu) modeDeJeu).majCartes((HashMap<String, InputStream>) nouveau);
+                break;
             case Peindre:
-                if (enJeu)
+                if (scene.equals("Jeu"))
                     jeu.repaint();  // Prévoit de mettre à jour le composant
                                     // n'appelle pas la méthode paint() !
-                else
+                else if (scene.equals("Editeur de carte"))
                     editeur.repaint();
                 break;
         }

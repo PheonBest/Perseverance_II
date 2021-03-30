@@ -11,8 +11,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ProcessBuilder.Redirect.Type;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.CellEditor;
@@ -28,15 +33,49 @@ public class Controleur {
         this.donnees = donnees;
     }
 
-	public void jouer() {
+    private Cellule[][] obtenirCarte(InputStream carte) {
+        String[][]records = CSV.lecture(carte);
+        Cellule[][] cellules = new Cellule[records.length][records[0].length];
+
+        TypeCase type;
+        String[] infoCellules = new String[2];
+        for(int i=0;i<records.length;i++){
+            for(int j=0;j<records[i].length;j++){
+
+                infoCellules = records[i][j].split(";");
+
+                type = null;
+                for (TypeCase t : TypeCase.values()) {
+                    if (t.name().equals(infoCellules[0])) {
+                        type = t;
+                        break;
+                    }
+                }
+                if (type == null)
+                    type = TypeCase.VIDE;
+                
+                
+                cellules[i][j] = new Cellule(type, i, j);
+                cellules[i][j].translate(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2); // Décalage de l'affichage
+            }
+        }
+        return cellules;
+    }
+    
+	public void jouer(InputStream carte) {
+
+        donnees.majCellules(obtenirCarte(carte));
         donnees.majJoueur(new Robot(donnees.getImagesJoueur(), 0, 0));
         donnees.majScene("Jeu");
         donnees.notifierObserveur(TypeMisAJour.Scene);
+        donnees.notifierObserveur(TypeMisAJour.Cellules);
         LinkedList<Dimension> buts = new LinkedList<Dimension>();
 
+        /*
         buts.add(donnees.obtenirCellules()[0][0].obtenirCentre());
         buts.add(donnees.obtenirCellules()[3][3].obtenirCentre());
         donnees.obtenirJoueur().definirBut(buts);
+        */
 	}
 
 	public void rafraichir() {
@@ -49,6 +88,7 @@ public class Controleur {
                 //click((int)(MouseInfo.getPointerInfo().getLocation().getX() - donnees.obtenirPositionFenetre().getX()), (int)(MouseInfo.getPointerInfo().getLocation().getY() - donnees.obtenirPositionFenetre().getY()));
                 click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY());
             }
+            donnees.notifierObserveur(TypeMisAJour.Peindre);
         }
         if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
             donnees.obtenirJoueur().move();
@@ -76,6 +116,15 @@ public class Controleur {
 	}
     
     public void charger() {
+
+        // Chargement des cartes
+        try {
+            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
+            donnees.majCartes(ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES));
+            donnees.notifierObserveur(TypeMisAJour.Cartes);
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
 
         // Chargement des musiques
         // Les formats supportés sont:
@@ -107,8 +156,8 @@ public class Controleur {
             e.printStackTrace();
         }
         
-        for (String i : donnees.getImagesSymboles().keySet())
-            System.out.println("Nom de l'image : " + i + "\nimage: " + donnees.getImagesSymboles().get(i)+"\n");
+        // for (String i : donnees.getImagesSymboles().keySet())
+        //     System.out.println("Nom de l'image : " + i + "\nimage: " + donnees.getImagesSymboles().get(i)+"\n");
 
         // Chargement des images du joueur
         ArrayList<ArrayList<Image>> images = new ArrayList<ArrayList<Image>>(4);
@@ -167,9 +216,10 @@ public class Controleur {
             try {
                 ArrayList<ArrayList<Image>> imagesJoueur = (ArrayList<ArrayList<Image>>) get();
                 donnees.majImagesJoueur(imagesJoueur);
-                jouer();
                 majMusique(0);
                 boucleMusique();
+                donnees.majScene("Choix du mode");
+                donnees.notifierObserveur(TypeMisAJour.Scene);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -317,7 +367,7 @@ public class Controleur {
             donnees.notifierObserveur(TypeMisAJour.Peindre);
     }
 
-    public void editer() {
+    public void editer(InputStream carte) {
         final int LARGEUR_MENU = (int)(donnees.obtenirLargeur()/Options.RATIO_LARGEUR_MENU);
         
         //BoutonsCercles
@@ -357,10 +407,13 @@ public class Controleur {
             }
         }
 
+        donnees.majCellules(obtenirCarte(carte));
         donnees.majBoutonsCercle(boutonsCercle);
         donnees.majBoutonsType(boutonsType);
         donnees.majScene("Editeur de carte");
 
+        donnees.notifierObserveur(TypeMisAJour.Scene);
+        donnees.notifierObserveur(TypeMisAJour.Cellules);
         donnees.notifierObserveur(TypeMisAJour.BoutonsCercle);
         donnees.notifierObserveur(TypeMisAJour.BoutonsType);
         donnees.notifierObserveur(TypeMisAJour.Peindre);
