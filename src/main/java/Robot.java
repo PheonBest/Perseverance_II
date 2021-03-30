@@ -277,8 +277,15 @@ public class Robot extends Avatar {
             }
         }
     }
-    public Dimension obtenirCase() {
-        return new Dimension(ligne, colonne);
-    }
     
+    public int[] obtenirCase() {
+        return new int[]{ligne, colonne};
+    }
+    public void majCase(int ligne, int colonne) {
+        this.ligne = ligne;
+        this.colonne = colonne;
+    }
+    public int[] obtenirCoordonnees() {
+        return new int[]{xFictif, yFictif};
+    }
 }

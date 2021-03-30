@@ -33,6 +33,20 @@ public class Controleur {
         this.donnees = donnees;
     }
     
+    private void extraire(int ligne, int colonne) {
+        // Extraction du minerais
+    }
+
+    private void placerJoueur(int ligne, int colonne) {
+        int[] but = donnees.obtenirCellules()[ligne][colonne].obtenirCentre();
+        int[] coordsJoueur = donnees.obtenirJoueur().obtenirCoordonnees();
+        
+        for (int i=0; i < donnees.obtenirCellules().length; i++) {
+            for (Cellule c: donnees.obtenirCellules()[i])
+                c.translate(coordsJoueur[0]-but[0], coordsJoueur[1]-but[1]);
+        }
+        donnees.obtenirJoueur().majCase(ligne, colonne);
+    }
 	public void jouer(InputStream carte) {
 
         donnees.majCellules(CSV.lecture(carte));
@@ -42,12 +56,15 @@ public class Controleur {
         donnees.notifierObserveur(TypeMisAJour.Cellules);
         LinkedList<int[]> buts = new LinkedList<int[]>();
         
+        /*
+        placerJoueur(4,1);
         buts.add(donnees.obtenirCellules()[4][2].obtenirCentre());
         buts.add(donnees.obtenirCellules()[4][3].obtenirCentre());
         buts.add(donnees.obtenirCellules()[4][4].obtenirCentre());
         buts.add(donnees.obtenirCellules()[4][5].obtenirCentre());
         
         donnees.obtenirJoueur().definirBut(buts);
+        */
 	}
 
 	public void rafraichir() {
@@ -89,14 +106,7 @@ public class Controleur {
     
     public void charger() {
 
-        // Chargement des cartes
-        try {
-            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
-            donnees.majCartes(ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES));
-            donnees.notifierObserveur(TypeMisAJour.Cartes);
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
+        chargerCartes();
 
         // Chargement des musiques
         // Les formats supportés sont:
@@ -377,7 +387,9 @@ public class Controleur {
             donnees.notifierObserveur(TypeMisAJour.Peindre);
     }
 
-    public void editer(InputStream carte) {
+    public void editer(String nomCarte, InputStream carte) {
+
+        donnees.majNomCarte(nomCarte);
         final int LARGEUR_MENU = (int)(donnees.obtenirLargeur()/Options.RATIO_LARGEUR_MENU);
         
         //BoutonsCercles
@@ -430,7 +442,7 @@ public class Controleur {
     }
 
     public void interactionClavier(int code) {
-        if (donnees.getScene().equals("Editeur de carte")) {
+        if (donnees.getScene() != null && donnees.getScene().equals("Editeur de carte")) {
             switch (code) {
                 case KeyEvent.VK_UP:
                     bougerEcran(0, +1);
@@ -462,12 +474,12 @@ public class Controleur {
     public void ajusterZoom(int notches, Point point) {
         // convert target coordinates to zoomTarget coordinates
         if (notches < 1) {
-            double tmpZoom = -donnees.obtenirZoom()*notches/Options.MULTIPLICATEUR_ZOOM;
+            double tmpZoom = donnees.obtenirZoom()/Options.MULTIPLICATEUR_ZOOM;
             if (tmpZoom < 0.01)
                 tmpZoom = 0.01;
             donnees.majZoom(tmpZoom);
         } else
-            donnees.majZoom(donnees.obtenirZoom()*notches*Options.MULTIPLICATEUR_ZOOM);
+            donnees.majZoom(donnees.obtenirZoom()*Options.MULTIPLICATEUR_ZOOM);
         donnees.majCentreZoom(point);
         donnees.notifierObserveur(TypeMisAJour.CentreZoom);
         donnees.notifierObserveur(TypeMisAJour.Zoom);
@@ -545,5 +557,32 @@ public class Controleur {
     }
     public Donnees getDonnees(){
         return this.donnees;
+    }
+
+    public void enregistrer() {
+        try {
+            System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true);
+            chargerCartes();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void retourMenu() {
+        donnees.majScene("Choix du mode");
+        donnees.notifierObserveur(TypeMisAJour.Scene);
+        chargerCartes();
+    }
+
+    private void chargerCartes() {
+        // Chargement des cartes
+        try {
+            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
+            donnees.majCartes(ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES));
+            donnees.notifierObserveur(TypeMisAJour.Cartes);
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
     }
 }

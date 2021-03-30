@@ -36,6 +36,7 @@ public class Donnees implements Observable {
     
     // CSV des cartes
     private HashMap<String, InputStream> cartes;
+    private String nomCarte;
 
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
@@ -391,5 +392,13 @@ public class Donnees implements Observable {
 
     public void majRayonDeSelection(int rayonDeSelection) {
         this.rayonDeSelection = rayonDeSelection;
+    }
+
+    public void majNomCarte(String nomCarte) {
+        this.nomCarte = nomCarte;
+    }
+
+    public String obtenirNomCarte() {
+        return nomCarte;
     }
 }

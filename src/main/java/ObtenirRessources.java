@@ -1,3 +1,4 @@
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -75,6 +76,23 @@ public class ObtenirRessources{
             }
         }
         return filenames;
+    }
+
+    public static HashMap<String, AudioInputStream> getAudioAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
+        HashMap<String, InputStream> readers = getStreamsAndFilenames(pattern, directoryName);
+        HashMap<String, AudioInputStream> audio = new HashMap<String, AudioInputStream>();
+        try {
+            for(Map.Entry<String, InputStream> entry : readers.entrySet())
+                // On créée le flux de données audio à partir de l'inputStream
+                // Pour ça, on doit passer par un BufferedInputStream pour supporter
+                // Les méthodes "mark" et "reset"
+                // On a alors un stream supporté par AudioSystem.
+                // On le lit donc avec AudioSystem, et on le rentre dans le cache
+                audio.put(entry.getKey(), createReusableAudioInputStream(AudioSystem.getAudioInputStream(new BufferedInputStream(entry.getValue()))));
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        }
+        return audio;
     }
 
     public static HashMap<String, Image> getImagesAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
@@ -155,67 +173,6 @@ public class ObtenirRessources{
             }
         }
         return streams;
-    }
-
-    public static HashMap<String, AudioInputStream> getAudioAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
-        HashMap<String, AudioInputStream> images = new HashMap<String, AudioInputStream>();
-        Pattern filenamePattern = Pattern.compile("[ \\w-]+?(?=\\.)");
-        Matcher filenameMatcher;
-
-        URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
-        if (url != null) {
-            if (url.getProtocol().equals("file")) {
-                final File file = Paths.get(url.toURI()).toFile();
-                if (file != null) {
-                    File[] files = file.listFiles();
-                    if (files != null) {
-                        for (File filename : files) {
-                            final boolean accept = pattern.matcher(filename.toString()).matches();
-                            if (accept) {
-                                try {
-                                    AudioInputStream AUDIO = createReusableAudioInputStream(AudioSystem.getAudioInputStream(filename));
-                                    filenameMatcher = filenamePattern.matcher(filename.toString());
-                                    if (filenameMatcher.find())
-                                        images.put(filenameMatcher.group(0), AUDIO);
-                                } catch (UnsupportedAudioFileException e) {
-                                    e.printStackTrace();
-                                } 
-                            }
-                        }
-                    }
-                }
-            } else if (url.getProtocol().equals("jar")) {
-                String dirname = directoryName + "/";
-                String path = url.getPath();
-                String jarPath = path.substring(5, path.indexOf("!"));
-                try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name()))) {
-                    Enumeration<JarEntry> entries = jar.entries();
-                    List<JarEntry> sortedEntries = Collections.list(entries);
-                    sortedEntries.sort(new Comparator<JarEntry>(){
-                        @Override
-                        public int compare(JarEntry o1, JarEntry o2) {
-                            return o1.getName().compareTo(o2.getName());
-                        }
-                    });
-                    for(JarEntry entry: sortedEntries) {
-                        String name = entry.getName();
-                        if (!dirname.equals(name)) {
-                        //if (name.startsWith(dirname) && !dirname.equals(name)) {
-                            URL resource = Thread.currentThread().getContextClassLoader().getResource(name);
-                            final boolean accept = pattern.matcher(resource.toString()).matches();
-                            if (accept) {
-                                filenameMatcher = filenamePattern.matcher(resource.toString());
-                                if (filenameMatcher.find())
-                                    images.put(filenameMatcher.group(0), AudioSystem.getAudioInputStream(Thread.currentThread().getContextClassLoader().getResourceAsStream(name)));
-                            }
-                        }
-                    }
-                } catch (UnsupportedAudioFileException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return images;
     }
 
     public static List<Image> getImages(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
