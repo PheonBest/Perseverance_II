@@ -33,7 +33,6 @@ public class Dessiner extends JPanel {
         this.affichagePanneauDeControle = affichagePanneauDeControle;
         if (affichagePanneauDeControle) {
             panneauDeControle = new ControlPanel(10,10);
-            panneauDeControle.setLayout(null);
             add(panneauDeControle);
         }
     }
