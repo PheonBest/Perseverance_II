@@ -47,7 +47,7 @@ public class ComposantRobot{
     public void degraderC(){
         this.voyant.setEtat(this.voyant.getEtat()+1);
     }
-    public void réparerC(){
+    public void reparerC(){
         this.voyant.setEtat(Options.ALERTE_MIN);
         this.usure = Options.USURE_MIN;
     }

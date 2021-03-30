@@ -57,7 +57,7 @@ public class Donnees implements Observable {
         this.largeur = largeur;
         this.hauteur = hauteur;
 
-        /* Création d'une carte
+        
         List<String[]> data = new ArrayList<String[]>();
 
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
@@ -83,7 +83,7 @@ public class Donnees implements Observable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        */
+        
     }
 
     // Getters et setters
