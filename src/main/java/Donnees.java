@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,8 @@ public class Donnees implements Observable {
     private double zoom = 1.;
     private Point centreZoom;
     private StatutSouris statutSouris = new StatutSouris();
+    private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
+    private int rayonDeSelection = 0;
     
     // CSV des cartes
     private HashMap<String, InputStream> cartes;
@@ -48,6 +51,7 @@ public class Donnees implements Observable {
     private Son lecteurEffets;
     private boolean etatMusique = true;
     private boolean etatEffets = true;
+    private BoutonCercle derniereCompetence = null;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
@@ -130,6 +134,9 @@ public class Donnees implements Observable {
     public void notifierObserveur(TypeMisAJour type) {
         for (Observer obs: listObserver) {
             switch (type) {
+                case Competences:
+                    obs.mettreAJour(TypeMisAJour.Competences, competences);
+                    break;
                 case Cellules:
                     obs.mettreAJour(TypeMisAJour.Cellules, cellules);
                     break;
@@ -193,6 +200,9 @@ public class Donnees implements Observable {
     public BoutonCercle obtenirDernierBouton() {
         return dernierBouton;
     }
+    public BoutonCercle obtenirDerniereCompetence() {
+        return derniereCompetence;
+    }
 
     public void majDernierBouton(BoutonCercle b) {
         dernierBouton = b;
@@ -202,6 +212,9 @@ public class Donnees implements Observable {
     }
     public void majDerniereCellule(Cellule c) {
         derniereCellule = c;
+    }
+    public void majDerniereCompetence(BoutonCercle b) {
+        derniereCompetence = b;
     }
 
     public Cellule[] obtenirBoutonsType() {
@@ -370,5 +383,21 @@ public class Donnees implements Observable {
 
     public HashMap<String, InputStream> obtenirCartes() {
         return cartes;
+    }
+
+    public void majCompetences(List<BoutonCercle> competences) {
+        this.competences = competences;
+    }
+
+    public List<BoutonCercle> obtenirCompetences() {
+        return competences;
+    }
+    
+    public int obtenirRayonDeSelection() {
+        return rayonDeSelection;
+    }
+
+    public void majRayonDeSelection(int rayonDeSelection) {
+        this.rayonDeSelection = rayonDeSelection;
     }
 }

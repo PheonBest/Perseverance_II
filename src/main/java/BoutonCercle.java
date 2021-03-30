@@ -11,6 +11,7 @@ public class BoutonCercle implements Dessin {
     private double rayon;
     private int taillePinceau;
     private Image image;
+    private String effet;
     
     public BoutonCercle(int x, int y, double rayon, int taillePinceau) {
         this.x = x;
@@ -20,11 +21,12 @@ public class BoutonCercle implements Dessin {
         this.taillePinceau = taillePinceau;
     }
 
-    public BoutonCercle(int x, int y, double rayon, Image image) {
+    public BoutonCercle(int x, int y, double rayon, String effet, Image image) {
         this.x = x;
         this.y = y;
         this.rayon = rayon;
         this.image = image;
+        this.effet = effet;
     }
 
     public void dessiner(Graphics g) {
@@ -50,7 +52,8 @@ public class BoutonCercle implements Dessin {
             g2d.fillOval(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
 
         // On dessine l'éventuelle image par-dessus le cercle
-        g2d.drawImage(image, x, y, null);
+        if (image != null)
+            g2d.drawImage(image, (int)(x-image.getWidth(null)/2), (int)(y-image.getHeight(null)/2), null);
     }
 
     public void majSourisDessus(boolean sourisDessus) {
@@ -61,6 +64,8 @@ public class BoutonCercle implements Dessin {
         // Le point est contenu dans le cercle ssi
         // distance^2 < rayon^2
         // (x-xEvent)^2+(y-yEvent)^2 < rayon^2
+        if (sourisDessus)
+            return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(1.15*rayon,2));
         return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(rayon,2));
     }
 
@@ -68,6 +73,10 @@ public class BoutonCercle implements Dessin {
         if (b == null)
             return false;
         return (x == b.x && y == b.y && rayon == b.rayon);
+    }
+
+    public String obtenirEffet() {
+        return effet;
     }
 
     public int obtenirTaillePinceau() {

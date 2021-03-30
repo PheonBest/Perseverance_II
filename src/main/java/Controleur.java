@@ -245,6 +245,41 @@ public class Controleur {
         // Si on est en jeu ou dans l'éditeur de carte, et qu'on a cliqué sur la carte
         final double COIN_GAUCHE_MENU = donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU;
         if (donnees.getScene() != null && (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && x < COIN_GAUCHE_MENU))) {
+
+            // Gestion des compétences dans le jeu
+            List<BoutonCercle> competences = donnees.obtenirCompetences();
+            for (BoutonCercle b: competences) {
+                if (b.contains(x, y)) {
+                    // Si on a déjà sélectionné la compétene, on la désélectionne
+                    if (donnees.obtenirDerniereCompetence() == b) { // On compare les pointeurs (références) des 2 objets
+                        donnees.obtenirDerniereCompetence().majSourisDessus(false);
+                        donnees.majDerniereCompetence(null);
+                        if (donnees.obtenirRayonDeSelection() != 0)
+                            donnees.majRayonDeSelection(0);
+                    } else { // On sélectionne la compétence
+                        b.majSourisDessus(true);
+                        if (donnees.obtenirRayonDeSelection() != 0)
+                            donnees.majRayonDeSelection(0);
+                        switch (b.obtenirEffet()) {
+                            case "Drone":
+                                donnees.majRayonDeSelection(7);
+                                donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                break;
+                            case "Réparation":
+                                break;
+                        }
+                        // On désélectionne l'ancienne compétence
+                        if (donnees.obtenirDerniereCompetence() != null)
+                            donnees.obtenirDerniereCompetence().majSourisDessus(false);
+                        donnees.majDerniereCompetence(b);
+                    }
+                    estModifie = true;
+                    donnees.notifierObserveur(TypeMisAJour.Competences);
+                    break;
+                }
+            }
+
+            // Gestion des cellules
             Cellule[][] cellules = donnees.obtenirCellules();
             for (int i=0; i < cellules.length; i++) {
                 for (int j=0; j < cellules[i].length; j++) {
@@ -322,8 +357,7 @@ public class Controleur {
             }
         }
 
-        //Gestion du menu de l'éditeur de carte
-
+        // Gestion du menu de l'éditeur de carte
         // Si on est dans l'éditeur de carte, et qu'on a cliqué sur le menu
         if (donnees.getScene() != null && donnees.getScene().equals("Editeur de carte") && x >= COIN_GAUCHE_MENU) {
             x -= COIN_GAUCHE_MENU; // Les coordonnées des boutons sont relatives au coin en haut à gauche du menu. Donc on soustrait sa coordonnée x.
@@ -406,7 +440,7 @@ public class Controleur {
                 index++;
             }
         }
-
+        
         donnees.majCellules(obtenirCarte(carte));
         donnees.majBoutonsCercle(boutonsCercle);
         donnees.majBoutonsType(boutonsType);

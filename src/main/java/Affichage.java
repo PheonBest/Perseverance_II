@@ -9,6 +9,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -139,6 +140,12 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
+            case RayonDeSelection:
+                ((Dessiner)jeu).majRayon((Integer) nouveau);
+                break;
+            case Competences:
+                ((Dessiner)jeu).majCompetences((List<BoutonCercle>) nouveau);
+                break;
             case BoutonsCercle:
                 ((Editeur)editeur).majBoutonsCercle((BoutonCercle[]) nouveau);
                 break;

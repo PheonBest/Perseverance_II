@@ -9,5 +9,7 @@ public enum TypeMisAJour {
     BoutonsCercle,
     Zoom,
     CentreZoom,
-    Cartes
+    Cartes,
+    Competences,
+    RayonDeSelection
 }

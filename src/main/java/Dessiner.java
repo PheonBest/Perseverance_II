@@ -5,6 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.awt.Color;
@@ -13,6 +14,7 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 
 public class Dessiner extends JPanel {
+    private int rayonDeSelection = 0;
     private Cellule[][] cellules = {{}};
     private double largeurEcran;
     private double hauteurEcran;
@@ -22,24 +24,9 @@ public class Dessiner extends JPanel {
     private Point centreZoom = new Point(0,0);
     private boolean enJeu = false;
     private int[] tailleMinimap = {100,100};
-    private Cellule[] voisins = new Cellule[6];
     private int ligneTmp;
     private int colonneTmp;
-    private int[][] indexVoisinsColonnePaire = {{-1,0},
-                                                {+1,0},
-                                                {0,+1},
-                                                {0,-1},
-                                                {+1,+1},
-                                                {+1,-1}
-                                            };
-    private int[][] indexVoisinsColonneImpaire={{-1,0},
-                                                {+1,0},
-                                                {0,+1},
-                                                {0,-1},
-                                                {-1,+1},
-                                                {-1,-1}
-                                            };
-    private LinkedList<BoutonCercle> competences = new LinkedList<BoutonCercle>();
+    private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
 
     public Dessiner(boolean affichagePanneauDeControle){
@@ -79,10 +66,24 @@ public class Dessiner extends JPanel {
         */
         at.scale(zoom, zoom);
         
+        // Obtention de la cellule sur laquelle le joueur est
+        Cellule[] voisins = Voisins.obtenirVoisins(cellules, 6, 6, 4);
+        // On dessine les cellules de la carte
         g2d.setTransform(at);
         for (int i=0; i < cellules.length; i++) {
             for (Cellule c: cellules[i]) {
                 //if (c.estVisible(largeurEcran,hauteurEcran,zoom))
+
+                // Si les cellules font partie des voisins du joueur, on les dessine en bleu
+                int j = 0;
+                while (j < voisins.length && voisins[j] != c)
+                    j++;
+                if (j < voisins.length) {
+                    TypeCase oldType = c.obtenirType();
+                    c.majType(TypeCase.DESERT);
+                    c.dessiner(g2d);
+                    c.majType(oldType);
+                } else
                     c.dessiner(g2d);
             }
         }
@@ -91,10 +92,15 @@ public class Dessiner extends JPanel {
         if (enJeu && joueur != null) {
             // Affichage du joueur
             joueur.dessiner(g2d);
+
             // Affichage de la minimap
-            
-            // On dessine la minimap sur un rectangle
             g2d.setTransform(ancienneTransformation);
+
+            // On dessine les compétences utilisables par le joueur
+            for (BoutonCercle c: competences)
+                c.dessiner(g);
+
+            // On dessine la minimap sur un rectangle
             g2d.setColor(Color.gray);
             
             g2d.fillRoundRect(  (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[0]),
@@ -129,25 +135,7 @@ public class Dessiner extends JPanel {
             ((Graphics2D) g2d).setTransform(ancienneTransformation);
             for (int i=0; i < cellules.length; i+=Options.INCREMENT_MINIMAP) {
                 for (int j=0; j < cellules[i].length; j+=Options.INCREMENT_MINIMAP) {
-                    Arrays.fill(voisins, null);
-                    // On obtient la liste des six voisins
-                    for (int ligne = 0; ligne < voisins.length; ligne++) {
-                        if (j%2==0) {
-                            ligneTmp = i+indexVoisinsColonnePaire[ligne][0];
-                            colonneTmp = j+indexVoisinsColonnePaire[ligne][1];
-                            if (ligneTmp > -1 && ligneTmp < cellules.length && colonneTmp > -1 && colonneTmp < cellules[0].length) {
-                                voisins[ligne] = cellules[ligneTmp][colonneTmp];
-                            }
-                        } else {
-                            ligneTmp = i+indexVoisinsColonneImpaire[ligne][0];
-                            colonneTmp = j+indexVoisinsColonneImpaire[ligne][1];
-                            if (ligneTmp > -1 && ligneTmp < cellules.length && colonneTmp > -1 && colonneTmp < cellules[0].length) {
-                                voisins[ligne] = cellules[ligneTmp][colonneTmp];
-                            }
-                        }
-                    }
-                    
-                    TypeCase typeRepresentatif = obtenirCelluleRepresentative(voisins);
+                    TypeCase typeRepresentatif = obtenirCelluleRepresentative(Voisins.obtenirVoisins(cellules, i, j, 2));
                     if (cellules[i][j].obtenirType() == typeRepresentatif)
                         cellules[i][j].dessiner(g2d, Options.AGRANDISSEMENT_CELLULE_MINICARTE); // La cellule sera agrandie autour de son centre
                     else {
@@ -219,6 +207,10 @@ public class Dessiner extends JPanel {
         this.enJeu = enJeu;
     }
 
+    public void majCompetences(List<BoutonCercle> competences) {
+        this.competences = (LinkedList<BoutonCercle>) competences;
+    }
+
     private void majTailleMinimap() {
         if (cellules.length > 1) {
             tailleMinimap[0] = (int)((cellules[0][cellules[0].length-1].xpoints[0] - cellules[0][0].xpoints[0])*Options.ZOOM_MINIMAP);
@@ -244,5 +236,9 @@ public class Dessiner extends JPanel {
                 individuMax = individu;
         };
         return individuMax.getKey();
+    }
+    
+    public void majRayon(Integer rayonDeSelection) {
+        this.rayonDeSelection = rayonDeSelection;
     }
 }

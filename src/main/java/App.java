@@ -36,7 +36,14 @@ public class App
                 Affichage affichage = new Affichage(largeur, hauteur, controleur);
                 donnees.addObserver(affichage);
                 affichage.initialiser();
-            }
+                
+                //Compétences
+                List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
+                competences.add(new BoutonCercle(100, 200, 50, "Drone", donnees.getImagesSymboles().get("checkbox")));
+                competences.add(new BoutonCercle(100, 320, 50, "Réparation", donnees.getImagesSymboles().get("checkbox")));
+                donnees.majCompetences(competences);
+                donnees.notifierObserveur(TypeMisAJour.Competences);
+                }
         });
         
         
