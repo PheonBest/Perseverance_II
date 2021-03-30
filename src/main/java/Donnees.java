@@ -57,9 +57,7 @@ public class Donnees implements Observable {
         this.largeur = largeur;
         this.hauteur = hauteur;
 
-        /* Création d'une carte
-        List<String[]> data = new ArrayList<String[]>();
-
+        //Création d'une carte
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
         for (int i=0; i < cellules.length; i++) {
             for (int j=0; j < cellules[i].length; j++) {
@@ -68,22 +66,13 @@ public class Donnees implements Observable {
             }
         }
 
-        String[] strings = new String[cellules[0].length];
-        for (int i=0; i < cellules.length; i++) {
-            for (int j=0; j < cellules[i].length; j++) {
-                strings[j] = cellules[i][j].toString();
-                //System.out.print(cellules[i][j].toString()+" ");
-            }
-            //System.out.println();
-            data.add(strings);
-        }
         try {
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(data, "new");
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "new");
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        */
+        
     }
 
     // Getters et setters
