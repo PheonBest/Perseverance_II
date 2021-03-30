@@ -32,39 +32,10 @@ public class Controleur {
     public Controleur(Donnees donnees) {
         this.donnees = donnees;
     }
-
-    private Cellule[][] obtenirCarte(InputStream carte) {
-        String[][]records = CSV.lecture(carte);
-        Cellule[][] cellules = new Cellule[records.length][records[0].length];
-
-        TypeCase type;
-        String[] infoCellules = new String[2];
-        for(int i=0;i<records.length;i++){
-            for(int j=0;j<records[i].length;j++){
-
-                infoCellules = records[i][j].split(";");
-
-                type = null;
-                for (TypeCase t : TypeCase.values()) {
-                    if (t.name().equals(infoCellules[0])) {
-                        type = t;
-                        break;
-                    }
-                }
-                if (type == null)
-                    type = TypeCase.VIDE;
-                
-                
-                cellules[i][j] = new Cellule(type, i, j);
-                cellules[i][j].translate(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2); // Décalage de l'affichage
-            }
-        }
-        return cellules;
-    }
     
 	public void jouer(InputStream carte) {
 
-        donnees.majCellules(obtenirCarte(carte));
+        donnees.majCellules(CSV.lecture(carte));
         donnees.majJoueur(new Robot(donnees.getImagesJoueur(), 0, 0));
         donnees.majScene("Jeu");
         donnees.notifierObserveur(TypeMisAJour.Scene);
@@ -446,7 +417,7 @@ public class Controleur {
             }
         }
         
-        donnees.majCellules(obtenirCarte(carte));
+        donnees.majCellules(CSV.lecture(carte));
         donnees.majBoutonsCercle(boutonsCercle);
         donnees.majBoutonsType(boutonsType);
         donnees.majScene("Editeur de carte");
