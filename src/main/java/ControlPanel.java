@@ -1,15 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
-public class ControlPanel extends JPanel{
+public class ControlPanel extends JPanel implements ActionListener{
     
     private int lx = 600;
     private int ly = 100;
     private Robot joueur;
     private JButton details;
+    private FullControlPanel panneauComplet;
     
     public ControlPanel(int x0, int y0){
         super();
+        setLayout(null);
         setSize(lx,ly);
         setLocation(x0,y0);
         
@@ -17,6 +20,7 @@ public class ControlPanel extends JPanel{
         details.setLocation(lx-120,ly-60);
         details.setSize(100,40);
         details.setBackground(Color.white);
+        details.addActionListener(this);
         add(details);
     }
     
@@ -55,6 +59,11 @@ public class ControlPanel extends JPanel{
 
     public void majJoueur(Robot joueur) {
         this.joueur = joueur;
+    }
+    
+    public void actionPerformed(ActionEvent e){
+        panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2);
+        panneauComplet.majJoueur(this.joueur);
     }
 }
 
