@@ -62,8 +62,7 @@ public class ControlPanel extends JPanel implements ActionListener{
     }
     
     public void actionPerformed(ActionEvent e){
-        panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2);
-        panneauComplet.majJoueur(this.joueur);
+        panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2, joueur);
     }
 }
 

@@ -10,6 +10,7 @@ public class Robot extends Avatar {
     
     // Paramètres vitaux du robots
     private int batterie;
+    private int nbRecharges;
     // 3 voyants principaux: Jambes, Bras Mécatro, Capteurs
     private Voyants[] voyantsPrincipaux = new Voyants[3]; 
     // Plusieurs éléments désignés par ces voyants
@@ -37,12 +38,13 @@ public class Robot extends Avatar {
     //--------------------------------------------------------------------------------------------------- Constructeurs
     
     // Constructeur complet 
-    public Robot(int nivBatterie, int listeEtats[], int listeUsures[],int nbKmParcourus, int compteurKm , int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
+    public Robot(int nivBatterie, int nbR, int listeEtats[], int listeUsures[],int nbKmParcourus, int compteurKm , int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
         // Le robot est un avatar, il hérite donc de son constructeur et de ses conditions d'avatar
         super(animationIndex, dureeImage, image, coords, x, y, r, dx, dy, dr);
         xFictif = x;
         yFictif = y;
         this.batterie = nivBatterie;
+        this.nbRecharges = nbR;
         this.kmTot = nbKmParcourus;
         this.comptKm = compteurKm;
         
@@ -63,7 +65,7 @@ public class Robot extends Avatar {
     
     // Constructeur "Robot neuf"
     public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
-        this(Options.BATTERIE_MAX, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
+        this(Options.BATTERIE_MAX,0, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
     }
     
     //---------------------------------------------------------------------------------------------------- Setters et getters
@@ -74,6 +76,9 @@ public class Robot extends Avatar {
     
     public int getBatterie(){
         return this.batterie;
+    }
+    public int getNbRecharges(){
+        return this.nbRecharges;
     }
 
     public Voyants[] getVP(){
@@ -152,6 +157,7 @@ public class Robot extends Avatar {
     
     public void rechargerBat(){
         setBatterie(Options.BATTERIE_MAX);
+        this.nbRecharges += 1;
     }
     
     public void usureJambes(double nbKm){
