@@ -1,1 +1,0 @@
-cmd /k mvn compile exec:java
