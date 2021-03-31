@@ -183,7 +183,7 @@ public abstract class Avatar implements Dessin {
         Graphics2D gg = (Graphics2D) g;
         gg.translate((int)(x + coords[0]), (int)(y + coords[1]));
 //gg.rotate(r);
-        gg.translate(-largeur/2,-hauteur/2);
+        gg.translate(-largeur*0.48,-hauteur*0.65);
         gg.drawImage(image.get(animationIndex).get(imageIndex), 0, 0, null);
     }
 }

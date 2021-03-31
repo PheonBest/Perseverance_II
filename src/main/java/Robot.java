@@ -25,11 +25,11 @@ public class Robot extends Avatar {
      * elle est utilisée ici pour référencer la position d'un point à atteindre sur la carte par rapport au robot.
      * Pour aller d'un point à un autre sur la carte, on utilise une liste de cases ciblées, appelées but (à atteindre).*/ 
      
-    private LinkedList<Dimension> but = new LinkedList<Dimension>();
+    private LinkedList<int[]> but = new LinkedList<int[]>();
     
     //  Position du robot dans la matrice de la carte
-    private int row = 0;
-    private int column = 0;
+    private int ligne = 0;
+    private int colonne = 0;
     
     // Position réélle du robot sur la carte, dont l'origine se rouve en haut à gauche
     private int xFictif = 0;
@@ -219,9 +219,10 @@ public class Robot extends Avatar {
     //---------------------------------------------------------------------------------------------------- Méthodes pour les déplacments du robot
     
     // La case à atteindre est définie par une série de sous-but
-    public void definirBut(LinkedList<Dimension> liste) {
+    public void definirBut(LinkedList<int[]> liste) {
         this.but = liste;
-        definirDirection(but.getFirst());
+        int[] d = but.getFirst(); // On prend une case à cibler 
+        definirDirection(new Dimension(d[0], d[1]));
         animationIndex = 2; //  Image qui montre le robot marcher 
     }
     
@@ -254,13 +255,17 @@ public class Robot extends Avatar {
         if (!but.isEmpty()) {
             xFictif += dx;
             yFictif += dy;
-            Dimension d = but.getFirst(); // On prend une case à cibler 
-            if (Math.abs(xFictif - d.getWidth()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
-                dx = (int) d.getWidth() - xFictif;
-            if (Math.abs(yFictif - d.getHeight()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
-                dy = (int) d.getHeight() - yFictif;
+            int[] d = but.getFirst(); // On prend une case à cibler 
+            if (Math.abs(xFictif - d[0]) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
+                dx = (int) d[0] - xFictif;
+            if (Math.abs(yFictif - d[1]) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
+                dy = (int) d[1] - yFictif;
             if (dx == 0 && dy == 0) {
-                actualiseCptKm(d);
+                
+                ligne = d[2];
+                colonne = d[3];
+                System.out.println(ligne+" "+colonne);
+                actualiseCptKm(new Dimension(d[0], d[1]));
                 usureJambes(comptKm);
                 actualiseBatterie();
                 actualiseVP();
@@ -269,7 +274,8 @@ public class Robot extends Avatar {
                 if (but.isEmpty()) // Si il ne reste plus de cases à parcourir, le robot est arrivé à la case demandée
                     animationIndex = 0; // On passe l'animation du joueur en mode "pause" (Idle)
                 else {
-                    definirDirection(but.getFirst());
+                    d = but.getFirst(); // On prend une case à cibler 
+                    definirDirection(new Dimension(d[0], d[1]));
                     //System.out.println("Coords joueur : "+xFictif +" _ "+ yFictif);
                     //System.out.println("Coords but : "+ but.getFirst().getWidth() +" _ "+ but.getFirst().getHeight());
                 }
@@ -278,4 +284,14 @@ public class Robot extends Avatar {
         }
     }
     
+    public int[] obtenirCase() {
+        return new int[]{ligne, colonne};
+    }
+    public void majCase(int ligne, int colonne) {
+        this.ligne = ligne;
+        this.colonne = colonne;
+    }
+    public int[] obtenirCoordonnees() {
+        return new int[]{xFictif, yFictif};
+    }
 }

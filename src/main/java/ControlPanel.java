@@ -44,7 +44,14 @@ public class ControlPanel extends JPanel implements ActionListener{
             g.fillRect(Xb+6,Yb+6,106,36);
             g.fillRect(Xb+6,Yb+19,112,10);
             // Jauge de batterie de couleur ajustable
-            g.setColor(new Color((float)(1.0-joueur.getBatterie()*0.01), (float)(0.0+joueur.getBatterie()*0.01), (float)(0.0)));
+            float c1 = (float) (1.0-joueur.getBatterie()*0.01);
+            float c2 = (float)(joueur.getBatterie()*0.01);
+            if (c1 < 0) c1 = 0;
+            else if (c1 > 1) c1 = 1;
+            if (c2 < 0) c2 = 0;
+            else if (c2 > 1) c2 = 1;
+            
+            g.setColor(new Color(c1, c2, (float)(0.0)));
             g.fillRect(Xb+9,Yb+9,joueur.getBatterie(),30);
             
             // Voyants : Origine(Xv,Yv) ( centre du 1er voyant ) 
