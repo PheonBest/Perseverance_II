@@ -53,8 +53,8 @@ public class Robot extends Avatar {
         this.jambes[1] = new ComposantRobot("Jambe gauche",listeEtats[1],listeUsures[1]);
         this.bras[0] = new ComposantRobot("Bras droit",listeEtats[2],listeUsures[2]);
         this.bras[1] = new ComposantRobot("Bras gauche",listeEtats[3],listeUsures[3]);
-        this.capteurs[0] = new ComposantRobot("Température du microprocesseur",listeEtats[4],listeUsures[4]);
-        this.capteurs[1] = new ComposantRobot("Capteurs visuels",listeEtats[5],listeUsures[5]);
+        this.capteurs[0] = new ComposantRobot("Température interne",listeEtats[4],listeUsures[4]);
+        this.capteurs[1] = new ComposantRobot("Caméras",listeEtats[5],listeUsures[5]);
         this.capteurs[2] = new ComposantRobot("Capteurs de pression",listeEtats[6],listeUsures[6]);
         
         voyantsPrincipaux[0] = new Voyants("Jambes");
@@ -83,6 +83,16 @@ public class Robot extends Avatar {
 
     public Voyants[] getVP(){
         return this.voyantsPrincipaux;
+    }
+    
+    public ComposantRobot[] getJambes(){
+        return this.jambes;
+    }
+    public ComposantRobot[] getBras(){
+        return this.bras;
+    }
+    public ComposantRobot[] getCapteurs(){
+        return this.capteurs;
     }
     
     public double getKmParcourus(){
@@ -267,6 +277,8 @@ public class Robot extends Avatar {
                 System.out.println(ligne+" "+colonne);
                 actualiseCptKm(new Dimension(d[0], d[1]));
                 usureJambes(comptKm);
+                // usure Bras
+                // usure Capteurs
                 actualiseBatterie();
                 actualiseVP();
                 but.removeFirst();

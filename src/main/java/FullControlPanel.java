@@ -39,6 +39,9 @@ public class FullControlPanel extends JFrame{
     private JLabel titreStat;
     private JLabel nbKmTot;
     private JLabel nbCasesExp;
+    
+    //---- Panneaux de droite
+    Image image;
    
     //------------------------------------------------------------------ Constructeur
 
@@ -56,17 +59,18 @@ public class FullControlPanel extends JFrame{
         cp.setLayout(null);
         cp.setLocation(0,0);
         cp.setSize(lx,ly);
+        cp.setBackground(Color.black);
         
         cg = new JPanel();
         cg.setLayout(null);
-        cg.setLocation(0,0);
-        cg.setSize(lx/2,ly);
+        cg.setLocation(5,5);
+        cg.setSize(lx/2,ly -50);
         cg.setBackground(new Color(175,175,175));
         
         cd = new JPanel();
         cd.setLayout(null);
-        cd.setLocation(lx/2,0);
-        cd.setSize(lx/2,ly);
+        cd.setLocation(lx/2 +10,5);
+        cd.setSize(lx/2 -30,ly-50);
         cd.setBackground(Color.white);
         
         titre = new JLabel("Donnnées en temps réel");
@@ -76,7 +80,7 @@ public class FullControlPanel extends JFrame{
         titre.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 24));
         cg.add(titre);
         
-        //-------- Panneaux de gauche
+        //-------- Panneau de gauche
         
         // Panneau de la batterie
         panneauBat = new JPanel();
@@ -152,6 +156,10 @@ public class FullControlPanel extends JFrame{
         nbCasesExp.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         stat.add(nbCasesExp);
         
+        //-------- Panneau de droite
+        
+        image = Toolkit.getDefaultToolkit().getImage("Perseverance II.png");
+               
         // add finaux
         cg.add(panneauBat);
         cg.add(panneauVoyants);
@@ -163,10 +171,6 @@ public class FullControlPanel extends JFrame{
     }
     
     //------------------------------------------------------------------ Méthodes
-    
-    public void majJoueur(Robot joueur) {
-        this.joueur = joueur;
-    }
     
     public void paint(Graphics g){
         super.paint(g);
@@ -186,6 +190,25 @@ public class FullControlPanel extends JFrame{
         g.fillRect(Xb+18,Yb+18,joueur.getBatterie()*2,60);
         
         // Voyants
+        int xv = xb + 90;
+        int yv = ypv + 170;
+        for(int i=0; i<joueur.getJambes().length; i++){
+            joueur.getJambes()[i].voyant.setPositionR(xv+i*200,yv,35); 
+            joueur.getJambes()[i].voyant.dessinerVoyant(g);
+        }
+        yv += 100;
+        for(int i=0; i<joueur.getBras().length; i++){
+            joueur.getBras()[i].voyant.setPositionR(xv+i*200,yv,35); 
+            joueur.getBras()[i].voyant.dessinerVoyant(g);
+        }
+        yv += 100;
+        for(int i=0; i<joueur.getCapteurs().length; i++){
+            joueur.getCapteurs()[i].voyant.setPositionR(xv+i*200,yv,35); 
+            joueur.getCapteurs()[i].voyant.dessinerVoyant(g);
+        }
+        
+        // Warnings robots;
+        g.drawImage(image,lx/2, 200, this);
     }
     
 }
