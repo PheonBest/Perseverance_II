@@ -32,9 +32,45 @@ public class Controleur {
     public Controleur(Donnees donnees) {
         this.donnees = donnees;
     }
-    
+
+    // Effet quand on utilise le bras robot sur une case qui contient un symbole
     private void extraire(int ligne, int colonne) {
-        // Extraction du minerais
+        donnees.majEtatMinijeuExtraction(true);
+        donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
+    }
+
+    // Effet quand on utilise le scanner sur une case qui contient un symbole
+    private void scan(int ligne, int colonne) {
+        donnees.majChronometreMinijeuLaser(System.currentTimeMillis());
+        donnees.majTempsAvantChrono((int)(Math.random()*((7000-3000)+1)+3000));
+        donnees.majEtatMinijeuLaser(true);
+        donnees.notifierObserveur(TypeMisAJour.MinijeuLaser);
+        
+    }
+
+    // Effet quand on marche sur une case
+    private void effetCase(int[] coordonnees) {
+        if (coordonnees != null) {
+            TypeCase typeActif = donnees.obtenirCellules()[coordonnees[0]][coordonnees[1]].obtenirType();
+            switch(typeActif){
+                case VIDE:
+                    break;
+                case EAU:
+                    break;
+                case MONTAGNE:
+                    break;
+                case DESERT:
+                    break;
+                case SABLE_MOUVANTS :
+                    break;
+                case NEIGE:
+                    break;
+                case FORET:
+                    break;
+                default :
+                    break;
+            }
+        }
     }
 
     private void placerJoueur(int ligne, int colonne) {
@@ -56,7 +92,7 @@ public class Controleur {
         donnees.notifierObserveur(TypeMisAJour.Cellules);
         LinkedList<int[]> buts = new LinkedList<int[]>();
         
-        /*
+        
         placerJoueur(4,1);
         buts.add(donnees.obtenirCellules()[4][2].obtenirCentre());
         buts.add(donnees.obtenirCellules()[4][3].obtenirCentre());
@@ -64,7 +100,7 @@ public class Controleur {
         buts.add(donnees.obtenirCellules()[4][5].obtenirCentre());
         
         donnees.obtenirJoueur().definirBut(buts);
-        */
+        
 	}
 
 	public void rafraichir() {
@@ -80,7 +116,16 @@ public class Controleur {
             donnees.notifierObserveur(TypeMisAJour.Peindre);
         }
         if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
+            // Si le minijeu du laser est actif
+            // ET si le le temps avant le départ du chronomètre est atteint
+            // On envoie l'ordre d'allumer les feux du minijeu en vert
+            if (donnees.obtenirEtatMiniJeuLaser() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() > donnees.obtenirTempsAvantChrono()) {
+                donnees.majEtatMinijeuLaser(false);
+                donnees.majDemarrerMiniJeuLaser(true);
+                donnees.notifierObserveur(TypeMisAJour.DemarrerMinijeuLaser);
+            }
             donnees.obtenirJoueur().move();
+            effetCase(donnees.obtenirJoueur().obtenirDerniereCase());
             donnees.obtenirJoueur().rafraichirImage();
             donnees.notifierObserveur(TypeMisAJour.Joueur);
             int dx = -donnees.obtenirJoueur().getDx();
@@ -220,10 +265,16 @@ public class Controleur {
     public void click(int x, int y) {
         //System.out.println("Clic en "+x/donnees.obtenirZoom()+" "+y/donnees.obtenirZoom());
         boolean estModifie = false;
+
+        // Si on est dans le jeu est dans le minijeu Extraction
+        if (donnees.getScene() != null && donnees.getScene().equals("Jeu") && donnees.obtenirEtatMiniJeuExtraction()) {
+            int score = (int) (-200*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100);
+            System.out.println(score+" %");
+            donnees.majEtatMinijeuExtraction(false);
+            donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
+        }
         //Gestion de la carte
 
-        // Si on est dans le jeu
-        // OU
         // Si on est en jeu ou dans l'éditeur de carte, et qu'on a cliqué sur la carte
         final double COIN_GAUCHE_MENU = donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU;
         if (donnees.getScene() != null && (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && x < COIN_GAUCHE_MENU))) {
@@ -249,6 +300,10 @@ public class Controleur {
                         switch (b.obtenirEffet()) {
                             case "Drone":
                                 donnees.majRayonDeSelection(4);
+                                donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                break;
+                            case "Scanner":
+                                donnees.majRayonDeSelection(2);
                                 donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
                                 break;
                             case "Réparation":
@@ -281,12 +336,43 @@ public class Controleur {
                                 donnees.obtenirDerniereCellule().majSourisDessus(false);
                             */
                             if (donnees.getScene().equals("Jeu")) { // Calcul et transmission de la trajectoire
+                                // Si on a une compétence de sélectionnée
+                                if (donnees.obtenirRayonDeSelection() > 0) {
+                                    // Si la case est dans le rayon d'action de la compétence:
+                                    int[] caseJoueur = donnees.obtenirJoueur().obtenirCase();
+                                    Cellule[] voisins = Voisins.obtenirVoisins(cellules, caseJoueur[0], caseJoueur[1], donnees.obtenirRayonDeSelection());
+                                    int index = 0;
+                                    while (index < voisins.length && voisins[index] != donnees.obtenirCellules()[i][j])
+                                        index ++;
+                                    if (index < voisins.length) {
+                                        switch (donnees.obtenirDerniereCompetence().obtenirEffet()) {
+                                            case "Drone":
+                                                extraire(i, j);
+                                                break;
+                                            case "Scanner":
+                                                scan(i, j);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+
+                                    // On désélectionne la compétence
+                                    donnees.obtenirDerniereCompetence().majSourisDessus(false);
+                                    donnees.majDerniereCompetence(null);
+                                    if (donnees.obtenirRayonDeSelection() != 0) {
+                                        donnees.majRayonDeSelection(0);
+                                        donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                    }
+                                }
 
                             } else { // Modification de la carte selon les outils d'édition sélectionnés
+                                
+                                // Si on a sélectionné le pinceau
                                 // Selon la taille du pinceau:
                                 // Taille 1: on ne modifie que la case sélectionnée
                                 // Taille 2: on modifie les 6 cases autour ET la case sélectionnée
-                                // Taille 2: on modifie les 6 + 12 cases autour ET la case sélectionnée
+                                // Taille 3: on modifie les 6 + 12 cases autour ET la case sélectionnée
                                 if (donnees.obtenirDerniereCaseType() != null) {
                                     final TypeCase type = donnees.obtenirDerniereCaseType().obtenirType();
                                     int taillePinceau = 1;
@@ -584,5 +670,9 @@ public class Controleur {
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void majPositionCurseurExtraction(double positionCurseurExtraction) {
+        donnees.majPositionCurseurExtraction(positionCurseurExtraction);
     }
 }

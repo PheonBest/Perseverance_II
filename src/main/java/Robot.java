@@ -19,6 +19,7 @@ public class Robot extends Avatar {
     private ComposantRobot[] capteurs = new ComposantRobot[3];
     private double kmTot;
     private double comptKm;
+    private int[] derniereCase = null;
     
     // Trajectoire
     /* La classe dimension est une classe qui comporte comme attribut une hauteur et une largeur,
@@ -274,7 +275,7 @@ public class Robot extends Avatar {
                 
                 ligne = d[2];
                 colonne = d[3];
-                System.out.println(ligne+" "+colonne);
+                derniereCase = new int[] {d[2],d[3]};
                 actualiseCptKm(new Dimension(d[0], d[1]));
                 usureJambes(comptKm);
                 // usure Bras
@@ -305,5 +306,11 @@ public class Robot extends Avatar {
     }
     public int[] obtenirCoordonnees() {
         return new int[]{xFictif, yFictif};
+    }
+    public int[] obtenirDerniereCase() {
+        return derniereCase;
+    }
+    public void majDerniereCase(int[] derniereCase) {
+        this.derniereCase = derniereCase;
     }
 }

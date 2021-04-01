@@ -33,6 +33,7 @@ public class Donnees implements Observable {
     private StatutSouris statutSouris = new StatutSouris();
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private int rayonDeSelection = 0;
+    private double positionCurseurExtraction;
     
     // CSV des cartes
     private HashMap<String, InputStream> cartes;
@@ -53,6 +54,13 @@ public class Donnees implements Observable {
     private boolean etatMusique = true;
     private boolean etatEffets = true;
     private BoutonCercle derniereCompetence = null;
+
+    // Minijeu
+    private boolean etatMinijeuExtraction = false;
+    private boolean etatMinijeuLaser = false;
+    private boolean demarrageMinijeuLaser = false;
+    private long chronometreMinijeuLaser = 0;
+    private int tempsAvantChrono = 0;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
@@ -126,8 +134,18 @@ public class Donnees implements Observable {
     public void notifierObserveur(TypeMisAJour type) {
         for (Observer obs: listObserver) {
             switch (type) {
+                case DemarrerMinijeuLaser:
+                    obs.mettreAJour(TypeMisAJour.DemarrerMinijeuLaser, demarrageMinijeuLaser);
+                    break;
+                case MinijeuLaser:
+                    obs.mettreAJour(TypeMisAJour.MinijeuLaser, etatMinijeuLaser);
+                    break;
+                case MinijeuExtraction:
+                    obs.mettreAJour(TypeMisAJour.MinijeuExtraction, etatMinijeuExtraction);
+                    break;
                 case RayonDeSelection:
                     obs.mettreAJour(TypeMisAJour.RayonDeSelection, rayonDeSelection);
+                    break;
                 case Competences:
                     obs.mettreAJour(TypeMisAJour.Competences, competences);
                     break;
@@ -401,5 +419,44 @@ public class Donnees implements Observable {
 
     public String obtenirNomCarte() {
         return nomCarte;
+    }
+
+    public void majEtatMinijeuExtraction(boolean etatMinijeuExtraction) {
+        this.etatMinijeuExtraction = etatMinijeuExtraction;
+    }
+    public boolean obtenirEtatMiniJeuExtraction() {
+        return etatMinijeuExtraction;
+    }
+
+    public void majEtatMinijeuLaser(boolean etatMinijeuLaser) {
+        this.etatMinijeuLaser = etatMinijeuLaser;
+    }
+    public boolean obtenirEtatMiniJeuLaser() {
+        return etatMinijeuLaser;
+    }
+
+    public void majPositionCurseurExtraction(double positionCurseurExtraction) {
+        this.positionCurseurExtraction = positionCurseurExtraction;
+    }
+    public double obtenirPositionCurseurExtraction() {
+        return positionCurseurExtraction;
+    }
+
+    public void majChronometreMinijeuLaser(long chronometreMinijeuLaser) {
+        this.chronometreMinijeuLaser = chronometreMinijeuLaser;
+    }
+    public long obtenirChronometreMinijeuLaser() {
+        return chronometreMinijeuLaser;
+    }
+
+    public void majTempsAvantChrono(int tempsAvantChrono) {
+        this.tempsAvantChrono = tempsAvantChrono;
+    }
+    public int obtenirTempsAvantChrono() {
+        return tempsAvantChrono;
+    }
+
+    public void majDemarrerMiniJeuLaser(boolean demarrageMinijeuLaser) {
+        this.demarrageMinijeuLaser = demarrageMinijeuLaser;
     }
 }

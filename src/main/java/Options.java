@@ -41,6 +41,7 @@ public class Options {
 	public static final double RATIO_LARGEUR_MENU = 5.; // La largeur du menu correspond à largeurEcran/RATIO_LARGEUR_MENU
 
 	public static final Font police = new Font("Courier", Font.BOLD, 24);
+    public static final Font POLICE_PLAIN = new Font("Courier", Font.PLAIN, 16);
     public static final double RATIO_TAILLE_SELECTION = 1.15;
 	public static final int ESPACE_INTER_CASE_BOUTON = 8;
 
