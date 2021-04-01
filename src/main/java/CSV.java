@@ -23,18 +23,25 @@ public class CSV {
 		return escapedData;
 	}
 	
-	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename) throws IOException {
+	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus) throws IOException {
 		List<String[]> data = dataLines (carteCellules);
+		System.out.println(data.get(0)[0]);
 		File dir = new File(Options.NOM_DOSSIER_CARTES);
     	if (!dir.exists()) dir.mkdirs();
 		File csvOutputFile = new File(Options.NOM_DOSSIER_CARTES+"/"+filename+".csv");
-		csvOutputFile.createNewFile();
-		try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
-			data.stream().map(CSV::convertToCSV).forEach(pw::println);
+		if (!csvOutputFile.exists() || ecrireParDessus) {
+			csvOutputFile.createNewFile();
+			System.out.println("Ecriture de "+filename+".csv");
+			try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
+				data.stream().map(CSV::convertToCSV).forEach(pw::println);
+			}
+			if(!csvOutputFile.exists()){
+				System.out.println("Erreur: Le fichier de destination ne peut pas être créé");
+			}
 		}
-		if(!csvOutputFile.exists()){
-			System.out.println("Erreur:Le fichier de destination ne peut pas être créé");
-		}
+	}
+	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename) throws IOException {
+		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false);
 	}
 	
 	public static List<String[]> dataLines (Cellule[][]carte){ // convertit la carte
@@ -58,7 +65,7 @@ public class CSV {
 			while (scanner.hasNextLine()) {
 				records.add(getRecordFromLine(scanner.nextLine()));
 			}
-			scanner.close();
+			//scanner.close(); // On veut pouvoir lire le stream une nouvelle fois, donc on ne ferme pas le scanner (fermer le scanner revient à fermer le stream)
 		}catch(Exception e){e.printStackTrace();}
 		return dataLines(records);	
 	}

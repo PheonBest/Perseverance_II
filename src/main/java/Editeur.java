@@ -7,13 +7,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Editeur extends JPanel {
-    private JPanel carte;
-    private JPanel menu = new Menu();
+    private JPanel carte = new Dessiner();
+    private JPanel menu;
     private Controleur controleur;
 
     public Editeur(Controleur controleur) {
         this.controleur = controleur;
-        carte =  new Dessiner();
+
+        menu = new Menu(controleur);
         
         setLayout(null);
         menu.setLayout(null);

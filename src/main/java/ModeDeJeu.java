@@ -36,7 +36,7 @@ public class ModeDeJeu extends JPanel {
     private Action actionEditer = new AbstractAction("Editer") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            controleur.editer(cartes.get(liste.getSelectedValue()));
+            controleur.editer(liste.getSelectedValue(),cartes.get(liste.getSelectedValue()));
         }
     };
     private String carteActive = null;

@@ -26,6 +26,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private CardLayout cardLayout = new CardLayout();
     private String scene = "";
 
+    private JPanel extraction = new JPanel();
     private JPanel contenu = new JPanel();
     private JPanel modeDeJeu;
     private JPanel chargement = new Chargement();
@@ -89,6 +90,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.hauteur = this.getContentPane().getSize().getHeight();
         ((Dessiner)jeu).majLargeur(this.largeur);
         ((Dessiner)jeu).majHauteur(this.hauteur);
+        ((Dessiner)jeu).initialiser();
         ((Dessiner)jeu).majEnJeu(true);
         ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
         
@@ -140,6 +142,15 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
+            case DemarrerMinijeuLaser:
+                ((Dessiner)jeu).demarrerMinijeuLaser((boolean) nouveau);
+                break;
+            case MinijeuLaser:
+                ((Dessiner)jeu).majEtatMinijeuLaser((boolean) nouveau);
+                break;
+            case MinijeuExtraction:
+                ((Dessiner)jeu).majEtatMinijeuExtraction((boolean) nouveau);
+                break;
             case RayonDeSelection:
                 ((Dessiner)jeu).majRayon((Integer) nouveau);
                 break;
@@ -223,6 +234,8 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
     @Override
     public void mousePressed(MouseEvent ev) {
+        if (scene.equals("Jeu") && ((Dessiner)jeu).obtenirEtatMinijeuExtraction())
+            controleur.majPositionCurseurExtraction(((Dessiner)jeu).obtenirPositionCurseur());
         controleur.majStatutSouris(ev, true);
     }
     

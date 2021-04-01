@@ -11,5 +11,8 @@ public enum TypeMisAJour {
     CentreZoom,
     Cartes,
     Competences,
-    RayonDeSelection
+    RayonDeSelection,
+    MinijeuExtraction,
+    MinijeuLaser,
+    DemarrerMinijeuLaser
 }

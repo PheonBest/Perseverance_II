@@ -10,6 +10,7 @@ public class Robot extends Avatar {
     
     // Paramètres vitaux du robots
     private int batterie;
+    private int nbRecharges;
     // 3 voyants principaux: Jambes, Bras Mécatro, Capteurs
     private Voyants[] voyantsPrincipaux = new Voyants[3]; 
     // Plusieurs éléments désignés par ces voyants
@@ -18,17 +19,18 @@ public class Robot extends Avatar {
     private ComposantRobot[] capteurs = new ComposantRobot[3];
     private double kmTot;
     private double comptKm;
+    private int[] derniereCase = null;
     
     // Trajectoire
     /* La classe dimension est une classe qui comporte comme attribut une hauteur et une largeur,
      * elle est utilisée ici pour référencer la position d'un point à atteindre sur la carte par rapport au robot.
      * Pour aller d'un point à un autre sur la carte, on utilise une liste de cases ciblées, appelées but (à atteindre).*/ 
      
-    private LinkedList<Dimension> but = new LinkedList<Dimension>();
+    private LinkedList<int[]> but = new LinkedList<int[]>();
     
     //  Position du robot dans la matrice de la carte
-    private int row = 0;
-    private int column = 0;
+    private int ligne = 0;
+    private int colonne = 0;
     
     // Position réélle du robot sur la carte, dont l'origine se rouve en haut à gauche
     private int xFictif = 0;
@@ -37,12 +39,13 @@ public class Robot extends Avatar {
     //--------------------------------------------------------------------------------------------------- Constructeurs
     
     // Constructeur complet 
-    public Robot(int nivBatterie, int listeEtats[], int listeUsures[],int nbKmParcourus, int compteurKm , int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
+    public Robot(int nivBatterie, int nbR, int listeEtats[], int listeUsures[],int nbKmParcourus, int compteurKm , int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
         // Le robot est un avatar, il hérite donc de son constructeur et de ses conditions d'avatar
         super(animationIndex, dureeImage, image, coords, x, y, r, dx, dy, dr);
         xFictif = x;
         yFictif = y;
         this.batterie = nivBatterie;
+        this.nbRecharges = nbR;
         this.kmTot = nbKmParcourus;
         this.comptKm = compteurKm;
         
@@ -51,8 +54,8 @@ public class Robot extends Avatar {
         this.jambes[1] = new ComposantRobot("Jambe gauche",listeEtats[1],listeUsures[1]);
         this.bras[0] = new ComposantRobot("Bras droit",listeEtats[2],listeUsures[2]);
         this.bras[1] = new ComposantRobot("Bras gauche",listeEtats[3],listeUsures[3]);
-        this.capteurs[0] = new ComposantRobot("Température du microprocesseur",listeEtats[4],listeUsures[4]);
-        this.capteurs[1] = new ComposantRobot("Capteurs visuels",listeEtats[5],listeUsures[5]);
+        this.capteurs[0] = new ComposantRobot("Température interne",listeEtats[4],listeUsures[4]);
+        this.capteurs[1] = new ComposantRobot("Caméras",listeEtats[5],listeUsures[5]);
         this.capteurs[2] = new ComposantRobot("Capteurs de pression",listeEtats[6],listeUsures[6]);
         
         voyantsPrincipaux[0] = new Voyants("Jambes");
@@ -63,7 +66,7 @@ public class Robot extends Avatar {
     
     // Constructeur "Robot neuf"
     public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
-        this(Options.BATTERIE_MAX, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
+        this(Options.BATTERIE_MAX,0, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
     }
     
     //---------------------------------------------------------------------------------------------------- Setters et getters
@@ -75,9 +78,22 @@ public class Robot extends Avatar {
     public int getBatterie(){
         return this.batterie;
     }
+    public int getNbRecharges(){
+        return this.nbRecharges;
+    }
 
     public Voyants[] getVP(){
         return this.voyantsPrincipaux;
+    }
+    
+    public ComposantRobot[] getJambes(){
+        return this.jambes;
+    }
+    public ComposantRobot[] getBras(){
+        return this.bras;
+    }
+    public ComposantRobot[] getCapteurs(){
+        return this.capteurs;
     }
     
     public double getKmParcourus(){
@@ -152,6 +168,7 @@ public class Robot extends Avatar {
     
     public void rechargerBat(){
         setBatterie(Options.BATTERIE_MAX);
+        this.nbRecharges += 1;
     }
     
     public void usureJambes(double nbKm){
@@ -213,9 +230,10 @@ public class Robot extends Avatar {
     //---------------------------------------------------------------------------------------------------- Méthodes pour les déplacments du robot
     
     // La case à atteindre est définie par une série de sous-but
-    public void definirBut(LinkedList<Dimension> liste) {
+    public void definirBut(LinkedList<int[]> liste) {
         this.but = liste;
-        definirDirection(but.getFirst());
+        int[] d = but.getFirst(); // On prend une case à cibler 
+        definirDirection(new Dimension(d[0], d[1]));
         animationIndex = 2; //  Image qui montre le robot marcher 
     }
     
@@ -248,14 +266,20 @@ public class Robot extends Avatar {
         if (!but.isEmpty()) {
             xFictif += dx;
             yFictif += dy;
-            Dimension d = but.getFirst(); // On prend une case à cibler 
-            if (Math.abs(xFictif - d.getWidth()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
-                dx = (int) d.getWidth() - xFictif;
-            if (Math.abs(yFictif - d.getHeight()) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
-                dy = (int) d.getHeight() - yFictif;
+            int[] d = but.getFirst(); // On prend une case à cibler 
+            if (Math.abs(xFictif - d[0]) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
+                dx = (int) d[0] - xFictif;
+            if (Math.abs(yFictif - d[1]) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
+                dy = (int) d[1] - yFictif;
             if (dx == 0 && dy == 0) {
-                actualiseCptKm(d);
+                
+                ligne = d[2];
+                colonne = d[3];
+                derniereCase = new int[] {d[2],d[3]};
+                actualiseCptKm(new Dimension(d[0], d[1]));
                 usureJambes(comptKm);
+                // usure Bras
+                // usure Capteurs
                 actualiseBatterie();
                 actualiseVP();
                 but.removeFirst();
@@ -263,7 +287,8 @@ public class Robot extends Avatar {
                 if (but.isEmpty()) // Si il ne reste plus de cases à parcourir, le robot est arrivé à la case demandée
                     animationIndex = 0; // On passe l'animation du joueur en mode "pause" (Idle)
                 else {
-                    definirDirection(but.getFirst());
+                    d = but.getFirst(); // On prend une case à cibler 
+                    definirDirection(new Dimension(d[0], d[1]));
                     //System.out.println("Coords joueur : "+xFictif +" _ "+ yFictif);
                     //System.out.println("Coords but : "+ but.getFirst().getWidth() +" _ "+ but.getFirst().getHeight());
                 }
@@ -272,4 +297,20 @@ public class Robot extends Avatar {
         }
     }
     
+    public int[] obtenirCase() {
+        return new int[]{ligne, colonne};
+    }
+    public void majCase(int ligne, int colonne) {
+        this.ligne = ligne;
+        this.colonne = colonne;
+    }
+    public int[] obtenirCoordonnees() {
+        return new int[]{xFictif, yFictif};
+    }
+    public int[] obtenirDerniereCase() {
+        return derniereCase;
+    }
+    public void majDerniereCase(int[] derniereCase) {
+        this.derniereCase = derniereCase;
+    }
 }

@@ -1,15 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
-public class ControlPanel extends JPanel{
+public class ControlPanel extends JPanel implements ActionListener{
     
     private int lx = 600;
     private int ly = 100;
     private Robot joueur;
     private JButton details;
+    private FullControlPanel panneauComplet;
     
     public ControlPanel(int x0, int y0){
         super();
+        setLayout(null);
         setSize(lx,ly);
         setLocation(x0,y0);
         
@@ -17,6 +20,7 @@ public class ControlPanel extends JPanel{
         details.setLocation(lx-120,ly-60);
         details.setSize(100,40);
         details.setBackground(Color.white);
+        details.addActionListener(this);
         add(details);
     }
     
@@ -40,7 +44,14 @@ public class ControlPanel extends JPanel{
             g.fillRect(Xb+6,Yb+6,106,36);
             g.fillRect(Xb+6,Yb+19,112,10);
             // Jauge de batterie de couleur ajustable
-            g.setColor(new Color((float)(1.0-joueur.getBatterie()*0.01), (float)(0.0+joueur.getBatterie()*0.01), (float)(0.0)));
+            float c1 = (float) (1.0-joueur.getBatterie()*0.01);
+            float c2 = (float)(joueur.getBatterie()*0.01);
+            if (c1 < 0) c1 = 0;
+            else if (c1 > 1) c1 = 1;
+            if (c2 < 0) c2 = 0;
+            else if (c2 > 1) c2 = 1;
+            
+            g.setColor(new Color(c1, c2, (float)(0.0)));
             g.fillRect(Xb+9,Yb+9,joueur.getBatterie(),30);
             
             // Voyants : Origine(Xv,Yv) ( centre du 1er voyant ) 
@@ -55,6 +66,10 @@ public class ControlPanel extends JPanel{
 
     public void majJoueur(Robot joueur) {
         this.joueur = joueur;
+    }
+    
+    public void actionPerformed(ActionEvent e){
+        panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2, joueur);
     }
 }
 
