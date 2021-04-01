@@ -41,16 +41,23 @@ public class Dessiner extends JPanel {
     
     // Mini-jeu "Extraction"
     private boolean etatMinijeuExtraction = false;
+    private boolean effacerMinijeuExtraction = false;
+    private double positionCurseur = 0;
+    private String score;
+    private boolean sensVariationCurseur = true;
+
     private int largeurRectangle;
     private int hauteurRectangle;
-    private double positionCurseur = 0;
-    private boolean sensVariationCurseur = true;
+    private int hauteurRectangleLaser;
+    
+    
     private final Color[] COULEURS_DIAGONALES = {  
-        new Color(229,229,229),  
-        new Color(222,222,222)
+        new Color(229,229,229), // gris clair  
+        new Color(222,222,222)  // gris
     };
-    private final double MINIJEU_CLICK_LARGEUR_ECRAN = 3.; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
-    private final double MINIJEU_CLICK_HAUTEUR_ECRAN = 3.; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
+    private final double MINIJEU_EXTRACTION_LARGEUR_ECRAN = 3.; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
+    private final double MINIJEU_EXTRACTION_HAUTEUR_ECRAN = 3.; // La hauteur du rectangle correspond au tiers de la hauteur de la fenêtre
+    private final double MINIJEU_LASER_HAUTEUR_ECRAN = 2.7;
     private final int ESPACE = 40;
     private final int LARGEUR_LIGNE = ESPACE/2;
     
@@ -74,7 +81,11 @@ public class Dessiner extends JPanel {
     // Mini-jeu "Laser"
     private boolean etatMinijeuLaser = false;
     private boolean demarrerMinijeuLaser = false;
-    private long tempsDepuisChrono = 0;
+    private boolean finMinijeuLaser = false;
+    private int nombreErreursLaser = 0;
+    private long tempsDebut = 0;
+    private long tempsChrono = 0;
+    private long tempsReaction = 0;
 
     public Dessiner(boolean affichagePanneauDeControle){
         this.affichagePanneauDeControle = affichagePanneauDeControle;
@@ -88,8 +99,9 @@ public class Dessiner extends JPanel {
     }
 
     public void initialiser() {
-        largeurRectangle = (int) (largeurEcran/MINIJEU_CLICK_LARGEUR_ECRAN);
-        hauteurRectangle = (int) (hauteurEcran/MINIJEU_CLICK_HAUTEUR_ECRAN);
+        largeurRectangle = (int) (largeurEcran/MINIJEU_EXTRACTION_LARGEUR_ECRAN);
+        hauteurRectangle = (int) (hauteurEcran/MINIJEU_EXTRACTION_HAUTEUR_ECRAN);
+        hauteurRectangleLaser = (int) (hauteurEcran/MINIJEU_LASER_HAUTEUR_ECRAN);
         coinMinijeuX = (int)(largeurEcran/2.-largeurRectangle/2.); // Coordonnée X du coin en haut à gauche du rectangle
         coinMinijeuY = (int)(hauteurEcran/2.-hauteurRectangle/2.); // Coordonnée Y du coin en haut à gauche du rectangle
     }
@@ -219,82 +231,119 @@ public class Dessiner extends JPanel {
                     largeur /= MULTIPLICATEUR_DIFFERENCE_LONGUEUR;
                 }
 
-                double angleDepart = -Math.PI/2.;
-                double angleFin = Math.PI/2.;
-                int sens = -1;
-                if (sensVariationCurseur) { // On déplace le curseur vers la droite
-                    positionCurseur += INCREMENT_CURSEUR;
-                    if (positionCurseur > 1) {
-                        positionCurseur = 1;
-                        sensVariationCurseur = false;
-                    }
-                } else { // On déplace le curseur vers la gauche
-                    positionCurseur -= INCREMENT_CURSEUR;
-                    angleDepart += Math.PI;
-                    angleFin += Math.PI;
-                    sens *= -1;
-                    if (positionCurseur < 0) {
-                        positionCurseur = 0;
-                        sensVariationCurseur = true;
-                    }
-                }
-
-                // On dessine les lignes qui suivent le curseur (effet de vitesse)
                 int xCurseur = (int) ((largeurEcran-LARGEUR_TOTALE_CLAVETTE)/2 + PLAGE_DE_VALEURS*positionCurseur);
-                final int NOMBRE_LIGNES = 20;
-                final int LONGUEUR_LIGNES = 10;
-                Color c1 = new Color(223, 228, 234); // blanc
-                Color c2 = new Color(30, 144, 255); // bleu
-                double mixCouleurs = 0.;
-                double deltaMix = 1./NOMBRE_LIGNES;
-                g2d.setStroke(new BasicStroke(1));
-                double deltaTheta = Math.PI/NOMBRE_LIGNES;
-                // On fait varier l'angle de Pi/2 à 3Pi/2 (vers la gauche) OU de -Pi/2 à Pi/2
-                for (double theta = angleDepart; theta <= angleFin; theta += deltaTheta) {
-                    mixCouleurs = (mixCouleurs+deltaMix)%1;
-                    if (sens == -1)
-                        g2d.setColor(mixColors(c2, c1, mixCouleurs));
-                    else
-                        g2d.setColor(mixColors(c1, c2, mixCouleurs));
-                    int xLine = (int)(xCurseur+RAYON_CURSEUR-RAYON_CURSEUR*Math.cos(theta));
-                    int yLine = (int)(hauteurEcran/2-RAYON_CURSEUR+RAYON_CURSEUR-RAYON_CURSEUR*Math.sin(theta));
-                    g2d.drawLine(xLine, yLine, xLine+LONGUEUR_LIGNES*sens, yLine);
+                if (!effacerMinijeuExtraction) {
+
+                    double angleDepart = -Math.PI/2.;
+                    double angleFin = Math.PI/2.;
+                    int sens = -1;
+                    if (sensVariationCurseur) { // On déplace le curseur vers la droite
+                        positionCurseur += INCREMENT_CURSEUR;
+                        if (positionCurseur > 1) {
+                            positionCurseur = 1;
+                            sensVariationCurseur = false;
+                        }
+                    } else { // On déplace le curseur vers la gauche
+                        positionCurseur -= INCREMENT_CURSEUR;
+                        angleDepart += Math.PI;
+                        angleFin += Math.PI;
+                        sens *= -1;
+                        if (positionCurseur < 0) {
+                            positionCurseur = 0;
+                            sensVariationCurseur = true;
+                        }
+                    }
+                    // On dessine les lignes qui suivent le curseur (effet de vitesse)
+                    xCurseur = (int) ((largeurEcran-LARGEUR_TOTALE_CLAVETTE)/2 + PLAGE_DE_VALEURS*positionCurseur);
+                    final int NOMBRE_LIGNES = 20;
+                    final int LONGUEUR_LIGNES = 10;
+                    Color c1 = new Color(223, 228, 234); // blanc
+                    Color c2 = new Color(30, 144, 255); // bleu
+                    double mixCouleurs = 0.;
+                    double deltaMix = 1./NOMBRE_LIGNES;
+                    g2d.setStroke(new BasicStroke(1));
+                    double deltaTheta = Math.PI/NOMBRE_LIGNES;
+                    // On fait varier l'angle de Pi/2 à 3Pi/2 (vers la gauche) OU de -Pi/2 à Pi/2
+                    for (double theta = angleDepart; theta <= angleFin; theta += deltaTheta) {
+                        mixCouleurs = (mixCouleurs+deltaMix)%1;
+                        if (sens == -1)
+                            g2d.setColor(mixColors(c2, c1, mixCouleurs));
+                        else
+                            g2d.setColor(mixColors(c1, c2, mixCouleurs));
+                        int xLine = (int)(xCurseur+RAYON_CURSEUR-RAYON_CURSEUR*Math.cos(theta));
+                        int yLine = (int)(hauteurEcran/2-RAYON_CURSEUR+RAYON_CURSEUR-RAYON_CURSEUR*Math.sin(theta));
+                        g2d.drawLine(xLine, yLine, xLine+LONGUEUR_LIGNES*sens, yLine);
+                    }
                 }
+
                 // On dessine le curseur
-
-                
-
                 g2d.setPaint(Color.WHITE);
                 g2d.fillOval(xCurseur, (int)(hauteurEcran/2-RAYON_CURSEUR), RAYON_CURSEUR*2, RAYON_CURSEUR*2);
                 g2d.setPaint(new Color(222,222,222));
                 g2d.setStroke(new BasicStroke(LARGEUR_CURSEUR));
                 g2d.drawOval(xCurseur, (int)(hauteurEcran/2-RAYON_CURSEUR), RAYON_CURSEUR*2, RAYON_CURSEUR*2);
+
+                g2d.setPaint(Color.BLACK);
+
+                dessinerTexteCentre(g2d, "Cliquez pour contrôler le bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
+                if (effacerMinijeuExtraction)
+                    dessinerTexteCentre(g2d, score+" % de précision", (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
             }
+            final int NOMBRE_FEUX = 3;
+            final int RAYON_FEU = 30;
+            final int ESPACE_INTRER_FEU = 30;
+            final int LARGEUR_CROIX = 30;
+            final int ESPACE_INTER_CROIX = 30;
+            final int NOMBRE_CROIX = 3;
+            final int LONGUEUR_TOTALE = NOMBRE_CROIX*LARGEUR_CROIX+(NOMBRE_CROIX-1)*ESPACE_INTER_CROIX;
+            final int coinX = (int) ((largeurEcran-LONGUEUR_TOTALE)/2);
+            final int coinY = (int) ((hauteurEcran-LARGEUR_CROIX)/2+RAYON_FEU*4);
             if (etatMinijeuLaser) {
-                System.out.println(etatMinijeuLaser);
                 ((Graphics2D) g2d).setTransform(transformationInitiale);
-                dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangle, RAYON, RAYON);
+                dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangleLaser, RAYON, RAYON);
                 g2d.setStroke(new BasicStroke(10));
-                final int NOMBRE_FEUX = 3;
-                final int RAYON_FEU = 30;
-                final int ESPACE_INTRER_FEU = 30;
+                
                 int largeurTotale = NOMBRE_FEUX*(RAYON_FEU*2)+(NOMBRE_FEUX-1)*ESPACE_INTRER_FEU;
                 for (int i=0; i < 3; i++) {
-                    if (demarrerMinijeuLaser)
+                    if (finMinijeuLaser)
+                        g2d.setPaint(new Color(52, 152, 219)); // bleu
+                    else if (!demarrerMinijeuLaser)
                         g2d.setPaint(new Color(231, 76, 60)); // rouge clair
                     else
                         g2d.setPaint(new Color(46, 204, 113)); // vert clair
                     g2d.fillOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU), RAYON_FEU*2, RAYON_FEU*2);
-                    if (demarrerMinijeuLaser)
+                    if (finMinijeuLaser)
+                        g2d.setPaint(new Color(34, 129, 191)); // bleu foncé
+                    else if (!demarrerMinijeuLaser)
                         g2d.setPaint(new Color(214,46,27)); // rouge foncé
                     else
                         g2d.setPaint(new Color(38,168,94)); // vert foncé
                     g2d.drawOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU), RAYON_FEU*2, RAYON_FEU*2);
                 }
-                String str = new DecimalFormat("0.0000").format(System.currentTimeMillis()-tempsDepuisChrono)+" secondes"; // on arrondie le temps au millième
+                String str;
+                if (finMinijeuLaser)
+                    str = new DecimalFormat("0.0").format(tempsReaction)+" millisecondes"; // on arrondie le temps au millième
+                else
+                    str = new DecimalFormat("0.0000").format((System.currentTimeMillis()-tempsDebut)/1000.)+" secondes"; // on arrondie le temps au millième
+                
                 g2d.setPaint(Color.BLACK);
                 dessinerTexteCentre(g2d, str, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU), Options.police);
-                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes, appuyez sur [espace]\nle plus vite possible pour renvoyer les données du scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU), Options.POLICE_PLAIN);
+                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes, cliquez\nle plus vite possible pour renvoyer les données du scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU), Options.POLICE_PLAIN);
+                
+                // On dessine les éventuelles erreurs
+                if (nombreErreursLaser > 0) {
+                    g2d.setStroke(new BasicStroke(10));
+                    for (int i=0; i< NOMBRE_CROIX; i++) {
+                        if (i < nombreErreursLaser) // Dessin de croix pleines
+                            g2d.setPaint(new Color(231, 76, 60)); // rouge clair
+                        else // Dessin de croix vides
+                            g2d.setPaint(Color.DARK_GRAY);  // gris
+                        // Ligne allant d'en bas à gauche à en haut à droite
+                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY+LARGEUR_CROIX, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY);
+                        // Ligne allant d'en haut à gauche à en bas à droite
+                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY+LARGEUR_CROIX);
+                    }
+                }
             }
         }
 
@@ -417,11 +466,17 @@ public class Dessiner extends JPanel {
     public boolean obtenirEtatMinijeuExtraction() {
         return etatMinijeuExtraction;
     }
+    public void majEffacerMinijeuExtraction(boolean effacerMinijeuExtraction) {
+        if (effacerMinijeuExtraction)
+            score = new DecimalFormat("0.0").format(-200*Math.abs(0.5 - positionCurseur) + 100);
+        this.effacerMinijeuExtraction = effacerMinijeuExtraction;
+    }
 
     public void majEtatMinijeuLaser(boolean etatMinijeuLaser) {
-        
+        if (etatMinijeuLaser)
+            finMinijeuLaser = false;
+        tempsDebut = System.currentTimeMillis();
         this.etatMinijeuLaser = etatMinijeuLaser;
-        System.out.println("majMinijeu "+this.etatMinijeuLaser+" "+etatMinijeuLaser);
     }
     public boolean obtenirEtatMinijeuLaser() {
         return etatMinijeuLaser;
@@ -434,10 +489,18 @@ public class Dessiner extends JPanel {
         int greenPart = (int) (color1.getGreen()*percent + color2.getGreen()*inverse_percent);
         int bluePart = (int) (color1.getBlue()*percent + color2.getBlue()*inverse_percent);
         return new Color(redPart, greenPart, bluePart);
-  }
+    }
     public void demarrerMinijeuLaser(boolean demarrerMinijeuLaser) {
         this.demarrerMinijeuLaser = demarrerMinijeuLaser;
+        if (demarrerMinijeuLaser) {
+            tempsChrono = System.currentTimeMillis();
+        } else {
+            finMinijeuLaser = true;
+            tempsReaction = System.currentTimeMillis()-tempsChrono;
+        }
     }
-    
-
+    public void majNombreErreursLaser(int nombreErreursLaser) {
+        this.nombreErreursLaser = nombreErreursLaser;
+        tempsDebut = System.currentTimeMillis();
+    }
 }

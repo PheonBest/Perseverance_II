@@ -33,6 +33,13 @@ public class Controleur {
         this.donnees = donnees;
     }
 
+    private boolean aucunJeuEnCours() {
+        return (!donnees.obtenirEtatMiniJeuExtraction()
+                && !donnees.obtenirEffacerMinijeuExtraction()
+                && !donnees.obtenirEtatMiniJeuLaser()
+                && !donnees.obtenirDemarrerMinijeuLaser()
+                && !donnees.obtenirEffacerMiniJeuLaser());
+    }
     // Effet quand on utilise le bras robot sur une case qui contient un symbole
     private void extraire(int ligne, int colonne) {
         donnees.majEtatMinijeuExtraction(true);
@@ -116,14 +123,26 @@ public class Controleur {
             donnees.notifierObserveur(TypeMisAJour.Peindre);
         }
         if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
+            // Si on doit effacer le minijeu de l'extraction
+            if (donnees.obtenirEffacerMinijeuExtraction() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuExtraction() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
+                donnees.majEffacerMinijeuExtraction(false);
+                donnees.notifierObserveur(TypeMisAJour.EffacerMinijeuExtraction);
+                donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
+            }
+
             // Si le minijeu du laser est actif
             // ET si le le temps avant le départ du chronomètre est atteint
             // On envoie l'ordre d'allumer les feux du minijeu en vert
             if (donnees.obtenirEtatMiniJeuLaser() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() > donnees.obtenirTempsAvantChrono()) {
                 donnees.majEtatMinijeuLaser(false);
-                donnees.majDemarrerMiniJeuLaser(true);
+                donnees.majDemarrerMinijeuLaser(true);
+                donnees.majChronometreMinijeuLaser(System.currentTimeMillis());
                 donnees.notifierObserveur(TypeMisAJour.DemarrerMinijeuLaser);
+            } else if (donnees.obtenirEffacerMiniJeuLaser() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
+                donnees.majEffacerMiniJeuLaser(false);
+                donnees.notifierObserveur(TypeMisAJour.MinijeuLaser);
             }
+                
             donnees.obtenirJoueur().move();
             effetCase(donnees.obtenirJoueur().obtenirDerniereCase());
             donnees.obtenirJoueur().rafraichirImage();
@@ -165,7 +184,7 @@ public class Controleur {
         }
         pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_EFFETS+"\\b.*\\.(?:aifc|aiff|au|snd|wav)");
         try {
-            HashMap<String, AudioInputStream> effets = ObtenirRessources.getAudioAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_MUSIQUES+"/");
+            HashMap<String, AudioInputStream> effets = ObtenirRessources.getAudioAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_EFFETS+"/");
             donnees.majListeEffets(effets);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
@@ -266,164 +285,191 @@ public class Controleur {
         //System.out.println("Clic en "+x/donnees.obtenirZoom()+" "+y/donnees.obtenirZoom());
         boolean estModifie = false;
 
-        // Si on est dans le jeu est dans le minijeu Extraction
-        if (donnees.getScene() != null && donnees.getScene().equals("Jeu") && donnees.obtenirEtatMiniJeuExtraction()) {
-            int score = (int) (-200*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100);
-            System.out.println(score+" %");
-            donnees.majEtatMinijeuExtraction(false);
-            donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
-        }
-        //Gestion de la carte
-
-        // Si on est en jeu ou dans l'éditeur de carte, et qu'on a cliqué sur la carte
         final double COIN_GAUCHE_MENU = donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU;
-        if (donnees.getScene() != null && (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && x < COIN_GAUCHE_MENU))) {
-
-            // Gestion des compétences dans le jeu
-            List<BoutonCercle> competences = donnees.obtenirCompetences();
-            for (BoutonCercle b: competences) {
-                if (b.contains(x, y)) {
-                    // Si on a déjà sélectionné la compétene, on la désélectionne
-                    if (donnees.obtenirDerniereCompetence() == b) { // On compare les pointeurs (références) des 2 objets
-                        donnees.obtenirDerniereCompetence().majSourisDessus(false);
-                        donnees.majDerniereCompetence(null);
-                        if (donnees.obtenirRayonDeSelection() != 0) {
-                            donnees.majRayonDeSelection(0);
-                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+        if (!aucunJeuEnCours()) {
+            if (donnees.obtenirEtatMiniJeuExtraction()) {
+                donnees.majEffet("win");
+                int score = (int) (-200*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100);
+                System.out.println(score+" %");
+                donnees.majEtatMinijeuExtraction(false);
+                donnees.majChronometreMinijeuExtraction(System.currentTimeMillis());
+                donnees.majEffacerMinijeuExtraction(true);
+                donnees.notifierObserveur(TypeMisAJour.EffacerMinijeuExtraction);
+            } else if (donnees.obtenirEtatMiniJeuLaser()) { // Si on on clique avant le début, on reçoit une croix. Au bout de 3 croix, le joueur reçoit un malus
+                if (System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() < donnees.obtenirTempsAvantChrono()) {
+                    donnees.majEffet("loose");
+                    donnees.majChronometreMinijeuLaser(System.currentTimeMillis()); // On réinitialise le chronomètre
+                    if (donnees.obtenirNombreErreursLaser() != Options.NOMBRE_ERREURS_LASER) {
+                        donnees.majNombreErreursLaser(donnees.obtenirNombreErreursLaser()+1);
+                        if (donnees.obtenirNombreErreursLaser() == Options.NOMBRE_ERREURS_LASER) {
+                            // MALUS
                         }
-                    } else { // On sélectionne la compétence
-                        b.majSourisDessus(true);
-                        if (donnees.obtenirRayonDeSelection() != 0) {
-                            donnees.majRayonDeSelection(0);
-                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
-                        }
-                        switch (b.obtenirEffet()) {
-                            case "Drone":
-                                donnees.majRayonDeSelection(4);
-                                donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
-                                break;
-                            case "Scanner":
-                                donnees.majRayonDeSelection(2);
-                                donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
-                                break;
-                            case "Réparation":
-                                break;
-                        }
-                        // On désélectionne l'ancienne compétence
-                        if (donnees.obtenirDerniereCompetence() != null)
-                            donnees.obtenirDerniereCompetence().majSourisDessus(false);
-                        donnees.majDerniereCompetence(b);
                     }
-                    estModifie = true;
-                    donnees.notifierObserveur(TypeMisAJour.Competences);
-                    break;
+                    donnees.notifierObserveur(TypeMisAJour.NombreErreursLaser);
                 }
+            } else if (donnees.obtenirDemarrerMinijeuLaser()) {
+                donnees.majEffet("win");
+                donnees.majDemarrerMinijeuLaser(false);
+                donnees.notifierObserveur(TypeMisAJour.DemarrerMinijeuLaser);
+                System.out.println(System.currentTimeMillis()-donnees.obtenirChronometreMinijeuLaser());
+                donnees.majChronometreMinijeuLaser(System.currentTimeMillis());
+                donnees.majEffacerMiniJeuLaser(true);
+                donnees.notifierObserveur(TypeMisAJour.EffacerMinijeuExtraction);
             }
+        } else {
+        
+            //Gestion de la carte
 
-            // Gestion des cellules
-            Cellule[][] cellules = donnees.obtenirCellules();
-            for (int i=0; i < cellules.length; i++) {
-                for (int j=0; j < cellules[i].length; j++) {
-                    if (cellules[i][j].contains((x - donnees.obtenirLargeur()/2 + 8)/donnees.obtenirZoom(), (y - donnees.obtenirHauteur()/2 + 20)/donnees.obtenirZoom())) {
-                        if (donnees.obtenirDerniereCellule() == cellules[i][j]) { // On compare les pointeurs (références) des 2 objets
-                            //cellules[i][j].majSourisDessus(false);
-                            donnees.majDerniereCellule(null);
-                        } else {
-                            //System.out.println("Case "+i+" "+j);
-                            /*
-                            cellules[i][j].majSourisDessus(true);
-                            if (donnees.obtenirDerniereCellule() != null)
-                                donnees.obtenirDerniereCellule().majSourisDessus(false);
-                            */
-                            if (donnees.getScene().equals("Jeu")) { // Calcul et transmission de la trajectoire
-                                // Si on a une compétence de sélectionnée
-                                if (donnees.obtenirRayonDeSelection() > 0) {
-                                    // Si la case est dans le rayon d'action de la compétence:
-                                    int[] caseJoueur = donnees.obtenirJoueur().obtenirCase();
-                                    Cellule[] voisins = Voisins.obtenirVoisins(cellules, caseJoueur[0], caseJoueur[1], donnees.obtenirRayonDeSelection());
-                                    int index = 0;
-                                    while (index < voisins.length && voisins[index] != donnees.obtenirCellules()[i][j])
-                                        index ++;
-                                    if (index < voisins.length) {
-                                        switch (donnees.obtenirDerniereCompetence().obtenirEffet()) {
-                                            case "Drone":
-                                                extraire(i, j);
-                                                break;
-                                            case "Scanner":
-                                                scan(i, j);
-                                                break;
-                                            default:
-                                                break;
+            // Si on est en jeu ou dans l'éditeur de carte, et qu'on a cliqué sur la carte
+            if (donnees.getScene() != null && (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && x < COIN_GAUCHE_MENU))) {
+
+                // Gestion des compétences dans le jeu
+                List<BoutonCercle> competences = donnees.obtenirCompetences();
+                for (BoutonCercle b: competences) {
+                    if (b.contains(x, y)) {
+                        // Si on a déjà sélectionné la compétene, on la désélectionne
+                        if (donnees.obtenirDerniereCompetence() == b) { // On compare les pointeurs (références) des 2 objets
+                            donnees.obtenirDerniereCompetence().majSourisDessus(false);
+                            donnees.majDerniereCompetence(null);
+                            if (donnees.obtenirRayonDeSelection() != 0) {
+                                donnees.majRayonDeSelection(0);
+                                donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                            }
+                        } else { // On sélectionne la compétence
+                            b.majSourisDessus(true);
+                            if (donnees.obtenirRayonDeSelection() != 0) {
+                                donnees.majRayonDeSelection(0);
+                                donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                            }
+                            switch (b.obtenirEffet()) {
+                                case "Drone":
+                                    donnees.majRayonDeSelection(4);
+                                    donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                    break;
+                                case "Scanner":
+                                    donnees.majRayonDeSelection(2);
+                                    donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                    break;
+                                case "Réparation":
+                                    break;
+                            }
+                            // On désélectionne l'ancienne compétence
+                            if (donnees.obtenirDerniereCompetence() != null)
+                                donnees.obtenirDerniereCompetence().majSourisDessus(false);
+                            donnees.majDerniereCompetence(b);
+                        }
+                        estModifie = true;
+                        donnees.notifierObserveur(TypeMisAJour.Competences);
+                        break;
+                    }
+                }
+
+                // Gestion des cellules
+                Cellule[][] cellules = donnees.obtenirCellules();
+                for (int i=0; i < cellules.length; i++) {
+                    for (int j=0; j < cellules[i].length; j++) {
+                        if (cellules[i][j].contains((x - donnees.obtenirLargeur()/2 + 8)/donnees.obtenirZoom(), (y - donnees.obtenirHauteur()/2 + 20)/donnees.obtenirZoom())) {
+                            if (donnees.obtenirDerniereCellule() == cellules[i][j]) { // On compare les pointeurs (références) des 2 objets
+                                //cellules[i][j].majSourisDessus(false);
+                                donnees.majDerniereCellule(null);
+                            } else {
+                                //System.out.println("Case "+i+" "+j);
+                                /*
+                                cellules[i][j].majSourisDessus(true);
+                                if (donnees.obtenirDerniereCellule() != null)
+                                    donnees.obtenirDerniereCellule().majSourisDessus(false);
+                                */
+                                if (donnees.getScene().equals("Jeu")) { // Calcul et transmission de la trajectoire
+                                    
+                                    // Si on a une compétence de sélectionnée ET que le robot n'est pas en train de se déplacer
+                                    if (donnees.obtenirRayonDeSelection() > 0 && donnees.obtenirJoueur().obtenirTrajectoire().isEmpty()) {
+                                        // Si la case est dans le rayon d'action de la compétence:
+                                        int[] caseJoueur = donnees.obtenirJoueur().obtenirCase();
+                                        Cellule[] voisins = Voisins.obtenirVoisins(cellules, caseJoueur[0], caseJoueur[1], donnees.obtenirRayonDeSelection());
+                                        int index = 0;
+                                        while (index < voisins.length && voisins[index] != donnees.obtenirCellules()[i][j])
+                                            index ++;
+                                        if (index < voisins.length) {
+                                            switch (donnees.obtenirDerniereCompetence().obtenirEffet()) {
+                                                case "Drone":
+                                                    extraire(i, j);
+                                                    break;
+                                                case "Scanner":
+                                                    scan(i, j);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+
+                                        // On désélectionne la compétence
+                                        donnees.obtenirDerniereCompetence().majSourisDessus(false);
+                                        donnees.majDerniereCompetence(null);
+                                        if (donnees.obtenirRayonDeSelection() != 0) {
+                                            donnees.majRayonDeSelection(0);
+                                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
                                         }
                                     }
 
-                                    // On désélectionne la compétence
-                                    donnees.obtenirDerniereCompetence().majSourisDessus(false);
-                                    donnees.majDerniereCompetence(null);
-                                    if (donnees.obtenirRayonDeSelection() != 0) {
-                                        donnees.majRayonDeSelection(0);
-                                        donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
-                                    }
-                                }
-
-                            } else { // Modification de la carte selon les outils d'édition sélectionnés
-                                
-                                // Si on a sélectionné le pinceau
-                                // Selon la taille du pinceau:
-                                // Taille 1: on ne modifie que la case sélectionnée
-                                // Taille 2: on modifie les 6 cases autour ET la case sélectionnée
-                                // Taille 3: on modifie les 6 + 12 cases autour ET la case sélectionnée
-                                if (donnees.obtenirDerniereCaseType() != null) {
-                                    final TypeCase type = donnees.obtenirDerniereCaseType().obtenirType();
-                                    int taillePinceau = 1;
-                                    if (donnees.obtenirDernierBouton() != null)
-                                        taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
-                                    switch (taillePinceau) {
-                                        case 3:
-                                            majCelluleType(i-2,j, type);
-                                            majCelluleType(i+2,j, type);
+                                } else { // Modification de la carte selon les outils d'édition sélectionnés
                                     
-                                            majCelluleType(i,j+2, type);
-                                            majCelluleType(i+1,j+2, type);
-                                            majCelluleType(i-1,j+2, type);
-                                            majCelluleType(i,j-2, type);
-                                            majCelluleType(i+1,j-2, type);
-                                            majCelluleType(i-1,j-2, type);
-                                    
-                                    
-                                            if(j%2==0){
-                                                majCelluleType(i-1,j+1, type);
-                                                majCelluleType(i+2,j+1, type);
-                                                majCelluleType(i+2,j-1, type);
-                                                majCelluleType(i-1,j-1, type);
-                                            } else {
-                                                majCelluleType(i-2,j+1, type);
-                                                majCelluleType(i+1,j+1, type);
-                                                majCelluleType(i+1,j-1, type);
-                                                majCelluleType(i-2,j-1, type);
-                                            }
-                                        case 2:
-                                            majCelluleType(i-1, j, type);
-                                            majCelluleType(i+1, j, type);
-                                            majCelluleType(i, j+1, type);
-                                            majCelluleType(i, j-1, type);
-                                            if(j%2==0){
-                                                majCelluleType(i+1,j+1,type);
-                                                majCelluleType(i+1,j-1, type);
-                                            } else {
-                                                majCelluleType(i-1,j+1, type);
-                                                majCelluleType(i-1,j-1, type);
-                                            }
-                                        case 1:
-                                            majCelluleType(i, j, type);
-                                            break;
+                                    // Si on a sélectionné le pinceau
+                                    // Selon la taille du pinceau:
+                                    // Taille 1: on ne modifie que la case sélectionnée
+                                    // Taille 2: on modifie les 6 cases autour ET la case sélectionnée
+                                    // Taille 3: on modifie les 6 + 12 cases autour ET la case sélectionnée
+                                    if (donnees.obtenirDerniereCaseType() != null) {
+                                        final TypeCase type = donnees.obtenirDerniereCaseType().obtenirType();
+                                        int taillePinceau = 1;
+                                        if (donnees.obtenirDernierBouton() != null)
+                                            taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
+                                        switch (taillePinceau) {
+                                            case 3:
+                                                majCelluleType(i-2,j, type);
+                                                majCelluleType(i+2,j, type);
+                                        
+                                                majCelluleType(i,j+2, type);
+                                                majCelluleType(i+1,j+2, type);
+                                                majCelluleType(i-1,j+2, type);
+                                                majCelluleType(i,j-2, type);
+                                                majCelluleType(i+1,j-2, type);
+                                                majCelluleType(i-1,j-2, type);
+                                        
+                                        
+                                                if(j%2==0){
+                                                    majCelluleType(i-1,j+1, type);
+                                                    majCelluleType(i+2,j+1, type);
+                                                    majCelluleType(i+2,j-1, type);
+                                                    majCelluleType(i-1,j-1, type);
+                                                } else {
+                                                    majCelluleType(i-2,j+1, type);
+                                                    majCelluleType(i+1,j+1, type);
+                                                    majCelluleType(i+1,j-1, type);
+                                                    majCelluleType(i-2,j-1, type);
+                                                }
+                                            case 2:
+                                                majCelluleType(i-1, j, type);
+                                                majCelluleType(i+1, j, type);
+                                                majCelluleType(i, j+1, type);
+                                                majCelluleType(i, j-1, type);
+                                                if(j%2==0){
+                                                    majCelluleType(i+1,j+1,type);
+                                                    majCelluleType(i+1,j-1, type);
+                                                } else {
+                                                    majCelluleType(i-1,j+1, type);
+                                                    majCelluleType(i-1,j-1, type);
+                                                }
+                                            case 1:
+                                                majCelluleType(i, j, type);
+                                                break;
+                                        }
                                     }
                                 }
                             }
+                            estModifie = true;
+                            donnees.notifierObserveur(TypeMisAJour.Cellules);
+                            break;
                         }
-                        estModifie = true;
-                        donnees.notifierObserveur(TypeMisAJour.Cellules);
-                        break;
                     }
                 }
             }

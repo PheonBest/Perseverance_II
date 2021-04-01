@@ -55,12 +55,18 @@ public class Donnees implements Observable {
     private boolean etatEffets = true;
     private BoutonCercle derniereCompetence = null;
 
-    // Minijeu
+    // Minijeu Extraction
     private boolean etatMinijeuExtraction = false;
+    private boolean effacerMinijeuExtraction = false;
+    private long chronometreMinijeuExtraction = 0;
+
+    // Minijeu Laser
     private boolean etatMinijeuLaser = false;
     private boolean demarrageMinijeuLaser = false;
+    private boolean effacerMiniJeuLaser = false;
     private long chronometreMinijeuLaser = 0;
     private int tempsAvantChrono = 0;
+    private int nombreErreursLaser = 0;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
@@ -134,11 +140,17 @@ public class Donnees implements Observable {
     public void notifierObserveur(TypeMisAJour type) {
         for (Observer obs: listObserver) {
             switch (type) {
+                case NombreErreursLaser:
+                    obs.mettreAJour(TypeMisAJour.NombreErreursLaser, nombreErreursLaser);
+                    break;
                 case DemarrerMinijeuLaser:
                     obs.mettreAJour(TypeMisAJour.DemarrerMinijeuLaser, demarrageMinijeuLaser);
                     break;
                 case MinijeuLaser:
                     obs.mettreAJour(TypeMisAJour.MinijeuLaser, etatMinijeuLaser);
+                    break;
+                case EffacerMinijeuExtraction:
+                    obs.mettreAJour(TypeMisAJour.EffacerMinijeuExtraction, effacerMinijeuExtraction);
                     break;
                 case MinijeuExtraction:
                     obs.mettreAJour(TypeMisAJour.MinijeuExtraction, etatMinijeuExtraction);
@@ -456,7 +468,38 @@ public class Donnees implements Observable {
         return tempsAvantChrono;
     }
 
-    public void majDemarrerMiniJeuLaser(boolean demarrageMinijeuLaser) {
+    public void majDemarrerMinijeuLaser(boolean demarrageMinijeuLaser) {
         this.demarrageMinijeuLaser = demarrageMinijeuLaser;
     }
+    public boolean obtenirDemarrerMinijeuLaser() {
+        return demarrageMinijeuLaser;
+    }
+    public void majEffacerMiniJeuLaser(boolean effacerMiniJeuLaser) {
+        this.effacerMiniJeuLaser = effacerMiniJeuLaser;
+    }
+    public boolean obtenirEffacerMiniJeuLaser() {
+        return effacerMiniJeuLaser;
+    }
+
+    public void majChronometreMinijeuExtraction(long chronometreMinijeuExtraction) {
+        this.chronometreMinijeuExtraction = chronometreMinijeuExtraction;
+    }
+    public long obtenirChronometreMinijeuExtraction() {
+        return chronometreMinijeuExtraction;
+    }
+
+    public void majEffacerMinijeuExtraction(boolean effacerMinijeuExtraction) {
+        this.effacerMinijeuExtraction = effacerMinijeuExtraction;
+    }
+    public boolean obtenirEffacerMinijeuExtraction() {
+        return effacerMinijeuExtraction;
+    }
+
+    public void majNombreErreursLaser(int nombreErreursLaser) {
+        this.nombreErreursLaser = nombreErreursLaser;
+    }
+    public int obtenirNombreErreursLaser() {
+        return nombreErreursLaser;
+    }
+    
 }

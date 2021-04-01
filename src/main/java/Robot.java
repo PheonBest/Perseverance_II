@@ -313,4 +313,8 @@ public class Robot extends Avatar {
     public void majDerniereCase(int[] derniereCase) {
         this.derniereCase = derniereCase;
     }
+
+    public LinkedList<int[]> obtenirTrajectoire() {
+        return but;
+    }
 }
