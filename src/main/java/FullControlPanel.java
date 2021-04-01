@@ -2,47 +2,49 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class FullControlPanel extends JFrame{
+public class FullControlPanel extends JFrame implements ActionListener{
     
     //------------------------------------------------------------------ Attributs
     
     // taille de la fenêtre
-    private int lx = 1200;
-    private int ly = 1000;
+    private int lx = 900;
+    private int ly = 700;
     private Robot joueur;
+    public Timer t;
+    private int cpt;
     
     // Panneaux principaux de la fenêtre
     private JPanel cg; // panneau principal de gauche
-    private JPanel cd; // panneau principal de droite
     private JPanel cp; // panneau principal global
     
-    //---- Panneaux de gauche 
+    // Partie de gauche - Panneaux de données
     private JLabel titre;
-    int ecartY = 20; // écart entre les panneaux de gauche
+    private int ecartY = 20; // écart entre les panneaux de gauche
     
     // Panneau de la batterie
     private JPanel panneauBat;
-    int xb = 20;
-    int yb = 100;
+    private int xb = 20;
+    private int yb = 60;
     private JLabel titreBat;
     private JLabel nivBat;
     private JLabel nbRecharges;
     
     // Panneau des voyants
     private JPanel panneauVoyants;
-    int ypv;
+    private int ypv;
     private JLabel titreVoyant;
     
     // Panneau des statistiques
     private JPanel stat;
-    int ys;
+    private int ys;
     private JLabel titreStat;
     private JLabel nbKmTot;
     private JLabel nbCasesExp;
-    
-    //---- Panneaux de droite
-    Image image;
    
+    // Partie de droite - Images
+    private Image imageP;
+    private Image imageR;
+    
     //------------------------------------------------------------------ Constructeur
 
     public FullControlPanel(int x, int y, Robot r){
@@ -53,6 +55,8 @@ public class FullControlPanel extends JFrame{
         setSize(lx,ly);
         setTitle("Fenêtre de contrôle");
         joueur = r;
+        t = new Timer(500,this);
+        t.start();
         
         // Panneaux principaux
         cp = new JPanel();
@@ -67,17 +71,11 @@ public class FullControlPanel extends JFrame{
         cg.setSize(lx/2,ly -50);
         cg.setBackground(new Color(175,175,175));
         
-        cd = new JPanel();
-        cd.setLayout(null);
-        cd.setLocation(lx/2 +10,5);
-        cd.setSize(lx/2 -30,ly-50);
-        cd.setBackground(Color.white);
-        
         titre = new JLabel("Donnnées en temps réel");
         titre.setLayout(null);
-        titre.setLocation(140,10);
-        titre.setSize(500,50);
-        titre.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 24));
+        titre.setLocation(80,15);
+        titre.setSize(300,20);
+        titre.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 18));
         cg.add(titre);
         
         //-------- Panneau de gauche
@@ -86,29 +84,29 @@ public class FullControlPanel extends JFrame{
         panneauBat = new JPanel();
         panneauBat.setLayout(null);
         panneauBat.setLocation(xb,yb);
-        panneauBat.setSize(lx/2 -2*xb,200);
+        panneauBat.setSize(lx/2 -2*xb,150);
         panneauBat.setBackground(new Color(220,220,220));
         
         titreBat = new JLabel("Batterie");
         titreBat.setLayout(null);
-        titreBat.setLocation(220,10);
+        titreBat.setLocation(150,10);
         titreBat.setSize(200,30);
-        titreBat.setFont(Options.police);
+        titreBat.setFont(new Font("Courier", Font.BOLD, 18));
         panneauBat.add(titreBat);
         
-        nivBat = new JLabel("Niveau : "+this.joueur.getBatterie()+" %");
-        nivBat.setLayout(null);
-        nivBat.setLocation(30,80);
-        nivBat.setSize(300,30);
-        nivBat.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
-        panneauBat.add(nivBat);
-        
-        nbRecharges = new JLabel("Nombres de recharges : "+this.joueur.getNbRecharges());
+        nbRecharges = new JLabel("Nombre de recharges : "+this.joueur.getNbRecharges());
         nbRecharges.setLayout(null);
-        nbRecharges.setLocation(30,130);
+        nbRecharges.setLocation(30,50);
         nbRecharges.setSize(400,30);
         nbRecharges.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         panneauBat.add(nbRecharges);
+        
+        nivBat = new JLabel("Niveau : "+this.joueur.getBatterie()+" %");
+        nivBat.setLayout(null);
+        nivBat.setLocation(30,90);
+        nivBat.setSize(200,30);
+        nivBat.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
+        panneauBat.add(nivBat);
         
         // Panneau des voyants
         ypv = yb + panneauBat.getHeight() + ecartY;
@@ -116,14 +114,14 @@ public class FullControlPanel extends JFrame{
         panneauVoyants = new JPanel();
         panneauVoyants.setLayout(null);
         panneauVoyants.setLocation(xb,ypv);
-        panneauVoyants.setSize(lx/2 -2*xb,400);
+        panneauVoyants.setSize(lx/2 -2*xb,250);
         panneauVoyants.setBackground(new Color(220,220,220));
         
         titreVoyant = new JLabel("Etats des composants");
         titreVoyant.setLayout(null);
-        titreVoyant.setLocation(150,10);
+        titreVoyant.setLocation(100,10);
         titreVoyant.setSize(300,30);
-        titreVoyant.setFont(Options.police);
+        titreVoyant.setFont(new Font("Courier", Font.BOLD, 18));
         panneauVoyants.add(titreVoyant);
         
         // Panneaux des statistiques
@@ -132,83 +130,197 @@ public class FullControlPanel extends JFrame{
         stat = new JPanel();
         stat.setLayout(null);
         stat.setLocation(xb,ys);
-        stat.setSize(lx/2 -2*xb,200);
+        stat.setSize(lx/2 -2*xb,130);
         stat.setBackground(new Color(220,220,220));
         
         titreStat = new JLabel("Statistiques");
         titreStat.setLayout(null);
-        titreStat.setLocation(200,10);
+        titreStat.setLocation(140,10);
         titreStat.setSize(300,30);
-        titreStat.setFont(Options.police);
+        titreStat.setFont(new Font("Courier", Font.BOLD, 18));
         stat.add(titreStat);
         
-        nbKmTot = new JLabel("Distance totale parcourus : "+this.joueur.getKmParcourus()+" km");
+        nbKmTot = new JLabel("Distance totale parcourue : "+this.joueur.getKmParcourus()+" km");
         nbKmTot.setLayout(null);
-        nbKmTot.setLocation(30,80);
+        nbKmTot.setLocation(30,50);
         nbKmTot.setSize(400,30);
         nbKmTot.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         stat.add(nbKmTot);
         
         nbCasesExp = new JLabel("Exploration de planète : 0 %");
         nbCasesExp.setLayout(null);
-        nbCasesExp.setLocation(30,130);
+        nbCasesExp.setLocation(30,80);
         nbCasesExp.setSize(400,30);
         nbCasesExp.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         stat.add(nbCasesExp);
         
-        //-------- Panneau de droite
+        // Images
         
-        image = Toolkit.getDefaultToolkit().getImage("Perseverance II.png");
+        imageP = Toolkit.getDefaultToolkit().getImage("Mars9.png");
+        imageR = Toolkit.getDefaultToolkit().getImage("Perseverance II.png");
                
         // add finaux
         cg.add(panneauBat);
         cg.add(panneauVoyants);
         cg.add(stat);
         cp.add(cg);
-        cp.add(cd);
         this.add(cp);
         setVisible(true);
     }
     
     //------------------------------------------------------------------ Méthodes
     
+    public void actionPerformed(ActionEvent e){
+        cpt++;
+        switch(cpt%4){
+            case 0 : 
+                titre.setText("Donnnées en temps réel ");
+                break;
+            case 1 : 
+                titre.setText("Donnnées en temps réel .");
+                break;
+            case 2 : 
+                titre.setText("Donnnées en temps réel ..");
+                break;
+            case 3 : 
+                titre.setText("Donnnées en temps réel ...");
+                break;
+        }
+        this.repaint();
+    }
+    
     public void paint(Graphics g){
         super.paint(g);
         
         // batterie : origine (xb,yb)
-        int Xb = xb + 300;
-        int Yb = yb + 100;
+        int Xb = xb + 210;
+        int Yb = yb + 120;
         g.setColor(Color.black);
-        g.fillRect(Xb+3,Yb+3,230,90);
+        g.fillRect(Xb,Yb,118,48);
         g.setColor(Color.white);
-        g.fillRect(Xb+6,Yb+6,224,84);
+        g.fillRect(Xb+3,Yb+3,112,42);
         g.setColor(Color.black);
-        g.fillRect(Xb+12,Yb+12,212,72);
-        g.fillRect(Xb+12,Yb+38,218,20);
+        g.fillRect(Xb+6,Yb+6,106,36);
+        g.fillRect(Xb+6,Yb+19,112,10);
         // Jauge de batterie de couleur ajustable
-        g.setColor(new Color((float)(1.0-joueur.getBatterie()*0.01), (float)(0.0+joueur.getBatterie()*0.01), (float)(0.0)));
-        g.fillRect(Xb+18,Yb+18,joueur.getBatterie()*2,60);
+        float c1 = (float) (1.0-joueur.getBatterie()*0.01);
+        float c2 = (float)(joueur.getBatterie()*0.01);
+        if (c1 < 0) c1 = 0;
+        else if (c1 > 1) c1 = 1;
+        if (c2 < 0) c2 = 0;
+        else if (c2 > 1) c2 = 1;
+        g.setColor(new Color(c1, c2, (float)(0.0)));
+        g.fillRect(Xb+9,Yb+9,joueur.getBatterie(),30);
         
         // Voyants
-        int xv = xb + 90;
-        int yv = ypv + 170;
+        int xv = xb + 100;
+        int yv = ypv + 120;
         for(int i=0; i<joueur.getJambes().length; i++){
-            joueur.getJambes()[i].voyant.setPositionR(xv+i*200,yv,35); 
+            joueur.getJambes()[i].voyant.setPositionR(xv+i*120,yv,20); 
             joueur.getJambes()[i].voyant.dessinerVoyant(g);
         }
-        yv += 100;
+        yv += 65;
         for(int i=0; i<joueur.getBras().length; i++){
-            joueur.getBras()[i].voyant.setPositionR(xv+i*200,yv,35); 
+            joueur.getBras()[i].voyant.setPositionR(xv+i*120,yv,20); 
             joueur.getBras()[i].voyant.dessinerVoyant(g);
         }
-        yv += 100;
+        yv += 65;
         for(int i=0; i<joueur.getCapteurs().length; i++){
-            joueur.getCapteurs()[i].voyant.setPositionR(xv+i*200,yv,35); 
+            joueur.getCapteurs()[i].voyant.setPositionR(xv+i*120,yv,20); 
             joueur.getCapteurs()[i].voyant.dessinerVoyant(g);
         }
         
+        // Images
+        g.drawImage(imageP,lx/2 +17,37,this);
+        g.drawImage(imageR,lx/2 -115, 100, this);
+        
         // Warnings robots;
-        g.drawImage(image,lx/2, 200, this);
+        int xc;
+        int yc;
+        //Jambe droite
+        if(joueur.getJambes()[0].voyant.getEtat()>Options.ALERTE_MIN){
+            xc = lx/2 + 175;
+            yc = 600;
+            g.setColor(Color.black);
+            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
+            g.setColor(Color.orange);
+            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
+            g.setColor(Color.black);
+            g.setFont(new Font("Times New Roman",Font.BOLD,40));
+            g.drawString("!",xc-5,yc+10);
+        }
+        //Jambe gauche
+        if(joueur.getJambes()[1].voyant.getEtat()>Options.ALERTE_MIN){
+            xc = lx/2 + 255;
+            yc = 600;
+            g.setColor(Color.black);
+            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
+            g.setColor(Color.orange);
+            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
+            g.setColor(Color.black);
+            g.setFont(new Font("Times New Roman",Font.BOLD,40));
+            g.drawString("!",xc-5,yc+10);
+        }
+        // Bras droit xc = 125, yc = 500
+        if(joueur.getBras()[0].voyant.getEtat()>Options.ALERTE_MIN){
+            xc = lx/2 + 140;
+            yc = 450;
+            g.setColor(Color.black);
+            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
+            g.setColor(Color.orange);
+            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
+            g.setColor(Color.black);
+            g.setFont(new Font("Times New Roman",Font.BOLD,40));
+            g.drawString("!",xc-5,yc+10);
+        }
+        // Bras gauche 
+        if(joueur.getBras()[1].voyant.getEtat()>Options.ALERTE_MIN){
+            xc = lx/2 + 285;
+            yc = 450;
+            g.setColor(Color.black);
+            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
+            g.setColor(Color.orange);
+            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
+            g.setColor(Color.black);
+            g.setFont(new Font("Times New Roman",Font.BOLD,40));
+            g.drawString("!",xc-5,yc+10);
+        }
+        // capteurs températures
+        if(joueur.getCapteurs()[0].voyant.getEtat()>Options.ALERTE_MIN){
+            xc = lx/2 + 310;
+            yc = 350;
+            g.setColor(Color.black);
+            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
+            g.setColor(Color.orange);
+            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
+            g.setColor(Color.black);
+            g.setFont(new Font("Times New Roman",Font.BOLD,40));
+            g.drawString("!",xc-5,yc+10);
+        }
+        if(joueur.getCapteurs()[1].voyant.getEtat()>Options.ALERTE_MIN){
+        // Caméras
+            xc = lx/2 + 150;
+            yc = 350;
+            g.setColor(Color.black);
+            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
+            g.setColor(Color.orange);
+            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
+            g.setColor(Color.black);
+            g.setFont(new Font("Times New Roman",Font.BOLD,40));
+            g.drawString("!",xc-5,yc+10);
+        }
+        // Capteurs pressions
+        if(joueur.getCapteurs()[1].voyant.getEtat()>Options.ALERTE_MIN){
+            xc = lx/2 + 320;
+            yc = 515;
+            g.setColor(Color.black);
+            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
+            g.setColor(Color.orange);
+            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
+            g.setColor(Color.black);
+            g.setFont(new Font("Times New Roman",Font.BOLD,40));
+            g.drawString("!",xc-5,yc+10);
+        }
     }
     
 }
