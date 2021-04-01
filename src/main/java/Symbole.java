@@ -12,8 +12,9 @@ public class Symbole extends Polygon {
 		private TypeSymbole type;
 		private Image image;
 	
-	public Symbole(TypeSymbole type){
+	public Symbole(TypeSymbole type, Image image){
 		this.type=type;
+		this.image=image;
 		//this.image=getImage();
 	}
 

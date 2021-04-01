@@ -1,8 +1,8 @@
 
 public enum TypeSymbole{
-	EAU,
+	RIVIERE,
 	BACTERIE, 
-	MINERAIS,
+	MINERAI,
 	DANGER,
 	MORT,
 	GRAPPIN
