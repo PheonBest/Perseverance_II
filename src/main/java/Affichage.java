@@ -142,11 +142,17 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
+            case NombreErreursLaser:
+                ((Dessiner)jeu).majNombreErreursLaser((int) nouveau);
+                break;
             case DemarrerMinijeuLaser:
                 ((Dessiner)jeu).demarrerMinijeuLaser((boolean) nouveau);
                 break;
             case MinijeuLaser:
                 ((Dessiner)jeu).majEtatMinijeuLaser((boolean) nouveau);
+                break;
+            case EffacerMinijeuExtraction:
+                ((Dessiner)jeu).majEffacerMinijeuExtraction((boolean) nouveau);
                 break;
             case MinijeuExtraction:
                 ((Dessiner)jeu).majEtatMinijeuExtraction((boolean) nouveau);
