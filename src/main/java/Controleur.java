@@ -18,6 +18,7 @@ import java.lang.ProcessBuilder.Redirect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.awt.Image;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.CellEditor;
@@ -721,4 +722,25 @@ public class Controleur {
     public void majPositionCurseurExtraction(double positionCurseurExtraction) {
         donnees.majPositionCurseurExtraction(positionCurseurExtraction);
     }
+    
+    public Image obtenirImageSymbole(TypeSymbole nomSymbole){
+		switch( nomSymbole){
+			case RIVIERE:
+				return donnees.getImagesSymboles().get("EAU");
+			case MINERAI:
+				return donnees.getImagesSymboles().get("MINERAI");
+			case MORT:
+				return donnees.getImagesSymboles().get("MORT");
+			case BACTERIE:
+				return donnees.getImagesSymboles().get("BACTERIE");
+			case DANGER:
+				return donnees.getImagesSymboles().get("DANGER");
+			case GRAPPIN:
+				return donnees.getImagesSymboles().get("GRAPPIN");
+			default:
+				return null;
+		
+		}
+	
+	}
 }
