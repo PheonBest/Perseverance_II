@@ -170,7 +170,8 @@ public class Cellule extends Polygon implements Dessin {
         type = unType;
         couleur = this.getColor();
     }
-
+    
+    // Renvoie les coordonnées du centre de la cellule et sa position dans la matrice de cellule
     public int[] obtenirCentre() {
         return new int[] {(int)(xpoints[0]+largeur/4),(int)(ypoints[0]+largeur/2), ligne, colonne};
     }

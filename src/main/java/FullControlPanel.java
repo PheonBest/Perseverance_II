@@ -140,7 +140,7 @@ public class FullControlPanel extends JFrame implements ActionListener{
         titreStat.setFont(new Font("Courier", Font.BOLD, 18));
         stat.add(titreStat);
         
-        nbKmTot = new JLabel("Distance totale parcourue : "+this.joueur.getKmParcourus()+" km");
+        nbKmTot = new JLabel("Distance totale parcourue : "+(int)(this.joueur.getKmParcourus())+" km");
         nbKmTot.setLayout(null);
         nbKmTot.setLocation(30,50);
         nbKmTot.setSize(400,30);

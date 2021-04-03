@@ -22,10 +22,8 @@ public class Robot extends Avatar {
     private int[] derniereCase = null;
     
     // Trajectoire
-    /* La classe dimension est une classe qui comporte comme attribut une hauteur et une largeur,
-     * elle est utilisée ici pour référencer la position d'un point à atteindre sur la carte par rapport au robot.
-     * Pour aller d'un point à un autre sur la carte, on utilise une liste de cases ciblées, appelées but (à atteindre).*/ 
-     
+    /* Pour aller d'un point à un autre sur la carte, on utilise une liste de cases ciblées, appelées but (à atteindre).
+     * Chaque but est un tableau d'entier*/ 
     private LinkedList<int[]> but = new LinkedList<int[]>();
     
     //  Position du robot dans la matrice de la carte
@@ -229,12 +227,13 @@ public class Robot extends Avatar {
     
     //---------------------------------------------------------------------------------------------------- Méthodes pour les déplacments du robot
     
-    // La case à atteindre est définie par une série de sous-but
+    // La case à atteindre est définie par une série de sous-but que l'on donne à cette méthode
     public void definirBut(LinkedList<int[]> liste) {
         this.but = liste;
-        int[] d = but.getFirst(); // On prend une case à cibler 
+        // On prend une case à cibler, la première de la liste de buts
+        int[] d = but.getFirst(); 
         definirDirection(new Dimension(d[0], d[1]));
-        animationIndex = 2; //  Image qui montre le robot marcher 
+        animationIndex = 2; //  Image qui montre le robot en marche
     }
     
     // 
@@ -244,7 +243,7 @@ public class Robot extends Avatar {
         
         dx = (int) (Math.cos(angle)*10); // 10 est la vitesse (pixel/itération de la boucle du jeu)
         dy = (int) (Math.sin(angle)*10);
-        animationIndex = 2; // Image qui montre le robot marcher 
+        animationIndex = 2; // Image qui montre le robot en marche
     }
     
     // Cette méthode permet le déplacement du robot si il en a le droit, et actualise les composants en rapport avec le déplacement.
@@ -267,6 +266,9 @@ public class Robot extends Avatar {
             xFictif += dx;
             yFictif += dy;
             int[] d = but.getFirst(); // On prend une case à cibler 
+            /* On ne veut pas que le joueur puisse parcourir toute la carte d'un coupe de clic, 
+             * il est donc obligé de  cliquer aux alentours du robots sur un rayon délimité par 
+             * Options.JOUERUR_TOLERANCE_DEPLACEMENT*/
             if (Math.abs(xFictif - d[0]) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
                 dx = (int) d[0] - xFictif;
             if (Math.abs(yFictif - d[1]) < Options.JOUERUR_TOLERANCE_DEPLACEMENT)
