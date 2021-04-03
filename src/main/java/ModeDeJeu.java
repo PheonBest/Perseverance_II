@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 import java.awt.Color;
 
-public class ModeDeJeu extends JPanel {
+public class ModeDeJeu extends JPanel implements ActionListener {
 	
     private Controleur controleur;
     private HashMap<String, InputStream> cartes;
@@ -74,16 +74,20 @@ public class ModeDeJeu extends JPanel {
 		this.hauteur=hauteur;
 	}
 	
-	/*
+	
 	 public void actionPerformed(ActionEvent e) {
 		 if(liste.getSelectedValue()!=null){
 			if (e.getSource()== jouer){
 				controleur.jouer(cartes.get(liste.getSelectedValue()));
-			}else if (e.getSource()== editer){
+				
+			}
+			/*
+			else if (e.getSource()== editer){
 				controleur.editer(cartes.get(liste.getSelectedValue()));
 			}
+			*/
 		}
-	}*/
+	}
 	
 	public void initialiser(){
 		
@@ -102,7 +106,7 @@ public class ModeDeJeu extends JPanel {
 		
 		//panneau bas 
 		panneauBas= new JPanel();
-		panneauBas.setBounds(0,300,1000,400);
+		panneauBas.setBounds(0,300,largeur,400);
 		panneauBas.setBackground(Color.gray);
 		panneauBas.setVisible(true);
 		panneauBas.setLayout(null);
@@ -112,13 +116,13 @@ public class ModeDeJeu extends JPanel {
 		jouer = new JButton("Jouer");
 		jouer.setBounds(300,50,100,100);
 		panneauBas.add(jouer);
-		//jouer.addActionListener(this);
+		jouer.addActionListener(this);
 		
 		//bouton éditer
 		editer= new JButton("Editer");
 		editer.setBounds(600,50,100,100);
 		panneauBas.add(editer);
-		//editer.addActionListener(this);
+		editer.addActionListener(this);
 		
 		
         liste.setModel(modele);
