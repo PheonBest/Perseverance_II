@@ -79,4 +79,6 @@ public class Options {
     public static final String NOM_DOSSIER_CARTES = "cartes";
     public static final long TEMPS_AVANT_SUPPRESSION_MINIJEU = 3000; // en secondes
     public static final int NOMBRE_ERREURS_LASER = 3;
+
+    public static final String NOM_DOSSIER_IMAGES = "images";
 }

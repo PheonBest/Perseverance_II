@@ -148,9 +148,11 @@ public class Cellule extends Polygon implements Dessin {
 
 	public boolean estVisible(double largeurEcran, double hauteurEcran, double zoom) {
 		Rectangle b = getBounds();
+        final int MOITIE_DIFF_Y = (int) ( hauteurEcran*( 1/zoom)/2 );
+        final int MOITIE_DIFF_X = (int) ( largeurEcran*( 1/zoom)/2 );
         // Si la case est visible à l'écran:
-        if (    ((b.x + largeur)*zoom > 0 && (b.x - largeur)*zoom < largeurEcran)
-                && ((b.y + hauteur)*zoom > 0 && (b.y - hauteur)*zoom < hauteurEcran))
+        if ( ((b.x + largeur) > - MOITIE_DIFF_X && (b.x - largeur) < MOITIE_DIFF_X)
+                && ((b.y + hauteur) > - MOITIE_DIFF_Y && (b.y - hauteur) < MOITIE_DIFF_Y))
             return true;
         // Sinon, la case n'est pas visible
         return false;

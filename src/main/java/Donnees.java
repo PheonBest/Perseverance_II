@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 
 public class Donnees implements Observable {
 
+    private ArrierePlan arrierePlan;
     private Robot joueur;
     private String scene;
     private ArrayList<Observer> listObserver = new ArrayList<Observer>();
@@ -34,6 +35,8 @@ public class Donnees implements Observable {
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private int rayonDeSelection = 0;
     private double positionCurseurExtraction;
+    private String scoreExtraction;
+    private boolean etatOptions = false;
     
     // CSV des cartes
     private HashMap<String, InputStream> cartes;
@@ -67,27 +70,24 @@ public class Donnees implements Observable {
     private long chronometreMinijeuLaser = 0;
     private int tempsAvantChrono = 0;
     private int nombreErreursLaser = 0;
+    private long tempsDeReaction = 0;
     
     public Donnees(int largeur, int hauteur) {
         this.largeur = largeur;
         this.hauteur = hauteur;
 
-        // Création d'une carte
-
+        // Création d'une carte par défaut si elle n'existe pas déjà
         List<String[]> data = new ArrayList<String[]>();
 
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
         for (int i=0; i < cellules.length; i++) {
-            for (int j=0; j < cellules[i].length; j++) {
+            for (int j=0; j < cellules[i].length; j++)
                 cellules[i][j] = new Cellule(i,j);
-                cellules[i][j].translate(-largeur/2, -hauteur /2); // Décalage de l'affichage
-            }
         }
 
         try {
             CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "new");
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -140,6 +140,12 @@ public class Donnees implements Observable {
     public void notifierObserveur(TypeMisAJour type) {
         for (Observer obs: listObserver) {
             switch (type) {
+                case Options:
+                    obs.mettreAJour(TypeMisAJour.Options, etatOptions);
+                    break;
+                case ArrierePlan:
+                    obs.mettreAJour(TypeMisAJour.ArrierePlan, arrierePlan);
+                    break;
                 case NombreErreursLaser:
                     obs.mettreAJour(TypeMisAJour.NombreErreursLaser, nombreErreursLaser);
                     break;
@@ -502,4 +508,32 @@ public class Donnees implements Observable {
         return nombreErreursLaser;
     }
     
+    public void majTempsDeReaction(long tempsDeReaction) {
+        this.tempsDeReaction = tempsDeReaction;
+    }
+    public long obtenirTempsDeReaction() {
+        return tempsDeReaction;
+    }
+
+    public void majScoreExtraction(String scoreExtraction) {
+        this.scoreExtraction = scoreExtraction;
+    }
+    public String obtenirScoreExtraction() {
+        return scoreExtraction;
+    }
+
+    public ArrierePlan obtenirArrierePlan() {
+        return arrierePlan;
+    }
+    public void majArrierePlan(ArrierePlan arrierePlan) {
+        this.arrierePlan = arrierePlan;
+    }
+
+    public boolean obtenirEtatOptions() {
+        return etatOptions;
+    }
+
+    public void majEtatOptions(boolean etatOptions) {
+        this.etatOptions = etatOptions;
+    }
 }

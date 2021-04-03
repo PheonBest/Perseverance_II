@@ -16,5 +16,7 @@ public enum TypeMisAJour {
     MinijeuLaser,
     DemarrerMinijeuLaser,
     EffacerMinijeuExtraction,
-    NombreErreursLaser
+    NombreErreursLaser,
+    ArrierePlan,
+    Options
 }

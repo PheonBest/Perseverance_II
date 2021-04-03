@@ -25,7 +25,6 @@ public class CSV {
 	
 	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus) throws IOException {
 		List<String[]> data = dataLines (carteCellules);
-		System.out.println(data.get(0)[0]);
 		File dir = new File(Options.NOM_DOSSIER_CARTES);
     	if (!dir.exists()) dir.mkdirs();
 		File csvOutputFile = new File(Options.NOM_DOSSIER_CARTES+"/"+filename+".csv");
@@ -58,7 +57,7 @@ public class CSV {
 	
 	
 /////////////////////////////////////////////////////////////////////////////////////////////Méthodes de lecture du fichier CSV
-	public static Cellule[][] lecture(InputStream csv){
+	public static Cellule[][] lecture(InputStream csv, int dx, int dy){
 		List<List<String>> records = new ArrayList<>();
 		try {
 			Scanner scanner = new Scanner(csv);
@@ -66,8 +65,14 @@ public class CSV {
 				records.add(getRecordFromLine(scanner.nextLine()));
 			}
 			//scanner.close(); // On veut pouvoir lire le stream une nouvelle fois, donc on ne ferme pas le scanner (fermer le scanner revient à fermer le stream)
-		}catch(Exception e){e.printStackTrace();}
-		return dataLines(records);	
+		} catch(Exception e){e.printStackTrace();}
+		
+		Cellule[][] cellules = dataLines(records);
+		for (int i=0; i < cellules.length; i++) {
+			for (Cellule c: cellules[i])
+				c.translate(dx, dy); // Décalage
+		}
+		return cellules;
 	}
 	
 	private static List<String> getRecordFromLine(String line) {

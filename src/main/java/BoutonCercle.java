@@ -37,12 +37,13 @@ public class BoutonCercle implements Dessin {
         
         Graphics2D g2d = (Graphics2D) g;
         // On dessine le cercle "Bordure"
-        final int EPAISSEUR_BORDURE = 3;
-        g2d.setColor(Color.black);
+        final int EPAISSEUR_BORDURE = 12;
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.setStroke(new BasicStroke(EPAISSEUR_BORDURE));
         if (sourisDessus)
-            g2d.fillOval(x-(int)(1.15*(EPAISSEUR_BORDURE+rayon)),y-(int)(1.15*(EPAISSEUR_BORDURE+rayon)),(int)(2*1.15*(EPAISSEUR_BORDURE+rayon)),(int)(2*1.15*(EPAISSEUR_BORDURE+rayon)));
+            g2d.drawOval(x-(int)(1.15*rayon),y-(int)(1.15*rayon),(int)(2*1.15*rayon),(int)(2*1.15*rayon));
         else
-            g2d.fillOval(x-(int)(EPAISSEUR_BORDURE+rayon),y-(int)(EPAISSEUR_BORDURE+rayon),(int)(2*(EPAISSEUR_BORDURE+rayon)),(int)(2*(EPAISSEUR_BORDURE+rayon)));
+            g2d.drawOval(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
         
         // On dessine le deuxième cercle
         g2d.setColor(Color.white);

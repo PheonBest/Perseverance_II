@@ -7,13 +7,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Editeur extends JPanel {
-    private JPanel carte = new Dessiner();
+    private JPanel carte;
     private JPanel menu;
     private Controleur controleur;
 
     public Editeur(Controleur controleur) {
         this.controleur = controleur;
 
+        carte = new Dessiner(controleur);
         menu = new Menu(controleur);
         
         setLayout(null);
@@ -58,5 +59,9 @@ public class Editeur extends JPanel {
 
     public void majCentreZoom(Point centreZoom) {
         ((Dessiner)carte).majCentreZoom(centreZoom);
+    }
+
+    public void majArrierePlan(ArrierePlan arrierePlan) {
+        ((Dessiner)carte).majArrierePlan(arrierePlan);
     }
 }

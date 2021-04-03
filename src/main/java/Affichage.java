@@ -31,7 +31,8 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private JPanel modeDeJeu;
     private JPanel chargement = new Chargement();
     private JPanel editeur;
-    private Dessiner jeu = new Dessiner(true);
+    private JPanel jeu;
+    private JPanel options = new JPanel();
 
     private double largeur;
     private double hauteur;
@@ -41,6 +42,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     public Affichage(int largeur, int hauteur, Controleur controleur) {
         
         this.controleur = controleur;
+        jeu = new Dessiner(controleur, true);
         modeDeJeu = new ModeDeJeu(controleur);
         editeur = new Editeur(controleur);
         jeu.setLayout(null);
@@ -65,12 +67,16 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.setTitle("Perseverance II");
         this.setSize(largeur, hauteur);
         this.setLocationRelativeTo(null);
+
+        options.setBounds(100,100,300,300);
+        options.setBackground(Color.RED);
         
         contenu.setLayout(cardLayout);
         contenu.add(modeDeJeu, "Choix du mode");
         contenu.add(jeu, "Jeu");
         contenu.add(chargement, "Chargement");
         contenu.add(editeur, "Editeur de carte");
+        contenu.add(options, "Options");
         jeu.setBackground(Color.DARK_GRAY);
 
         
@@ -124,8 +130,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-        controleur.interactionClavier(code);
+        controleur.interactionClavier(e.getKeyCode());
     }
 
     @Override
@@ -142,6 +147,18 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
+            case Options:
+                if ((boolean)nouveau)
+                    cardLayout.show(contenu, "Options");
+                else
+                    cardLayout.show(contenu, scene);
+                break;
+            case ArrierePlan:
+                if (scene.equals("Jeu"))
+                    ((Dessiner)jeu).majArrierePlan((ArrierePlan) nouveau);
+                else if (scene.equals("Editeur de carte"))
+                    ((Editeur)editeur).majArrierePlan((ArrierePlan) nouveau);
+                break;
             case NombreErreursLaser:
                 ((Dessiner)jeu).majNombreErreursLaser((int) nouveau);
                 break;
@@ -240,8 +257,8 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
     @Override
     public void mousePressed(MouseEvent ev) {
-        if (scene.equals("Jeu") && ((Dessiner)jeu).obtenirEtatMinijeuExtraction())
-            controleur.majPositionCurseurExtraction(((Dessiner)jeu).obtenirPositionCurseur());
+        if (scene != null && scene.equals("Jeu") && ((Dessiner)jeu).obtenirEtatMinijeuExtraction())
+            controleur.majScoreExtraction(((Dessiner)jeu).obtenirScore());
         controleur.majStatutSouris(ev, true);
     }
     

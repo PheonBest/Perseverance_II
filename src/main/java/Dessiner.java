@@ -1,5 +1,6 @@
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.util.Arrays;
@@ -8,12 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.TexturePaint;
 
 import javax.swing.JPanel;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.awt.RenderingHints;
 import java.awt.Rectangle;
@@ -24,6 +28,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 
 public class Dessiner extends JPanel {
+    private Controleur controleur;
+    private ArrierePlan arrierePlan;
     private int rayonDeSelection = 0;
     private Cellule[][] cellules = {{}};
     private double largeurEcran;
@@ -87,15 +93,16 @@ public class Dessiner extends JPanel {
     private long tempsChrono = 0;
     private long tempsReaction = 0;
 
-    public Dessiner(boolean affichagePanneauDeControle){
+    public Dessiner(Controleur controleur, boolean affichagePanneauDeControle){
+        this.controleur = controleur;
         this.affichagePanneauDeControle = affichagePanneauDeControle;
         if (affichagePanneauDeControle) {
             panneauDeControle = new ControlPanel(10,10);
             add(panneauDeControle);
         }
     }
-    public Dessiner(){
-        this(false);
+    public Dessiner(Controleur controleur){
+        this(controleur, false);
     }
 
     public void initialiser() {
@@ -112,26 +119,28 @@ public class Dessiner extends JPanel {
         Graphics2D g2d = (Graphics2D) g.create();
         AffineTransform transformationInitiale = g2d.getTransform();
         AffineTransform transformationMinimap = g2d.getTransform();
-        // Affichage de la carte
+        
         AffineTransform at = g2d.getTransform();
-        // Application du zoom centré autour d'un point p:
+        // Application du zoom centré autour d'un point "p"
+        // (le point p est le centre de l'écran ici)
         // 1. On veut que le point p soit la nouvelle origine
         //    Donc on translate le coin en haut à gauche vers le centre
         // 2. On aggrandit/rétrécit.
 
+        
         at.translate(
             (largeurEcran/2),
             (hauteurEcran/2)
         );
         
-        /*
-        at.translate(
-            (centreZoom.getX()),
-            (centreZoom.getY())
-        );
-        */
-        at.scale(zoom, zoom);
         
+        at.scale(zoom, zoom);
+        g2d.setTransform(at);
+        
+        // Affichage de l'arrière plan
+        arrierePlan.dessiner(g2d, largeurEcran, hauteurEcran, zoom);
+
+        // Affichage de la carte
         // Obtention de la cellule sur laquelle le joueur est
         Cellule[] voisins = {};
         if (joueur != null && rayonDeSelection > 0) {
@@ -139,24 +148,28 @@ public class Dessiner extends JPanel {
             voisins = Voisins.obtenirVoisins(cellules, caseJoueur[0], caseJoueur[1], rayonDeSelection);
         }
         // On dessine les cellules de la carte
-        g2d.setTransform(at);
+        int nombreCellulesVisibles = 0;
         for (int i=0; i < cellules.length; i++) {
             for (Cellule c: cellules[i]) {
-                //if (c.estVisible(largeurEcran,hauteurEcran,zoom))
+                if (c.estVisible(largeurEcran,hauteurEcran,zoom)) {
+                    nombreCellulesVisibles++;
 
-                // Si les cellules font partie des voisins du joueur, on les dessine en bleu
-                int j = 0;
-                while (j < voisins.length && voisins[j] != c)
-                    j++;
-                if (j < voisins.length) {
-                    TypeCase oldType = c.obtenirType();
-                    c.majType(TypeCase.DESERT);
-                    c.dessiner(g2d);
-                    c.majType(oldType);
-                } else
-                    c.dessiner(g2d);
+                    // Si les cellules font partie des voisins du joueur, on les dessine en bleu
+                    int j = 0;
+                    while (j < voisins.length && voisins[j] != c)
+                        j++;
+                    if (j < voisins.length) {
+                        TypeCase oldType = c.obtenirType();
+                        c.majType(TypeCase.DESERT);
+                        c.dessiner(g2d);
+                        c.majType(oldType);
+                    } else
+                        c.dessiner(g2d);
+
+                }
             }
         }
+        //System.out.println(nombreCellulesVisibles);
 
         
         if (enJeu && joueur != null) {
@@ -172,13 +185,14 @@ public class Dessiner extends JPanel {
 
             // On dessine la minimap sur un rectangle
             g2d.setColor(Color.gray);
-            
-            g2d.fillRoundRect(  (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[0]),
-                                (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - (hauteurEcran/2)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[1]),
-                                (int)(tailleMinimap[0] + 9./4.*Options.DIMENSIONS_CASES[0]),
-                                (int)(tailleMinimap[1] + 9./4.*Options.DIMENSIONS_CASES[1]),
-                                15,
-                                15);
+
+            dessinerRectangle(g2d,
+            (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[0]),
+            (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - (hauteurEcran/2)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[1]),
+            (int)(tailleMinimap[0] + 9./4.*Options.DIMENSIONS_CASES[0]),
+            (int)(tailleMinimap[1] + 9./4.*Options.DIMENSIONS_CASES[1]),
+            15,
+            15);
 
             // On dessine la minimap
             
@@ -330,8 +344,8 @@ public class Dessiner extends JPanel {
                 dessinerTexteCentre(g2d, str, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU), Options.police);
                 dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes, cliquez\nle plus vite possible pour renvoyer les données du scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU), Options.POLICE_PLAIN);
                 
-                // On dessine les éventuelles erreurs
-                if (nombreErreursLaser > 0) {
+                // On dessine les éventuelles erreurs SI le jeu n'est pas finit et qu'il y a au moins une erreur
+                if (!finMinijeuLaser && nombreErreursLaser > 0) {
                     g2d.setStroke(new BasicStroke(10));
                     for (int i=0; i< NOMBRE_CROIX; i++) {
                         if (i < nombreErreursLaser) // Dessin de croix pleines
@@ -374,12 +388,13 @@ public class Dessiner extends JPanel {
         g2d.setPaint(COULEURS_DIAGONALES[0]);
 
         Shape rectangle = new RoundRectangle2D.Float(coinX, coinY, largeur - 1f, hauteur -1f, RAYON, RAYON);
-        g2d.fill(rectangle);
         g2d.setClip(rectangle);
-        g2d.setStroke(new BasicStroke(LARGEUR_LIGNE));
+        g2d.fill(rectangle);
+        
 
         // dessin des lignes diagonales
-        g2d.setPaint(COULEURS_DIAGONALES[1]);
+        g2d.setColor(COULEURS_DIAGONALES[1]);
+        g2d.setStroke(new BasicStroke(LARGEUR_LIGNE));
         
         for (int x = coinX, y = coinY; y < (coinY + largeur + hauteur); y += ESPACE)
             g2d.drawLine(x, y ,  x + (int) largeur , y  - (int) largeur);
@@ -454,8 +469,8 @@ public class Dessiner extends JPanel {
         this.rayonDeSelection = rayonDeSelection;
     }
 
-    public double obtenirPositionCurseur() {
-        return positionCurseur;
+    public String obtenirScore() {
+        return score;
     }
 
     public void majEtatMinijeuExtraction(boolean etatMinijeuExtraction) {
@@ -467,8 +482,10 @@ public class Dessiner extends JPanel {
         return etatMinijeuExtraction;
     }
     public void majEffacerMinijeuExtraction(boolean effacerMinijeuExtraction) {
-        if (effacerMinijeuExtraction)
+        if (effacerMinijeuExtraction) {
             score = new DecimalFormat("0.0").format(-200*Math.abs(0.5 - positionCurseur) + 100);
+            controleur.majScoreExtraction(score);
+        }
         this.effacerMinijeuExtraction = effacerMinijeuExtraction;
     }
 
@@ -497,10 +514,14 @@ public class Dessiner extends JPanel {
         } else {
             finMinijeuLaser = true;
             tempsReaction = System.currentTimeMillis()-tempsChrono;
+            controleur.majTempsDeReaction(tempsReaction);
         }
     }
     public void majNombreErreursLaser(int nombreErreursLaser) {
         this.nombreErreursLaser = nombreErreursLaser;
         tempsDebut = System.currentTimeMillis();
+    }
+    public void majArrierePlan(ArrierePlan arrierePlan) {
+        this.arrierePlan = arrierePlan;
     }
 }
