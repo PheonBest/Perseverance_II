@@ -175,6 +175,18 @@ public class Cellule extends Polygon implements Dessin {
     public int[] obtenirCentre() {
         return new int[] {(int)(xpoints[0]+largeur/4),(int)(ypoints[0]+largeur/2), ligne, colonne};
     }
+    // Renvoie la cellule d'une matrice de cellule qui contient les coordonnées (x,y)
+    public Cellule obtenirCellule(int x, int y, Cellule[][] mat ){
+        Cellule c = null;
+        for(int i=0; i<mat.length; i++){
+            for(int j=0; j<mat[i].length; j++){
+                if( mat[i][j].contains(x,y) ){
+                    c = mat[i][j];
+                }
+            }
+        }
+        return c;
+    }
 
     public String toString() {
         return type.name()+";null";

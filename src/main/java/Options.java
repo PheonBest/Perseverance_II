@@ -30,6 +30,7 @@ public class Options {
 	public static final int JOUEUR_DUREE_ANIMATION = 50;
 	public static final int JOUEUR_LARGEUR = 300;
 	public static final int JOUERUR_TOLERANCE_DEPLACEMENT = 5;
+    public static final int JOUEUR_TOLERANCE_CLICK = 4;
 
     public static final int ESPACE_INTER_BOUTON = 50;
 	public static final int LARGEUR_BOUTON_CIRCULAIRE = 30;
