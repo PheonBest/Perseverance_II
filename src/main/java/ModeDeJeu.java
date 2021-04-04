@@ -14,13 +14,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.io.InputStream;
-
-import java.awt.Color;
+import javax.swing.ImageIcon;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 public class ModeDeJeu extends JPanel implements ActionListener {
 	
@@ -84,13 +87,54 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 			/*
 			else if (e.getSource()== editer){
 				controleur.editer(cartes.get(liste.getSelectedValue()));
-			}
 			*/
+			
 		}
 	}
 	
 	public void initialiser(){
 		
+		// fond d'ecran image
+		JLabel presentation = new JLabel(new ImageIcon ("./res/images/planetes.jpg"));
+		presentation.setLayout(null);
+		presentation.setBounds(0,0,largeur,hauteur);
+		presentation.setVisible(true);
+		this.add(presentation);
+		
+		// titre du jeu
+		JLabel titre = new JLabel();
+		titre.setText("PERSEVERANCE II");
+		titre.setFont(new Font("Serif", Font.BOLD, 60));
+        titre.setForeground(Color.WHITE);
+		titre.setBounds(largeur/4, 20, 1000, 70);
+		presentation.add(titre);
+		
+		JLabel titre2 = new JLabel();
+		titre2.setText(" Veuillez selectonner une carte dans le menu ci-dessous, puis cliquer sur JOUER ou EDITER");
+		titre2.setFont(new Font("Serif", Font.BOLD, 19));
+        titre2.setForeground(Color.WHITE);
+		titre2.setBounds(largeur/8, 90, 1000, 70);
+		presentation.add(titre2);
+		
+		jouer = new JButton("Jouer");
+		jouer.setBounds(largeur/3-100,2*hauteur/3,100,100);
+		presentation.add(jouer);
+		jouer.addActionListener(this);
+		
+		editer = new JButton("Editer");
+		editer.setBounds(2*largeur/3, 2*hauteur/3,100,100);
+		presentation.add(editer);
+		editer.addActionListener(this);
+		
+		j=new JScrollPane(liste);
+        final int LARGEUR_LISTE = 100;
+        final int HAUTEUR_LISTE = 100;
+        //j.setBounds(150,200,100,100);
+        j.setBounds((largeur-LARGEUR_LISTE)/2,(hauteur-HAUTEUR_LISTE)/2,LARGEUR_LISTE,HAUTEUR_LISTE);
+        j.setVisible(true);
+        presentation.add(j);
+		
+		/*
 		//panneau haut
 		panneauAffichage= new JPanel();
 		panneauAffichage.setBounds(0,0,largeur,50);
@@ -98,19 +142,22 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		panneauAffichage.setVisible(true);
 		this.add(panneauAffichage);
 		
+		
 		//selection de la carte 
 		selection= new JLabel();
 		selection.setText("SELECTION DE LA CARTE");
 		selection.setBounds(400,20,320,50);
-		panneauAffichage.add(selection);
+		this.add(selection);
+		
 		
 		//panneau bas 
 		panneauBas= new JPanel();
-		panneauBas.setBounds(0,300,largeur,400);
+		panneauBas.setBounds(0,300,1000,400);
 		panneauBas.setBackground(Color.gray);
 		panneauBas.setVisible(true);
 		panneauBas.setLayout(null);
 		this.add(panneauBas);
+		
 		
 		//bouton jouer
 		jouer = new JButton("Jouer");
@@ -123,17 +170,12 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		editer.setBounds(600,50,100,100);
 		panneauBas.add(editer);
 		editer.addActionListener(this);
-		
+		*/
 		
         liste.setModel(modele);
         liste.setVisibleRowCount(5);
         
-        j=new JScrollPane(liste);
-        final int LARGEUR_LISTE = 100;
-        final int HAUTEUR_LISTE = 100;
-        j.setBounds((largeur-LARGEUR_LISTE)/2,(hauteur-HAUTEUR_LISTE)/2,LARGEUR_LISTE,HAUTEUR_LISTE);
-        j.setVisible(true);
-        this.add(j);
+        
 	}
 
  
