@@ -390,42 +390,66 @@ public class Controleur {
                                     */
                                     
                                     if (donnees.getScene().equals("Jeu")) {  // Calcul et transmission de la trajectoire
-                                        int[] caseRobot = donnees.obtenirJoueur().obtenirCase();
-                                        double rayon = Math.sqrt(Math.pow((double)(x-caseRobot[0]),2)+Math.pow((double)(y-caseRobot[1]),2));
+                                        /*
+                                        int[] coordRobot = donnees.obtenirJoueur().obtenirCoordonnees();
+                                        double rayon = Math.sqrt(Math.pow((double)(x-coordRobot[0]),2)+Math.pow((double)(y-coordRobot[1]),2));
                                         
                                         // Si le click est dans le rayon de cellules autorisé ...
                                         if(rayon<Options.JOUEUR_TOLERANCE_CLICK){
                                             
                                             // Trouver la celluler dans la matrice dans laquelle le click (x,y) a été effectué
-                                            Cellule clickee = null;
-                                            clickee.obtenirCellule(x,y,donnees.obtenirCellules());
-                                            
+                                            Cellule clickee = new Cellule(0,0);
+                                            clickee = clickee.obtenirCellule(x,y,donnees.obtenirCellules());
+                        
                                             // Récupérer les coordonnées de cette cellule 
                                             if( clickee != null ){
                                                 int[] coordFinal = clickee.obtenirCentre();
+                                                LinkedList<int[]> listeBut = new LinkedList<int[]>();
                                                 
                                                 // Etablir la distance totale à parcourir
-                                                double distance = Math.sqrt(Math.pow((double)(coordFinal[0]-caseRobot[0]),2)+Math.pow((double)(coordFinal[1]-caseRobot[1]),2));
+                                                double distance = Math.sqrt(Math.pow((double)(coordFinal[0]-coordRobot[0]),2)+Math.pow((double)(coordFinal[1]-coordRobot[1]),2));
                                                 
-                                                // Pour chaque cellule voisine, on définit la distance entre son centre et l'arrivée
-                                                Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, caseRobot[0], caseRobot[1], 2);
-                                                int k = 0;
-                                                double[] d = new  double[6];
-                                                int[] coordVoisin;
-                                                while (k < casesVoisines.length && casesVoisines[k] != donnees.obtenirCellules()[i][j]){
-                                                    k ++;
-                                                    if (k < casesVoisines.length) {
-                                                        coordVoisin = casesVoisines[k].obtenirCentre();
-                                                        d[k] =  Math.sqrt(Math.pow((double)(coordFinal[0]-coordVoisin[0]),2)+Math.pow((double)(coordFinal[1]-coordVoisin[1]),2));
+                                                while( distance > 10.0 ){ // On réitère le processecus pour chaque déplacent jusqu'à l'arrivée
+                                                    
+                                                    // Pour chaque cellule voisine, on définit la distance entre son centre et l'arrivée
+                                                    Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, donnees.obtenirJoueur().obtenirCase()[0], donnees.obtenirJoueur().obtenirCase()[1], 2);
+                                                    int k = 0;
+                                                    double[] d = new  double[casesVoisines.length];
+                                                    
+                                                    // Initiaisation
+                                                    for(k=0; k<casesVoisines.length; k++){
+                                                        d[k] = 1000;
                                                     }
+                                                    int[] coordVoisin;
+                                                    while (k < casesVoisines.length && casesVoisines[k] != donnees.obtenirCellules()[i][j]){
+                                                        k ++;
+                                                        if (k < casesVoisines.length) {
+                                                            coordVoisin = casesVoisines[k].obtenirCentre();
+                                                            d[k] =  Math.sqrt(Math.pow((double)(coordFinal[0]-coordVoisin[0]),2)+Math.pow((double)(coordFinal[1]-coordVoisin[1]),2));
+                                                        }
+                                                    }
+                                                    // Déplacement sur la cellule où la distance restante est optimale = but1
+                                                    double dmin = 0;
+                                                    boolean min;
+                                                    for(int p=0; p<casesVoisines.length && casesVoisines[p] != donnees.obtenirCellules()[i][j]; p++){
+                                                        min = true;
+                                                        for( int q=0; q<casesVoisines.length && casesVoisines[q] != donnees.obtenirCellules()[i][j]; q++){
+                                                            if(d[p]>d[q]) min = false;
+                                                        }
+                                                        if(min == true) dmin = d[p];
+                                                    }
+                                                    for(k=0; k<casesVoisines.length && casesVoisines[k] != donnees.obtenirCellules()[i][j]; k++){
+                                                        if(d[k] == dmin){
+                                                            listeBut.add(new int[]{casesVoisines[k].obtenirCentre()[0],casesVoisines[k].obtenirCentre()[1]});
+                                                        }
+                                                    }
+                                                    coordRobot = donnees.obtenirJoueur().obtenirCoordonnees();
+                                                    distance = Math.sqrt(Math.pow((double)(coordFinal[0]-coordRobot[0]),2)+Math.pow((double)(coordFinal[1]-coordRobot[1]),2));
                                                 }
-                                                // Déplacement sur la cellule où la distance restante est optimale = but1
-                                                
-                                                // On réitère le processecus pour chaque déplacent jusqu'à l'arrivée
-                                        
-                                                
+                                                donnees.obtenirJoueur().definirBut(listeBut);
                                             }
                                         }
+                                        */
                                         
                                         
                                         
