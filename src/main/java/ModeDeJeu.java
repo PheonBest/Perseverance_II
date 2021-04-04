@@ -133,7 +133,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		editer.addActionListener(this);
 		
 		aide= new JButton("AIDE");
-		aide.setBounds(largeur-100,hauteur/5,70,70);
+		aide.setBounds(largeur-100,hauteur/5+15,70,50);
 		aide.setBackground(Color.orange);
 		presentation.add(aide);
 		aide.addActionListener(this);
