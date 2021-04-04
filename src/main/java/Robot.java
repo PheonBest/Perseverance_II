@@ -229,11 +229,18 @@ public class Robot extends Avatar {
     
     // La case à atteindre est définie par une série de sous-but que l'on donne à cette méthode
     public void definirBut(LinkedList<int[]> liste) {
-        this.but = liste;
-        // On prend une case à cibler, la première de la liste de buts
-        int[] d = but.getFirst(); 
-        definirDirection(new Dimension(d[0], d[1]));
-        animationIndex = 2; //  Image qui montre le robot en marche
+        but = liste;
+        
+        if (but.isEmpty()) {
+            animationIndex = 0; // On passe l'animation du joueur en mode "pause" (Idle)
+            dx = dy = 0;
+        } else {
+            // On prend une case à cibler, la première de la liste de buts
+            int[] d = but.getFirst(); 
+            definirDirection(new Dimension(d[0], d[1]));
+            System.out.println(d[0]+" "+d[1]);
+            animationIndex = 2; //  Image qui montre le robot en marche
+        }
     }
     
     // 
