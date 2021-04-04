@@ -44,11 +44,14 @@ public class ModeDeJeu extends JPanel implements ActionListener {
     private int hauteur;
 	private JLabel selection;
 	private JScrollPane j;
+	private JButton aide;
+	private RegleJeu maFenetre2;
 	
     public ModeDeJeu(Controleur controleur) {
         super();
         this.controleur = controleur;
         this.setLayout(null);
+        this.maFenetre2= new RegleJeu();
     }
 
     public void majCartes(HashMap<String, InputStream> cartesEtNoms) {
@@ -75,14 +78,18 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		this.setSize(largeur,hauteur);
 		this.largeur=largeur;
 		this.hauteur=hauteur;
+		
 	}
 	
 	
 	 public void actionPerformed(ActionEvent e) {
+		if(e.getSource()==aide){
+			maFenetre2.setVisible(true);
+			
+		}
 		 if(liste.getSelectedValue()!=null){
 			if (e.getSource()== jouer){
 				controleur.jouer(cartes.get(liste.getSelectedValue()));
-				
 			}
 			/*
 			else if (e.getSource()== editer){
@@ -101,19 +108,18 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		presentation.setVisible(true);
 		this.add(presentation);
 		
-		// titre du jeu
 		JLabel titre = new JLabel();
 		titre.setText("PERSEVERANCE II");
 		titre.setFont(new Font("Serif", Font.BOLD, 60));
         titre.setForeground(Color.WHITE);
-		titre.setBounds(largeur/4, 20, 1000, 70);
-		presentation.add(titre);
+		titre.setBounds(largeur/2-300, 20, 550, 70);
+		presentation.add(titre);		
 		
 		JLabel titre2 = new JLabel();
-		titre2.setText(" Veuillez selectonner une carte dans le menu ci-dessous, puis cliquer sur JOUER ou EDITER");
+		titre2.setText(" Pour plus d'informations sur les regles du jeu, n'hesitez pas a cliquer sur ce bouton: ");
 		titre2.setFont(new Font("Serif", Font.BOLD, 19));
         titre2.setForeground(Color.WHITE);
-		titre2.setBounds(largeur/8, 90, 1000, 70);
+		titre2.setBounds(largeur/8, hauteur/5, 1000, 70);
 		presentation.add(titre2);
 		
 		jouer = new JButton("Jouer");
@@ -125,6 +131,12 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		editer.setBounds(2*largeur/3, 2*hauteur/3,100,100);
 		presentation.add(editer);
 		editer.addActionListener(this);
+		
+		aide= new JButton("AIDE");
+		aide.setBounds(largeur-100,hauteur/5,70,70);
+		aide.setBackground(Color.orange);
+		presentation.add(aide);
+		aide.addActionListener(this);
 		
 		j=new JScrollPane(liste);
         final int LARGEUR_LISTE = 100;
