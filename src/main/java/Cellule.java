@@ -142,7 +142,7 @@ public class Cellule extends Polygon implements Dessin {
         }
     }
 
-    public int[] getCoordMatrice(Cellule uneCellule){
+    public int[] obtenirPositionTableau(){
         return (new int[]{ligne,colonne});
     }
 

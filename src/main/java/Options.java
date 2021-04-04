@@ -82,4 +82,5 @@ public class Options {
     public static final int NOMBRE_ERREURS_LASER = 3;
 
     public static final String NOM_DOSSIER_IMAGES = "images";
+    public static final int RAYON_JOUEUR = 4; // Rayon de séléction autorisé du joueur
 }

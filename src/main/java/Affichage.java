@@ -96,6 +96,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.hauteur = this.getContentPane().getSize().getHeight();
         ((Dessiner)jeu).majLargeur(this.largeur);
         ((Dessiner)jeu).majHauteur(this.hauteur);
+        ((Dessiner)jeu).initialiser();
         ((ModeDeJeu)modeDeJeu).majTaille((int)this.largeur,(int)this.hauteur);
 		((ModeDeJeu)modeDeJeu).initialiser();
         ((Dessiner)jeu).majEnJeu(true);

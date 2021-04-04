@@ -4,9 +4,11 @@ import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.awt.event.KeyEvent;
@@ -104,11 +106,11 @@ public class Controleur {
         LinkedList<int[]> buts = new LinkedList<int[]>();
         
         
-        placerJoueur(4,1);
-        buts.add(donnees.obtenirCellules()[4][2].obtenirCentre());
-        buts.add(donnees.obtenirCellules()[4][3].obtenirCentre());
-        buts.add(donnees.obtenirCellules()[4][4].obtenirCentre());
-        buts.add(donnees.obtenirCellules()[4][5].obtenirCentre());
+        placerJoueur(0,0);
+        buts.add(donnees.obtenirCellules()[0][1].obtenirCentre());
+        buts.add(donnees.obtenirCellules()[0][2].obtenirCentre());
+        buts.add(donnees.obtenirCellules()[0][3].obtenirCentre());
+        buts.add(donnees.obtenirCellules()[0][4].obtenirCentre());
         donnees.obtenirJoueur().definirBut(buts);
         
         donnees.notifierObserveur(TypeMisAJour.Scene);
@@ -390,74 +392,75 @@ public class Controleur {
                                     */
                                     
                                     if (donnees.getScene().equals("Jeu")) {  // Calcul et transmission de la trajectoire
-                                        /*
-                                        int[] coordRobot = donnees.obtenirJoueur().obtenirCoordonnees();
-                                        double rayon = Math.sqrt(Math.pow((double)(x-coordRobot[0]),2)+Math.pow((double)(y-coordRobot[1]),2));
-                                        
-                                        // Si le click est dans le rayon de cellules autorisé ...
-                                        if(rayon<Options.JOUEUR_TOLERANCE_CLICK){
+                                        final int[] INDEX_ROBOT = donnees.obtenirJoueur().obtenirCase(); // Ligne et colonne du centre de la case sur lequel se trouve le joueur
+                                        final int[] COORDS_ROBOT = cellules[INDEX_ROBOT[0]][INDEX_ROBOT[1]].obtenirCentre(); // Coordonnées du centre de la case sur lequel se trouve le joueur
+
+                                        if (i == INDEX_ROBOT[0] && j == INDEX_ROBOT[1]) {
+                                            donnees.obtenirJoueur().definirBut(new LinkedList<int[]>());
+                                            donnees.notifierObserveur(TypeMisAJour.Joueur);
+                                        } else {
                                             
-                                            // Trouver la celluler dans la matrice dans laquelle le click (x,y) a été effectué
-                                            Cellule clickee = new Cellule(0,0);
-                                            clickee = clickee.obtenirCellule(x,y,donnees.obtenirCellules());
-                        
-                                            // Récupérer les coordonnées de cette cellule 
-                                            if( clickee != null ){
-                                                int[] coordFinal = clickee.obtenirCentre();
+                                            // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de séléction autorisé
+                                            Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, INDEX_ROBOT[0], INDEX_ROBOT[1], Options.RAYON_JOUEUR);
+                                            int index = 0;
+                                            while (index < casesVoisines.length && casesVoisines[index] != cellules[i][j])
+                                                index ++;
+                                            if (index < casesVoisines.length) { // Si la case fait partie des voisins, alors elle est bien dans le rayon de séléction autorisé
+
+                                                final int[] INDEX_CELLULE = cellules[i][j].obtenirPositionTableau();
+                                                final int[] COORDS_CELLULE = cellules[i][j].obtenirCentre();
                                                 LinkedList<int[]> listeBut = new LinkedList<int[]>();
-                                                
-                                                // Etablir la distance totale à parcourir
-                                                double distance = Math.sqrt(Math.pow((double)(coordFinal[0]-coordRobot[0]),2)+Math.pow((double)(coordFinal[1]-coordRobot[1]),2));
-                                                
-                                                while( distance > 10.0 ){ // On réitère le processecus pour chaque déplacent jusqu'à l'arrivée
+                                                HashMap<Cellule, Double> distances = new HashMap<Cellule, Double>();
+                                                Cellule celluleOptimale = null;
+
+                                                int[] centreVoisins = INDEX_ROBOT;
+
+                                                while( listeBut.isEmpty() || !(INDEX_CELLULE[0] == celluleOptimale.obtenirPositionTableau()[0] && INDEX_CELLULE[1] == celluleOptimale.obtenirPositionTableau()[1]) ) { // On réitère le processecus pour chaque déplacement jusqu'à l'arrivée
                                                     
-                                                    // Pour chaque cellule voisine, on définit la distance entre son centre et l'arrivée
-                                                    Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, donnees.obtenirJoueur().obtenirCase()[0], donnees.obtenirJoueur().obtenirCase()[1], 2);
+                                                    casesVoisines = Voisins.obtenirVoisins(cellules, centreVoisins[0], centreVoisins[1], 2);
+                                                
                                                     int k = 0;
-                                                    double[] d = new  double[casesVoisines.length];
-                                                    
-                                                    // Initiaisation
-                                                    for(k=0; k<casesVoisines.length; k++){
-                                                        d[k] = 1000;
-                                                    }
-                                                    int[] coordVoisin;
-                                                    while (k < casesVoisines.length && casesVoisines[k] != donnees.obtenirCellules()[i][j]){
-                                                        k ++;
-                                                        if (k < casesVoisines.length) {
-                                                            coordVoisin = casesVoisines[k].obtenirCentre();
-                                                            d[k] =  Math.sqrt(Math.pow((double)(coordFinal[0]-coordVoisin[0]),2)+Math.pow((double)(coordFinal[1]-coordVoisin[1]),2));
+                                                    distances.clear();
+                                                    while (k < casesVoisines.length){
+                                                        if (casesVoisines[k] != cellules[centreVoisins[0]][centreVoisins[1]]) {
+                                                            System.out.println(casesVoisines[k].obtenirPositionTableau()[0]+","+casesVoisines[k].obtenirPositionTableau()[1]);
+                                                            distances.put(casesVoisines[k], Math.pow((double)(COORDS_CELLULE[0]-casesVoisines[k].obtenirCentre()[0]),2)+Math.pow((double)(COORDS_CELLULE[1]-casesVoisines[k].obtenirCentre()[1]),2)); // Distance au carré
                                                         }
+                                                        k++;
                                                     }
+
                                                     // Déplacement sur la cellule où la distance restante est optimale = but1
-                                                    double dmin = 0;
-                                                    boolean min;
-                                                    for(int p=0; p<casesVoisines.length && casesVoisines[p] != donnees.obtenirCellules()[i][j]; p++){
-                                                        min = true;
-                                                        for( int q=0; q<casesVoisines.length && casesVoisines[q] != donnees.obtenirCellules()[i][j]; q++){
-                                                            if(d[p]>d[q]) min = false;
-                                                        }
-                                                        if(min == true) dmin = d[p];
-                                                    }
-                                                    for(k=0; k<casesVoisines.length && casesVoisines[k] != donnees.obtenirCellules()[i][j]; k++){
-                                                        if(d[k] == dmin){
-                                                            listeBut.add(new int[]{casesVoisines[k].obtenirCentre()[0],casesVoisines[k].obtenirCentre()[1]});
+                                                    double min = Collections.min(distances.values());
+                                                    
+                                                    for (Entry<Cellule, Double> entry : distances.entrySet()) {
+                                                        if (entry.getValue()==min) {
+                                                            celluleOptimale = entry.getKey();
+                                                            break;
                                                         }
                                                     }
-                                                    coordRobot = donnees.obtenirJoueur().obtenirCoordonnees();
-                                                    distance = Math.sqrt(Math.pow((double)(coordFinal[0]-coordRobot[0]),2)+Math.pow((double)(coordFinal[1]-coordRobot[1]),2));
+
+                                                    final int[] INDEX_CASE_OPTIMALE = celluleOptimale.obtenirPositionTableau();
+
+                                                    System.out.println("Centre Robot: "+INDEX_ROBOT[0]+","+INDEX_ROBOT[1]);
+                                                    System.out.println("Case à atteindre: "+INDEX_CELLULE[0]+","+INDEX_CELLULE[1]);
+                                                    System.out.println("Case atteinte: "+INDEX_CASE_OPTIMALE[0]+","+INDEX_CASE_OPTIMALE[1]);
+                                                    
+                                                    final int[] DELTA_POSITION_JOUEUR = donnees.obtenirJoueur().obtenirCoordonnees();
+                                                    int[] deltaPosition = {celluleOptimale.obtenirCentre()[0] + DELTA_POSITION_JOUEUR[0], celluleOptimale.obtenirCentre()[1] + DELTA_POSITION_JOUEUR[1], INDEX_CASE_OPTIMALE[0], INDEX_CASE_OPTIMALE[1]};
+                                                    listeBut.add(deltaPosition);
+                                                    centreVoisins = celluleOptimale.obtenirPositionTableau();
+                                                
                                                 }
                                                 donnees.obtenirJoueur().definirBut(listeBut);
+                                                donnees.notifierObserveur(TypeMisAJour.Joueur);
                                             }
                                         }
-                                        */
-                                        
                                         
                                         
                                         // Si on a une compétence de sélectionnée ET que le robot n'est pas en train de se déplacer
                                         if (donnees.obtenirRayonDeSelection() > 0 && donnees.obtenirJoueur().obtenirTrajectoire().isEmpty()) {
                                             // Si la case est dans le rayon d'action de la compétence:
-                                            int[] caseJoueur = donnees.obtenirJoueur().obtenirCase();
-                                            Cellule[] voisins = Voisins.obtenirVoisins(cellules, caseJoueur[0], caseJoueur[1], donnees.obtenirRayonDeSelection());
+                                            Cellule[] voisins = Voisins.obtenirVoisins(cellules, INDEX_ROBOT[0], INDEX_ROBOT[1], donnees.obtenirRayonDeSelection());
                                             int index = 0;
                                             while (index < voisins.length && voisins[index] != donnees.obtenirCellules()[i][j])
                                                 index ++;
