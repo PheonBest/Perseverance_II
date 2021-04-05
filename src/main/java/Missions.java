@@ -8,9 +8,22 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class Missions extends JFrame {
-	
-	public static void main (String args[]) {
-		
+    
+    private int lx = 700;
+    private int ly = 700;
+    //------------------------------------------------------------------ Constructeur
+
+    public Missions(int x, int y){
+        // Fenêtre
+        super();
+        setLayout(null);
+        setLocation(x,y);
+        setSize(lx,ly);
+        setTitle("MISSIONS");
+        this.setVisible(true);
 	}
+	
 }
+        
+        
 
