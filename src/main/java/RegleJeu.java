@@ -84,7 +84,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			//bouton quitter 
 			
 			quitter= new JButton("QUITTER");
-			quitter.setBounds(350,325,100,50);
+			quitter.setBounds(350,350,100,50);
 			quitter.setBackground(Color.red);
 			panneau.add(quitter);
 			quitter.addActionListener(this);

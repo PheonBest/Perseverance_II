@@ -120,17 +120,21 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		
 		jouer = new JButton("Jouer");
 		jouer.setBounds(largeur/3-100,2*hauteur/3,100,100);
+		jouer.setBackground(Color.WHITE);
+		jouer.setForeground(Color.gray);
 		presentation.add(jouer);
 		jouer.addActionListener(this);
 		
 		editer = new JButton("Editer");
 		editer.setBounds(2*largeur/3, 2*hauteur/3,100,100);
+		editer.setBackground(Color.WHITE);
 		presentation.add(editer);
 		editer.addActionListener(this);
 		
 		aide= new JButton("AIDE");
 		aide.setBounds(largeur-100,hauteur/5+15,70,50);
-		aide.setBackground(Color.orange);
+		
+		aide.setBackground(Color.white);
 		presentation.add(aide);
 		aide.addActionListener(this);
 		
