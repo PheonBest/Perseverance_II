@@ -6,6 +6,5 @@ public enum TypeSymbole{
 	DANGER,
 	MORT,
 	GRAPPIN
-	
 }
 

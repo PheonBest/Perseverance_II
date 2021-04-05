@@ -1,6 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class FullControlPanel extends JFrame implements ActionListener{
     
@@ -156,8 +161,14 @@ public class FullControlPanel extends JFrame implements ActionListener{
         
         // Images
         
-        imageP = Toolkit.getDefaultToolkit().getImage("Mars9.png");
-        imageR = Toolkit.getDefaultToolkit().getImage("Perseverance II.png");
+        try {
+            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_DETAILS+"\\b.*\\.(?:jpg|gif|png)");
+            HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, Options.NOM_DOSSIER_DETAILS);
+            imageP = images.get("Mars9");
+            imageR = images.get("PerseveranceII");
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
                
         // add finaux
         cg.add(panneauBat);

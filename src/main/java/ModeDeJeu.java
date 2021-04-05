@@ -14,8 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -31,6 +29,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
     private HashMap<String, InputStream> cartes;
     private JList<String> liste = new JList<>();
     DefaultListModel<String> modele = new DefaultListModel<>();
+	private Image imageMenu;
    
 	
     private String carteActive = null;
@@ -46,6 +45,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	private JScrollPane j;
 	private JButton aide;
 	private RegleJeu maFenetre2;
+	private JLabel presentation;
 	
     public ModeDeJeu(Controleur controleur) {
         super();
@@ -55,7 +55,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
     }
 
     public void majCartes(HashMap<String, InputStream> cartesEtNoms) {
-		System.out.println(cartesEtNoms.values().size());
+		//System.out.println(cartesEtNoms.values().size());
         // On veut trier les cartes par ordre alphabétique
         List<String> nomCartes = cartesEtNoms.entrySet()
                     .stream()
@@ -88,21 +88,17 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 			
 		}
 		 if(liste.getSelectedValue()!=null){
-			if (e.getSource()== jouer){
+			if (e.getSource()== jouer)
 				controleur.jouer(cartes.get(liste.getSelectedValue()));
-			}
-			/*
-			else if (e.getSource()== editer){
-				controleur.editer(cartes.get(liste.getSelectedValue()));
-			*/
-			
+			else if (e.getSource()== editer)
+				controleur.editer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 		}
 	}
 	
 	public void initialiser(){
 		
 		// fond d'ecran image
-		JLabel presentation = new JLabel(new ImageIcon ("./res/images/planetes.jpg"));
+		presentation = new JLabel();
 		presentation.setLayout(null);
 		presentation.setBounds(0,0,largeur,hauteur);
 		presentation.setVisible(true);
@@ -188,6 +184,11 @@ public class ModeDeJeu extends JPanel implements ActionListener {
         liste.setVisibleRowCount(5);
         
         
+	}
+
+	public void majImageMenu(Image imageMenu) {
+		this.imageMenu = imageMenu;
+		presentation.setIcon(new ImageIcon (imageMenu));
 	}
 
  

@@ -9,10 +9,12 @@ import java.awt.Image;
 
 public class Symbole extends Polygon {
 	
-		private TypeSymbole type;
-		private Image image;
+	private TypeSymbole type;
+	private Image image;
+	private boolean estVisible = false;
 	
-	public Symbole(TypeSymbole type, Image image){
+	public Symbole(TypeSymbole type, Image image, boolean estVisible){
+		this.estVisible = estVisible;
 		this.type=type;
 		this.image=image;
 		//this.image=getImage();
@@ -23,7 +25,9 @@ public class Symbole extends Polygon {
 		this.image = img;
 	}
 
-
+	public Image obtenirImage() {
+		return image;
+	}
 	
 	
 }

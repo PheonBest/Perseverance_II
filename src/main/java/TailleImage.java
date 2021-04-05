@@ -27,10 +27,15 @@ public class TailleImage {
      * @param biggerWidth
      * @param biggerHeight
      */
-    public static Image resizeImage(Image originalImage, int biggerWidth, int biggerHeight) {
+    public static Image resizeImage(Image originalImage, int biggerWidth, int biggerHeight, boolean preserveAspectRatio) {
         int type = BufferedImage.TYPE_INT_ARGB;
 
-
+        if (preserveAspectRatio) {
+            if (biggerWidth > biggerHeight)
+                biggerHeight = biggerHeight*originalImage.getWidth(null)/originalImage.getHeight(null);
+            else
+                biggerWidth = biggerWidth*originalImage.getHeight(null)/originalImage.getWidth(null);
+        }
         BufferedImage resizedImage = new BufferedImage(biggerWidth, biggerHeight, type);
         Graphics2D g = resizedImage.createGraphics();
 

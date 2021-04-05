@@ -12,6 +12,7 @@ import java.awt.Graphics;
 public class Menu extends JPanel {
     private BoutonCercle[] boutonsCercle;
     private Cellule[] boutonsType = new Cellule[TypeCase.values().length];
+    private Cellule[] boutonsSymbole = new Cellule[TypeSymbole.values().length];
     private JButton enregistrer = new JButton("Enregistrer");
     private Action actionEnregistrer = new AbstractAction("Enregistrer") {
         @Override
@@ -42,17 +43,20 @@ public class Menu extends JPanel {
             label.setBounds(0, Options.yLabels[i], largeurMenu, 50);
             add(label);
         }
+
+        final int LARGEUR_BOUTON = largeurMenu/2;
+        final int HAUTEUR_BOUTON = 50;
         // Par défaut, lorsqu'on clique sur le bouton,
         // on place le focus sur le bouton.
         // Or cela empêche la saisie des touches du clavier.
         // Donc on n'empêche le focus sur le bouton
         enregistrer.setFocusable(false);
         enregistrer.addActionListener(actionEnregistrer);
-        enregistrer.setBounds(40,350,100,20);
+        enregistrer.setBounds((largeurMenu-LARGEUR_BOUTON)/2,(520)-HAUTEUR_BOUTON/2,LARGEUR_BOUTON,HAUTEUR_BOUTON);
         add(enregistrer);
 
         menu.addActionListener(actionMenu);
-        menu.setBounds(40,450,100,20);
+        menu.setBounds((largeurMenu-LARGEUR_BOUTON)/2,(520+HAUTEUR_BOUTON)-HAUTEUR_BOUTON/2,LARGEUR_BOUTON,HAUTEUR_BOUTON);
         add(menu);
     }
 
@@ -70,6 +74,16 @@ public class Menu extends JPanel {
                     c.dessiner(g);
             }
         }
+        if (boutonsSymbole != null) {
+            for (Cellule c: boutonsSymbole) {
+                if (c != null)
+                    c.dessiner(g);
+            }
+        }
+    }
+
+    public void majBoutonsSymbole(Cellule[] boutonsSymbole) {
+        this.boutonsSymbole = boutonsSymbole;
     }
 
     public void majBoutonsType(Cellule[] boutonsType) {

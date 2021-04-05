@@ -2,6 +2,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.*;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -27,7 +28,16 @@ public class CSV {
 		List<String[]> data = dataLines (carteCellules);
 		File dir = new File(Options.NOM_DOSSIER_CARTES);
     	if (!dir.exists()) dir.mkdirs();
-		File csvOutputFile = new File(Options.NOM_DOSSIER_CARTES+"/"+filename+".csv");
+
+		// On obtient le dossier à la racine du projet maven
+		URL url = Thread.currentThread().getContextClassLoader().getResource(Options.NOM_DOSSIER_CARTES);
+		String chemin;
+        if (url == null)
+			chemin = "./././"+Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
+		else
+			chemin = Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
+		
+		File csvOutputFile = new File(chemin);
 		if (!csvOutputFile.exists() || ecrireParDessus) {
 			csvOutputFile.createNewFile();
 			System.out.println("Ecriture de "+filename+".csv");

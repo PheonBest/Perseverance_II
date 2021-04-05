@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.awt.Point;
+import java.awt.Image;
 
 public class Affichage extends JFrame implements Observer, ActionListener, KeyListener, MouseWheelListener, MouseMotionListener, MouseListener {
     private Controleur controleur;
@@ -149,6 +150,9 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
+            case ImageMenu:
+                ((ModeDeJeu) modeDeJeu).majImageMenu((Image)nouveau);
+                break;
             case Options:
                 if ((boolean)nouveau)
                     cardLayout.show(contenu, "Options");
@@ -181,6 +185,9 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 break;
             case Competences:
                 ((Dessiner)jeu).majCompetences((List<BoutonCercle>) nouveau);
+                break;
+            case BoutonsSymbole:
+                ((Editeur)editeur).majBoutonsSymbole((Cellule[]) nouveau);
                 break;
             case BoutonsCercle:
                 ((Editeur)editeur).majBoutonsCercle((BoutonCercle[]) nouveau);

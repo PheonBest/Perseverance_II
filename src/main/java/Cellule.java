@@ -12,6 +12,7 @@ public class Cellule extends Polygon implements Dessin {
     
     private TypeCase type;
     private Color couleur;
+    private Symbole symbole;
     
     //Position dans la matrice de la carte            
     private int ligne;
@@ -20,6 +21,8 @@ public class Cellule extends Polygon implements Dessin {
     private double largeur;
     private double hauteur;
     private boolean sourisDessus = false;
+
+    private boolean estDecouverte = false;
      
     //////////////////////////////////////////////////////////////////// Constructeurs 
     
@@ -28,8 +31,10 @@ public class Cellule extends Polygon implements Dessin {
      * stocker dans des tableaux x et y, en fonction de leurs ligne et de leur colonne
      * */
     
-    public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase){
-        
+    public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase, boolean estDecouverte, Symbole symbole){
+
+        this.symbole = symbole;
+        this.estDecouverte = estDecouverte;
         //Position dans la matrice de la carte
         ligne = uneLigne;
         colonne = uneColonne;
@@ -70,12 +75,16 @@ public class Cellule extends Polygon implements Dessin {
         // Déplacement du symbole
     }
 
+    public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase, boolean estDecouverte){
+        this(unType, uneLigne, uneColonne, taille, espaceInterCase, estDecouverte, null);
+    }
+
     public Cellule(TypeCase type, int uneLigne, int uneColonne){
-        this(type, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
+        this(type, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE, false);
     }
 
     public Cellule(int uneLigne, int uneColonne){
-        this(TypeCase.VIDE, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
+        this(TypeCase.VIDE, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE, false);
     }
     
     public void dessiner(Graphics g, double agrandissement) {
@@ -83,6 +92,11 @@ public class Cellule extends Polygon implements Dessin {
         Graphics2D g2d = (Graphics2D) g;
         //Graphics2D g2d = (Graphics2D) g.create();
         
+        if (!estDecouverte)
+            g2d.setColor(getColor(TypeCase.VIDE));
+        else
+            g2d.setColor(couleur);
+
         if (sourisDessus || agrandissement != 1) {
             double facteurDeTaille = Options.RATIO_TAILLE_SELECTION;
             if (agrandissement != 1)
@@ -100,13 +114,21 @@ public class Cellule extends Polygon implements Dessin {
             at.translate(COIN_EN_HAUT_A_GAUCHE[0]-DELTA_LARGEUR*facteurDeTaille/2.,COIN_EN_HAUT_A_GAUCHE[1]-DELTA_HAUTEUR*facteurDeTaille/2.);
             at.scale(facteurDeTaille, facteurDeTaille);
             g2d.setTransform(at);
-            g2d.setColor(couleur);
+
             g2d.fillPolygon(this);
+            if (symbole != null) {
+                System.out.println("image");
+                System.out.println(symbole.obtenirImage());
+                g2d.drawImage(symbole.obtenirImage(), xpoints[0], ypoints[0], null);
+            }
             translate((int)(COIN_EN_HAUT_A_GAUCHE[0]), (int)(COIN_EN_HAUT_A_GAUCHE[1]));
             g2d.setTransform(ANCIENNE_TRANSFORMATION);
+
+            
         } else {
-            g2d.setColor(couleur);
             g2d.fillPolygon(this);
+            if (symbole != null)
+                g2d.drawImage(symbole.obtenirImage(), xpoints[0], ypoints[0], null);
         }
     }
 
@@ -120,7 +142,11 @@ public class Cellule extends Polygon implements Dessin {
         return (this.type==uneCellule.type);
     }
     
-    public Color getColor(){
+    public Color getColor() {
+        return getColor(type);
+    }
+
+    public Color getColor(TypeCase type) {
         switch(type){
             case VIDE:
                 return Color.black;
@@ -190,5 +216,16 @@ public class Cellule extends Polygon implements Dessin {
 
     public String toString() {
         return type.name()+";null";
+    }
+
+    public boolean estDecouverte() {
+        return estDecouverte;
+    }
+    public void majEstDecouverte(boolean estDecouverte) {
+        this.estDecouverte = estDecouverte;
+    }
+
+    public Symbole obtenirSymbole() {
+        return symbole;
     }
 }

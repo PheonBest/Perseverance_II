@@ -18,5 +18,7 @@ public enum TypeMisAJour {
     EffacerMinijeuExtraction,
     NombreErreursLaser,
     ArrierePlan,
-    Options
+    Options,
+    ImageMenu,
+    BoutonsSymbole
 }

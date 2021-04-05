@@ -107,11 +107,19 @@ public class Controleur {
         
         
         placerJoueur(0,0);
+        Cellule[] voisins = Voisins.obtenirVoisins(donnees.obtenirCellules(), donnees.obtenirJoueur().obtenirDerniereCase()[0], donnees.obtenirJoueur().obtenirDerniereCase()[1], Options.RAYON_DECOUVERTE);
+        for (int i=0; i < voisins.length; i++) {
+            if (!voisins[i].estDecouverte())
+                voisins[i].majEstDecouverte(true);
+        }
+
+        /*
         buts.add(donnees.obtenirCellules()[0][1].obtenirCentre());
         buts.add(donnees.obtenirCellules()[0][2].obtenirCentre());
         buts.add(donnees.obtenirCellules()[0][3].obtenirCentre());
         buts.add(donnees.obtenirCellules()[0][4].obtenirCentre());
         donnees.obtenirJoueur().definirBut(buts);
+        */
         
         donnees.notifierObserveur(TypeMisAJour.Scene);
         donnees.notifierObserveur(TypeMisAJour.Cellules);
@@ -152,7 +160,18 @@ public class Controleur {
                 }
                     
                 donnees.obtenirJoueur().move();
-                effetCase(donnees.obtenirJoueur().obtenirDerniereCase());
+
+                // Si on a changé de case
+                if (donnees.obtenirJoueur().obtenirCasePrecedente()[0] != donnees.obtenirJoueur().obtenirCase()[0] || donnees.obtenirJoueur().obtenirCasePrecedente()[1] != donnees.obtenirJoueur().obtenirCase()[1]) {
+                    effetCase(donnees.obtenirJoueur().obtenirDerniereCase());
+                    Cellule[] voisins = Voisins.obtenirVoisins(donnees.obtenirCellules(), donnees.obtenirJoueur().obtenirDerniereCase()[0], donnees.obtenirJoueur().obtenirDerniereCase()[1], Options.RAYON_DECOUVERTE);
+                    for (int i=0; i < voisins.length; i++) {
+                        if (!voisins[i].estDecouverte())
+                            voisins[i].majEstDecouverte(true);
+                    }
+                }
+                    
+
                 donnees.obtenirJoueur().rafraichirImage();
                 donnees.notifierObserveur(TypeMisAJour.Joueur);
                 int dx = -donnees.obtenirJoueur().getDx();
@@ -182,6 +201,9 @@ public class Controleur {
             HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_IMAGES+"/");
             donnees.majArrierePlan(new ArrierePlan(images.get("surface_texture")));
             donnees.notifierObserveur(TypeMisAJour.ArrierePlan);
+            donnees.majImageMenu(TailleImage.resizeImage(images.get("planetes"), donnees.obtenirLargeur(), donnees.obtenirHauteur(), true));
+            
+            donnees.notifierObserveur(TypeMisAJour.ImageMenu);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
@@ -248,7 +270,7 @@ public class Controleur {
                 final Collection<Image> tmp = ObtenirRessources.getImages(pattern, "res/robot/"+Options.JOUEURS_IMAGES[i]+"/");
                 images.add(new ArrayList<Image>());
                 for (Image img: tmp) {
-                    images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null)))) );
+                    images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null))), false) );
                 }
                 avancementChargement +=tmp.size();
                 publish((int)(100.*avancementChargement/nombreImages)); // On publie l'avancement du chargement (résultat intermédiaire)
@@ -377,6 +399,9 @@ public class Controleur {
 
                     // Gestion des cellules
                     Cellule[][] cellules = donnees.obtenirCellules();
+                    int[] indexRobot = new int[2];
+                    if (donnees.obtenirJoueur() != null) 
+                        indexRobot = donnees.obtenirJoueur().obtenirCase(); // Ligne et colonne du centre de la case sur lequel se trouve le joueur
                     for (int i=0; i < cellules.length; i++) {
                         for (int j=0; j < cellules[i].length; j++) {
                             if (cellules[i][j].contains((x - donnees.obtenirLargeur()/2 + 8)/donnees.obtenirZoom(), (y - donnees.obtenirHauteur()/2 + 20)/donnees.obtenirZoom())) {
@@ -392,75 +417,11 @@ public class Controleur {
                                     */
                                     
                                     if (donnees.getScene().equals("Jeu")) {  // Calcul et transmission de la trajectoire
-                                        final int[] INDEX_ROBOT = donnees.obtenirJoueur().obtenirCase(); // Ligne et colonne du centre de la case sur lequel se trouve le joueur
-                                        final int[] COORDS_ROBOT = cellules[INDEX_ROBOT[0]][INDEX_ROBOT[1]].obtenirCentre(); // Coordonnées du centre de la case sur lequel se trouve le joueur
 
-                                        if (i == INDEX_ROBOT[0] && j == INDEX_ROBOT[1]) {
-                                            donnees.obtenirJoueur().definirBut(new LinkedList<int[]>());
-                                            donnees.notifierObserveur(TypeMisAJour.Joueur);
-                                        } else {
-                                            
-                                            // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de séléction autorisé
-                                            Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, INDEX_ROBOT[0], INDEX_ROBOT[1], Options.RAYON_JOUEUR);
-                                            int index = 0;
-                                            while (index < casesVoisines.length && casesVoisines[index] != cellules[i][j])
-                                                index ++;
-                                            if (index < casesVoisines.length) { // Si la case fait partie des voisins, alors elle est bien dans le rayon de séléction autorisé
-
-                                                final int[] INDEX_CELLULE = cellules[i][j].obtenirPositionTableau();
-                                                final int[] COORDS_CELLULE = cellules[i][j].obtenirCentre();
-                                                LinkedList<int[]> listeBut = new LinkedList<int[]>();
-                                                HashMap<Cellule, Double> distances = new HashMap<Cellule, Double>();
-                                                Cellule celluleOptimale = null;
-
-                                                int[] centreVoisins = INDEX_ROBOT;
-
-                                                while( listeBut.isEmpty() || !(INDEX_CELLULE[0] == celluleOptimale.obtenirPositionTableau()[0] && INDEX_CELLULE[1] == celluleOptimale.obtenirPositionTableau()[1]) ) { // On réitère le processecus pour chaque déplacement jusqu'à l'arrivée
-                                                    
-                                                    casesVoisines = Voisins.obtenirVoisins(cellules, centreVoisins[0], centreVoisins[1], 2);
-                                                
-                                                    int k = 0;
-                                                    distances.clear();
-                                                    while (k < casesVoisines.length){
-                                                        if (casesVoisines[k] != cellules[centreVoisins[0]][centreVoisins[1]]) {
-                                                            System.out.println(casesVoisines[k].obtenirPositionTableau()[0]+","+casesVoisines[k].obtenirPositionTableau()[1]);
-                                                            distances.put(casesVoisines[k], Math.pow((double)(COORDS_CELLULE[0]-casesVoisines[k].obtenirCentre()[0]),2)+Math.pow((double)(COORDS_CELLULE[1]-casesVoisines[k].obtenirCentre()[1]),2)); // Distance au carré
-                                                        }
-                                                        k++;
-                                                    }
-
-                                                    // Déplacement sur la cellule où la distance restante est optimale = but1
-                                                    double min = Collections.min(distances.values());
-                                                    
-                                                    for (Entry<Cellule, Double> entry : distances.entrySet()) {
-                                                        if (entry.getValue()==min) {
-                                                            celluleOptimale = entry.getKey();
-                                                            break;
-                                                        }
-                                                    }
-
-                                                    final int[] INDEX_CASE_OPTIMALE = celluleOptimale.obtenirPositionTableau();
-
-                                                    System.out.println("Centre Robot: "+INDEX_ROBOT[0]+","+INDEX_ROBOT[1]);
-                                                    System.out.println("Case à atteindre: "+INDEX_CELLULE[0]+","+INDEX_CELLULE[1]);
-                                                    System.out.println("Case atteinte: "+INDEX_CASE_OPTIMALE[0]+","+INDEX_CASE_OPTIMALE[1]);
-                                                    
-                                                    final int[] DELTA_POSITION_JOUEUR = donnees.obtenirJoueur().obtenirCoordonnees();
-                                                    int[] deltaPosition = {celluleOptimale.obtenirCentre()[0] + DELTA_POSITION_JOUEUR[0], celluleOptimale.obtenirCentre()[1] + DELTA_POSITION_JOUEUR[1], INDEX_CASE_OPTIMALE[0], INDEX_CASE_OPTIMALE[1]};
-                                                    listeBut.add(deltaPosition);
-                                                    centreVoisins = celluleOptimale.obtenirPositionTableau();
-                                                
-                                                }
-                                                donnees.obtenirJoueur().definirBut(listeBut);
-                                                donnees.notifierObserveur(TypeMisAJour.Joueur);
-                                            }
-                                        }
-                                        
-                                        
                                         // Si on a une compétence de sélectionnée ET que le robot n'est pas en train de se déplacer
                                         if (donnees.obtenirRayonDeSelection() > 0 && donnees.obtenirJoueur().obtenirTrajectoire().isEmpty()) {
                                             // Si la case est dans le rayon d'action de la compétence:
-                                            Cellule[] voisins = Voisins.obtenirVoisins(cellules, INDEX_ROBOT[0], INDEX_ROBOT[1], donnees.obtenirRayonDeSelection());
+                                            Cellule[] voisins = Voisins.obtenirVoisins(cellules, indexRobot[0], indexRobot[1], donnees.obtenirRayonDeSelection());
                                             int index = 0;
                                             while (index < voisins.length && voisins[index] != donnees.obtenirCellules()[i][j])
                                                 index ++;
@@ -484,6 +445,69 @@ public class Controleur {
                                                 donnees.majRayonDeSelection(0);
                                                 donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
                                             }
+                                        } else {
+                                            
+                                            if (i == indexRobot[0] && j == indexRobot[1]) {
+                                                donnees.obtenirJoueur().definirBut(new LinkedList<int[]>());
+                                                donnees.notifierObserveur(TypeMisAJour.Joueur);
+                                            } else {
+                                                
+                                                // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de séléction autorisé
+                                                Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, indexRobot[0], indexRobot[1], Options.RAYON_JOUEUR);
+                                                int index = 0;
+                                                while (index < casesVoisines.length && casesVoisines[index] != cellules[i][j])
+                                                    index ++;
+                                                if (index < casesVoisines.length) { // Si la case fait partie des voisins, alors elle est bien dans le rayon de séléction autorisé
+
+                                                    final int[] INDEX_CELLULE = cellules[i][j].obtenirPositionTableau();
+                                                    final int[] COORDS_CELLULE = cellules[i][j].obtenirCentre();
+                                                    LinkedList<int[]> listeBut = new LinkedList<int[]>();
+                                                    HashMap<Cellule, Double> distances = new HashMap<Cellule, Double>();
+                                                    Cellule celluleOptimale = null;
+
+                                                    int[] centreVoisins = indexRobot;
+
+                                                    while( listeBut.isEmpty() || !(INDEX_CELLULE[0] == celluleOptimale.obtenirPositionTableau()[0] && INDEX_CELLULE[1] == celluleOptimale.obtenirPositionTableau()[1]) ) { // On réitère le processecus pour chaque déplacement jusqu'à l'arrivée
+                                                        
+                                                        casesVoisines = Voisins.obtenirVoisins(cellules, centreVoisins[0], centreVoisins[1], 2);
+                                                        
+                                                        int k = 0;
+                                                        distances.clear();
+                                                        while (k < casesVoisines.length){
+                                                            if (casesVoisines[k] != cellules[centreVoisins[0]][centreVoisins[1]])
+                                                                distances.put(casesVoisines[k], Math.pow((double)(COORDS_CELLULE[0]-casesVoisines[k].obtenirCentre()[0]),2)+Math.pow((double)(COORDS_CELLULE[1]-casesVoisines[k].obtenirCentre()[1]),2)); // Distance au carré
+                                                            k++;
+                                                        }
+
+                                                        // Déplacement sur la cellule où la distance restante est optimale = but1
+                                                        double min = Collections.min(distances.values());
+                                                        
+                                                        for (Entry<Cellule, Double> entry : distances.entrySet()) {
+                                                            if (entry.getValue()==min) {
+                                                                celluleOptimale = entry.getKey();
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        
+                                                        final int[] INDEX_CASE_OPTIMALE = celluleOptimale.obtenirPositionTableau();
+
+                                                        /*
+                                                        System.out.println("Centre Robot: "+indexRobot[0]+","+indexRobot[1]);
+                                                        System.out.println("Case à atteindre: "+INDEX_CELLULE[0]+","+INDEX_CELLULE[1]);
+                                                        System.out.println("Case atteinte: "+INDEX_CASE_OPTIMALE[0]+","+INDEX_CASE_OPTIMALE[1]);
+                                                        */
+                                                        
+                                                        final int[] DELTA_POSITION_JOUEUR = donnees.obtenirJoueur().obtenirCoordonnees();
+                                                        int[] deltaPosition = {celluleOptimale.obtenirCentre()[0] + DELTA_POSITION_JOUEUR[0], celluleOptimale.obtenirCentre()[1] + DELTA_POSITION_JOUEUR[1], INDEX_CASE_OPTIMALE[0], INDEX_CASE_OPTIMALE[1]};
+                                                        listeBut.add(deltaPosition);
+                                                        centreVoisins = celluleOptimale.obtenirPositionTableau();
+                                                    
+                                                    }
+                                                    donnees.obtenirJoueur().definirBut(listeBut);
+                                                    //donnees.notifierObserveur(TypeMisAJour.Joueur);
+                                                }
+                                            }
                                         }
 
                                     } else { // Modification de la carte selon les outils d'édition sélectionnés
@@ -498,47 +522,19 @@ public class Controleur {
                                             int taillePinceau = 1;
                                             if (donnees.obtenirDernierBouton() != null)
                                                 taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
-                                            switch (taillePinceau) {
-                                                case 3:
-                                                    majCelluleType(i-2,j, type);
-                                                    majCelluleType(i+2,j, type);
-                                            
-                                                    majCelluleType(i,j+2, type);
-                                                    majCelluleType(i+1,j+2, type);
-                                                    majCelluleType(i-1,j+2, type);
-                                                    majCelluleType(i,j-2, type);
-                                                    majCelluleType(i+1,j-2, type);
-                                                    majCelluleType(i-1,j-2, type);
-                                            
-                                            
-                                                    if(j%2==0){
-                                                        majCelluleType(i-1,j+1, type);
-                                                        majCelluleType(i+2,j+1, type);
-                                                        majCelluleType(i+2,j-1, type);
-                                                        majCelluleType(i-1,j-1, type);
-                                                    } else {
-                                                        majCelluleType(i-2,j+1, type);
-                                                        majCelluleType(i+1,j+1, type);
-                                                        majCelluleType(i+1,j-1, type);
-                                                        majCelluleType(i-2,j-1, type);
-                                                    }
-                                                case 2:
-                                                    majCelluleType(i-1, j, type);
-                                                    majCelluleType(i+1, j, type);
-                                                    majCelluleType(i, j+1, type);
-                                                    majCelluleType(i, j-1, type);
-                                                    if(j%2==0){
-                                                        majCelluleType(i+1,j+1,type);
-                                                        majCelluleType(i+1,j-1, type);
-                                                    } else {
-                                                        majCelluleType(i-1,j+1, type);
-                                                        majCelluleType(i-1,j-1, type);
-                                                    }
-                                                case 1:
-                                                    majCelluleType(i, j, type);
-                                                    break;
-                                            }
+                                            Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
+                                            for (Cellule c: voisins)
+                                                c.majType(type);
                                         }
+                                        if (donnees.obtenirDerniereCaseSymbole() != null) {
+                                            final Image symbole = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().obtenirImage();
+                                            int taillePinceau = 1;
+                                            if (donnees.obtenirDernierBouton() != null)
+                                                taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
+                                            Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
+                                            for (Cellule c: voisins)
+                                                c.obtenirSymbole().majSymbole(symbole);
+                                        } 
                                     }
                                 }
                                 estModifie = true;
@@ -554,6 +550,24 @@ public class Controleur {
             // Si on est dans l'éditeur de carte, et qu'on a cliqué sur le menu
             if (donnees.getScene() != null && donnees.getScene().equals("Editeur de carte") && x >= COIN_GAUCHE_MENU) {
                 x -= COIN_GAUCHE_MENU; // Les coordonnées des boutons sont relatives au coin en haut à gauche du menu. Donc on soustrait sa coordonnée x.
+                Cellule[] boutonsSymbole = donnees.obtenirBoutonsSymbole();
+                for (int i=0; i < boutonsSymbole.length; i++) {
+                    if (boutonsSymbole[i].contains(x,y)) {
+                        if (donnees.obtenirDerniereCaseSymbole() == boutonsSymbole[i]) { // On compare les pointeurs (références) des 2 objets
+                            boutonsSymbole[i].majSourisDessus(false);
+                            donnees.majDerniereCaseSymbole(null);
+                        } else {
+                            boutonsSymbole[i].majSourisDessus(true);
+                            if (donnees.obtenirDerniereCaseSymbole() != null)
+                                donnees.obtenirDerniereCaseSymbole().majSourisDessus(false);
+                            donnees.majDerniereCaseSymbole(boutonsSymbole[i]);
+                        }
+                        estModifie = true;
+                        donnees.notifierObserveur(TypeMisAJour.BoutonsSymbole);
+                        break;
+                    }
+                }
+                
                 Cellule[] boutonsType = donnees.obtenirBoutonsType();
                 for (int i=0; i < boutonsType.length; i++) {
                     if (boutonsType[i].contains(x,y)) {
@@ -618,28 +632,49 @@ public class Controleur {
         }
 
         //BoutonsHex
-        final TypeCase[] types = TypeCase.values();
+        final TypeCase[] TYPES = TypeCase.values();
         
         final double TAILLE = 0.5;
-        final int NOMBRE_COLONNES = (int) Math.ceil(types.length/(double)Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE);
+        final int NOMBRE_COLONNES = (int) Math.ceil(TYPES.length/(double)Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE);
         final int LONGUEUR_ESPACEMENTS_CASE = (Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE+1)*Options.ESPACE_INTER_CASE_BOUTON;
         final int LONGUEUR_CASES = (int)(Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE*Options.LARGEUR_BOUTON_CASE*TAILLE + (Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE-1)*Options.ESPACE_INTER_CASE_BOUTON);
         final int LONGUEUR_TOTALE_CASES = LONGUEUR_ESPACEMENTS_CASE + LONGUEUR_CASES;
         int index = 0;
-        Cellule[] boutonsType = new Cellule[types.length];
+        Cellule[] boutonsType = new Cellule[TYPES.length];
         for (int i=0; i<NOMBRE_COLONNES; i++) {
             for (int j=0; j<Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE; j++) {
-                if (index < types.length) {
-                    boutonsType[index] = new Cellule(types[index], i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON);
+                if (index < TYPES.length) {
+                    boutonsType[index] = new Cellule(TYPES[index], i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON, true);
                     boutonsType[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[1]+80);
+                }
+                index++;
+            }
+        }
+
+        //BoutonsSymboles
+        final TypeSymbole[] SYMBOLES = TypeSymbole.values();
+        index = 0;
+        final int NOMBRE_COLONNES_SYMBOLE = (int) Math.ceil(SYMBOLES.length/(double)Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE);
+        Cellule[] boutonsSymbole = new Cellule[SYMBOLES.length];
+        for (int i=0; i<NOMBRE_COLONNES_SYMBOLE; i++) {
+            for (int j=0; j<Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE; j++) {
+                if (index < SYMBOLES.length) {
+                    //System.out.println("Image: "+SYMBOLES[index].name()+" "+donnees.getImagesSymboles().get(SYMBOLES[index].name()));
+                    boutonsSymbole[index] = new Cellule(TypeCase.VIDE, i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON, true, new Symbole(SYMBOLES[index], donnees.getImagesSymboles().get(SYMBOLES[index].name()), true));
+                    boutonsSymbole[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[1]+80+160);
                 }
                 index++;
             }
         }
         
         donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2));
+        for (int i=0; i< donnees.obtenirCellules().length; i++) {
+            for (Cellule c: donnees.obtenirCellules()[i])
+                c.majEstDecouverte(true);
+        }
         donnees.majBoutonsCercle(boutonsCercle);
         donnees.majBoutonsType(boutonsType);
+        donnees.majBoutonsSymbole(boutonsSymbole);
         donnees.majScene("Editeur de carte");
 
         donnees.obtenirArrierePlan().majCoords(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2);
@@ -649,6 +684,7 @@ public class Controleur {
         donnees.notifierObserveur(TypeMisAJour.Cellules);
         donnees.notifierObserveur(TypeMisAJour.BoutonsCercle);
         donnees.notifierObserveur(TypeMisAJour.BoutonsType);
+        donnees.notifierObserveur(TypeMisAJour.BoutonsSymbole);
         donnees.notifierObserveur(TypeMisAJour.Peindre);
     }
 

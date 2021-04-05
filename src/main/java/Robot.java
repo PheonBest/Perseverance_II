@@ -29,6 +29,9 @@ public class Robot extends Avatar {
     //  Position du robot dans la matrice de la carte
     private int ligne = 0;
     private int colonne = 0;
+    // On mémorise sa position précédente
+    private int lignePrecedente = 0;
+    private int colonnePrecedente = 0;
     
     // Position réélle du robot sur la carte, dont l'origine se rouve en haut à gauche
     private int xFictif = 0;
@@ -238,7 +241,6 @@ public class Robot extends Avatar {
             // On prend une case à cibler, la première de la liste de buts
             int[] d = but.getFirst(); 
             definirDirection(new Dimension(d[0], d[1]));
-            System.out.println(d[0]+" "+d[1]);
             animationIndex = 2; //  Image qui montre le robot en marche
         }
     }
@@ -268,6 +270,8 @@ public class Robot extends Avatar {
     public void updateCoords() {
 
         r += dr;
+        lignePrecedente = ligne;
+        colonnePrecedente = colonne;
 
         if (!but.isEmpty()) {
             xFictif += dx;
@@ -306,12 +310,21 @@ public class Robot extends Avatar {
         }
     }
     
+    public int[] obtenirCasePrecedente() {
+        return new int[]{lignePrecedente, colonnePrecedente};
+    }
     public int[] obtenirCase() {
         return new int[]{ligne, colonne};
     }
     public void majCase(int ligne, int colonne) {
+        derniereCase = new int[] {ligne,colonne};
         this.ligne = ligne;
         this.colonne = colonne;
+
+        // On modifie l'état précédent des lignes/colonnes
+        // Donc la case sur laquelle on place le joueur n'aura pas d'effet
+        lignePrecedente = ligne;
+        colonnePrecedente = colonne;
     }
     public int[] obtenirCoordonnees() {
         return new int[]{xFictif, yFictif};

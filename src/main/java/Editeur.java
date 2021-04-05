@@ -46,6 +46,9 @@ public class Editeur extends JPanel {
     public void majCellules(Cellule[][] cellules) {
         ((Dessiner)carte).majCellules(cellules);
     }
+    public void majBoutonsSymbole(Cellule[] boutonsSymbole) {
+        ((Menu)menu).majBoutonsSymbole(boutonsSymbole);
+    }
     public void majBoutonsType(Cellule[] boutonsType) {
         ((Menu)menu).majBoutonsType(boutonsType);
     }

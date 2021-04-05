@@ -17,17 +17,19 @@ import java.net.URISyntaxException;
 public class Donnees implements Observable {
 
     private ArrierePlan arrierePlan;
+    private Image imageMenu;
     private Robot joueur;
     private String scene;
     private ArrayList<Observer> listObserver = new ArrayList<Observer>();
     private Cellule[][] cellules = { {} };
-    private Cellule[][] cellulesFixes = { {} };
     private BoutonCercle[] boutonsCercle = {};
     private Cellule[] boutonsType = {};
+    private Cellule[] boutonsSymbole = {};
     private int largeur;
     private int hauteur;
     private Cellule derniereCellule = null;
     private Cellule derniereCaseType = null;
+    private Cellule derniereCaseSymbole = null;
     private BoutonCercle dernierBouton = null;
     private double zoom = 1.;
     private Point centreZoom;
@@ -140,6 +142,9 @@ public class Donnees implements Observable {
     public void notifierObserveur(TypeMisAJour type) {
         for (Observer obs: listObserver) {
             switch (type) {
+                case ImageMenu:
+                    obs.mettreAJour(TypeMisAJour.ImageMenu, imageMenu);
+                    break;
                 case Options:
                     obs.mettreAJour(TypeMisAJour.Options, etatOptions);
                     break;
@@ -179,6 +184,9 @@ public class Donnees implements Observable {
                 case Peindre:
                     obs.mettreAJour(TypeMisAJour.Peindre, null);// Prévoit de mettre à jour le composant
                     // n'appelle pas la méthode paint() !
+                    break;
+                case BoutonsSymbole:
+                    obs.mettreAJour(TypeMisAJour.BoutonsSymbole, boutonsSymbole);
                     break;
                 case BoutonsType:
                     obs.mettreAJour(TypeMisAJour.BoutonsType, boutonsType);
@@ -247,12 +255,20 @@ public class Donnees implements Observable {
         derniereCompetence = b;
     }
 
+    public Cellule[] obtenirBoutonsSymbole() {
+        return boutonsSymbole;
+    }
+
     public Cellule[] obtenirBoutonsType() {
         return boutonsType;
     }
 
     public BoutonCercle[] obtenirBoutonsCercle() {
         return boutonsCercle;
+    }
+
+    public void majBoutonsSymbole(Cellule[] boutonsSymbole) {
+        this.boutonsSymbole = boutonsSymbole;
     }
 
     public void majBoutonsCercle(BoutonCercle[] boutonsCercle) {
@@ -535,5 +551,17 @@ public class Donnees implements Observable {
 
     public void majEtatOptions(boolean etatOptions) {
         this.etatOptions = etatOptions;
+    }
+
+    public void majImageMenu(Image imageMenu) {
+        this.imageMenu = imageMenu;
+    }
+
+    public Cellule obtenirDerniereCaseSymbole() {
+        return derniereCaseSymbole;
+    }
+
+    public void majDerniereCaseSymbole(Cellule derniereCaseSymbole) {
+        this.derniereCaseSymbole = derniereCaseSymbole;
     }
 }
