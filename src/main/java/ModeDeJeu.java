@@ -112,10 +112,10 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		presentation.add(titre);		
 		
 		JLabel titre2 = new JLabel();
-		titre2.setText(" Pour plus d'informations sur les regles du jeu, n'hesitez pas a cliquer sur ce bouton: ");
+		titre2.setText(" Pour plus d'informations concernant les regles du jeu, n'hesitez pas a cliquer sur ce bouton: ");
 		titre2.setFont(new Font("Serif", Font.BOLD, 19));
         titre2.setForeground(Color.WHITE);
-		titre2.setBounds(largeur/8, hauteur/5, 1000, 70);
+		titre2.setBounds(largeur/10, hauteur/5, 1000, 70);
 		presentation.add(titre2);
 		
 		jouer = new JButton("Jouer");
@@ -129,7 +129,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		editer.addActionListener(this);
 		
 		aide= new JButton("AIDE");
-		aide.setBounds(largeur-100,hauteur/5,70,70);
+		aide.setBounds(largeur-100,hauteur/5+15,70,50);
 		aide.setBackground(Color.orange);
 		presentation.add(aide);
 		aide.addActionListener(this);

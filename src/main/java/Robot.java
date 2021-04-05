@@ -158,12 +158,12 @@ public class Robot extends Avatar {
     }
 
     public void actualiseBatterie(){
-        batterie = Options.BATTERIE_MAX - (int)(comptKm*Options.CONSO_BATTERIE_PAR_KM);
+        setBatterie(Options.BATTERIE_MAX - (int)(comptKm*Options.CONSO_BATTERIE_PAR_KM));
         //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
     }
     
     public void actualiseCptKm(Dimension but){
-        comptKm += Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight());
+        comptKm += Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight())*Options.KM_PAR_PIXELS;
         kmTot += comptKm;
     }
     
