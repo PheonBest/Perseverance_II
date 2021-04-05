@@ -832,18 +832,18 @@ public class Controleur {
     
     public Image obtenirImageSymbole(TypeSymbole nomSymbole){
 		switch( nomSymbole){
-			case RIVIERE:
-				return donnees.getImagesSymboles().get("EAU");
 			case MINERAI:
 				return donnees.getImagesSymboles().get("MINERAI");
-			case MORT:
-				return donnees.getImagesSymboles().get("MORT");
 			case BACTERIE:
 				return donnees.getImagesSymboles().get("BACTERIE");
-			case DANGER:
-				return donnees.getImagesSymboles().get("DANGER");
 			case GRAPPIN:
 				return donnees.getImagesSymboles().get("GRAPPIN");
+			case SCANNER:
+				return donnees.getImagesSymboles().get("SCANNER");
+			case RAVIN:
+				return donnees.getImagesSymboles().get("RAVIN");
+			case INCONNUE:
+				return donnees.getImagesSymboles().get("INCONNUE");
 			default:
 				return null;
 		
