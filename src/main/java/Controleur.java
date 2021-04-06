@@ -45,20 +45,20 @@ public class Controleur {
                 && !donnees.obtenirDemarrerMinijeuLaser()
                 && !donnees.obtenirEffacerMiniJeuLaser());
     }
-    // Effet quand on utilise le bras robot sur une case qui contient un symbole
+    // Effet quand on utilise le bras robot sur une case qui contient un symbole (use les bras)
     private void extraire(int ligne, int colonne) {
         donnees.majEtatMinijeuExtraction(true);
         donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
-        // + user les bras
+        donnees.obtenirJoueur().usureBras();
     }
 
-    // Effet quand on utilise le scanner sur une case qui contient un symbole
+    // Effet quand on utilise le scanner sur une case qui contient un symbole (une les capteurs)
     private void scan(int ligne, int colonne) {
         donnees.majChronometreMinijeuLaser(System.currentTimeMillis());
         donnees.majTempsAvantChrono((int)(Math.random()*((7000-3000)+1)+3000));
         donnees.majEtatMinijeuLaser(true);
         donnees.notifierObserveur(TypeMisAJour.MinijeuLaser);
-        // user les jambes
+        donnees.obtenirJoueur().usureCapteurs();
     }
 
     // Effet quand on marche sur une case
@@ -140,6 +140,7 @@ public class Controleur {
                     click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY());
             }
             if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
+                
                 // Si on doit effacer le minijeu de l'extraction
                 if (donnees.obtenirEffacerMinijeuExtraction() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuExtraction() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
                     donnees.majEffacerMinijeuExtraction(false);

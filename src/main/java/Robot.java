@@ -127,15 +127,15 @@ public class Robot extends Avatar {
     // Actualise les voyants principaux
     public void actualiseVP(){
         // On calcul la somme des états possible pour un liste de composants de même types et la somme réelle des états dans une même liste
-        int sEtatJambes = (Options.ALERTE_MAX-Options.ALERTE_MIN+1)*jambes.length;
-        int sEtatBras = (Options.ALERTE_MAX-Options.ALERTE_MIN+1)*bras.length;
-        int sEtatCapteurs = (Options.ALERTE_MAX-Options.ALERTE_MIN+1)*capteurs.length;
+        int sEtatJambes = (Options.ALERTE_MAX-Options.ALERTE_MIN)*jambes.length;
+        int sEtatBras = (Options.ALERTE_MAX-Options.ALERTE_MIN)*bras.length;
+        int sEtatCapteurs = (Options.ALERTE_MAX-Options.ALERTE_MIN)*capteurs.length;
         int sj=0;
         int sb=0;
         int sc=0;
-        for(int i=0; i<jambes.length; i++){ sj += jambes[i].voyant.getEtat() +1;}
-        for(int i=0; i<bras.length; i++){sb += bras[i].voyant.getEtat() +1;}
-        for(int i=0; i<capteurs.length; i++){sc += capteurs[i].voyant.getEtat() +1;}
+        for(int i=0; i<jambes.length; i++){ sj += jambes[i].voyant.getEtat();}
+        for(int i=0; i<bras.length; i++){sb += bras[i].voyant.getEtat();}
+        for(int i=0; i<capteurs.length; i++){sc += capteurs[i].voyant.getEtat();}
         
         // On définit le 1/3 de la somme des états d'une liste de composants
         double rj = (sEtatJambes/((double)(Options.ALERTE_MAX-Options.ALERTE_MIN+1)));
@@ -163,11 +163,13 @@ public class Robot extends Avatar {
     }
     
     public void actualiseCptKm(Dimension but){
-        comptKm += Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight())*Options.KM_PAR_PIXELS;
-        kmTot += comptKm;
+        double d = Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight())*Options.KM_PAR_PIXELS;
+        comptKm += d;
+        kmTot += d;
     }
     
     public void rechargerBat(){
+        resetCompteurkm();
         setBatterie(Options.BATTERIE_MAX);
         this.nbRecharges += 1;
     }
@@ -181,11 +183,11 @@ public class Robot extends Avatar {
             jambes[i].setUsure(jambes[i].getUsure() + (int)(nbKm*Options.USURE_PAR_KM));
             chance = (int)(Math.random()*100 + 1);
         
-            if (jambes[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION) jambes[i].degraderC();
+            if (jambes[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION_JAMBES) jambes[i].degraderC();
         }
     }
     
-    public void usureBras(double nbKm){
+    public void usureBras(){
         // définition du tiers d'usure pour adapter les voyants des composants à leur usure en fonction d'un facteur chance
         double r3u = (Options.USURE_MAX-Options.USURE_MIN)/3.0;
         int chance;
@@ -194,10 +196,10 @@ public class Robot extends Avatar {
             bras[i].setUsure(bras[i].getUsure() + Options.USURE_PAR_UTILISATION);
             chance = (int)(Math.random()*100 + 1);
         
-            if (bras[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION) bras[i].degraderC();
+            if (bras[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION_AUTRES) bras[i].degraderC();
         }
     }
-    public void usureCapteurs(double nbKm){
+    public void usureCapteurs(){
          // définition du tiers d'usure pour adapter les voyants des composants à leur usure en fonction d'un facteur chance
         double r3u = (Options.USURE_MAX-Options.USURE_MIN)/3.0;
         int chance;
@@ -206,7 +208,7 @@ public class Robot extends Avatar {
             capteurs[i].setUsure(capteurs[i].getUsure() + Options.USURE_PAR_UTILISATION);
             chance = (int)(Math.random()*100 + 1);
         
-            if (capteurs[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION)capteurs[i].degraderC();
+            if (capteurs[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION_AUTRES)capteurs[i].degraderC();
         }
     }
     
