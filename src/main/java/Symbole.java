@@ -9,9 +9,14 @@ import java.awt.Image;
 
 public class Symbole extends Polygon {
 	
+<<<<<<< Updated upstream
 	private TypeSymbole type;
 	private Image image;
 	private boolean estVisible = false;
+=======
+		public TypeSymbole type;
+		private Image image;
+>>>>>>> Stashed changes
 	
 	public Symbole(TypeSymbole type, Image image, boolean estVisible){
 		this.estVisible = estVisible;

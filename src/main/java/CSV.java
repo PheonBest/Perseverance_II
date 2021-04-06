@@ -103,8 +103,10 @@ public class CSV {
 			for(int j=0;j<liste.get(i).size();j++){
 				String [] ds = liste.get(i).get(j).split(";");
 				for (TypeCase t : TypeCase.values()) {
-                    if (t.name().equals(ds[0])) {
-							s[j]=new Cellule (t, i, j);
+					for(TypeSymbole s : TypeSymbole.values()){
+						if (t.name().equals(ds[0])) {
+							if(s.name().equals(ds[1])){
+								s[j]=new Cellule (t, i, j);
                         break;
                     }
                 }

@@ -14,6 +14,11 @@ public class Cellule extends Polygon implements Dessin {
     private TypeCase type;
     private Color couleur;
     private Symbole symbole;
+<<<<<<< Updated upstream
+=======
+    private boolean caseVisible;
+    private boolean symboleVisible;
+>>>>>>> Stashed changes
     
     //Position dans la matrice de la carte            
     private int ligne;
@@ -23,8 +28,12 @@ public class Cellule extends Polygon implements Dessin {
     private double hauteur;
     private double taille;
     private boolean sourisDessus = false;
+<<<<<<< Updated upstream
 
     private boolean estDecouverte = false;
+=======
+    
+>>>>>>> Stashed changes
      
     //////////////////////////////////////////////////////////////////// Constructeurs 
     
@@ -33,11 +42,16 @@ public class Cellule extends Polygon implements Dessin {
      * stocker dans des tableaux x et y, en fonction de leurs ligne et de leur colonne
      * */
     
+<<<<<<< Updated upstream
     public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase, boolean estDecouverte, Symbole symbole){
 
         this.taille = taille;
         this.symbole = symbole;
         this.estDecouverte = estDecouverte;
+=======
+    public Cellule(TypeCase unType, Symbole unSymbole, boolean caseVis, boolean symboleVis, int uneLigne, int uneColonne, double taille, int espaceInterCase){
+        
+>>>>>>> Stashed changes
         //Position dans la matrice de la carte
         ligne = uneLigne;
         colonne = uneColonne;
@@ -78,6 +92,7 @@ public class Cellule extends Polygon implements Dessin {
         // Déplacement du symbole
     }
 
+<<<<<<< Updated upstream
     public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase, boolean estDecouverte){
         this(unType, uneLigne, uneColonne, taille, espaceInterCase, estDecouverte, null);
     }
@@ -88,7 +103,19 @@ public class Cellule extends Polygon implements Dessin {
 
     public Cellule(int uneLigne, int uneColonne){
         this(TypeCase.VIDE, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE, false);
+=======
+    public Cellule(TypeCase type, Symbole unSymbole, boolean caseVis, boolean symboleVis, int uneLigne, int uneColonne){
+        this(type, unSymbole, caseVis, symboleVis, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
     }
+
+    public Cellule(Symbole unSymbole, boolean caseVis, boolean symboleVis, int uneLigne, int uneColonne){
+        this(TypeCase.VIDE, unSymbole, FALSE, symboleVis, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
+>>>>>>> Stashed changes
+    }
+    
+    public Cellule(int uneLigne, int uneColonne){
+		this(TypeCase.VIDE, new Symbole(TypeSymbole.AUCUN,, caseVis, symboleVis, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
+	}
     
     public void dessiner(Graphics g, double agrandissement) {
         // On dessine le polygone
@@ -249,7 +276,7 @@ public class Cellule extends Polygon implements Dessin {
     }
 
     public String toString() {
-        return type.name()+";null";
+        return type.name()+";"+symbole.type.name()+";"+caseVisible+";"+symboleVisible;
     }
 
     public boolean estDecouverte() {
