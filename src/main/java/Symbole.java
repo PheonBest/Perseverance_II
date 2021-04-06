@@ -9,9 +9,9 @@ import java.awt.Image;
 
 public class Symbole extends Polygon {
 	
-	private TypeSymbole type;
-	private Image image;
-	private boolean estVisible = false;
+	public TypeSymbole type;
+	public Image image;
+	public boolean estVisible = false;
 	
 	public Symbole(TypeSymbole type, Image image, boolean estVisible){
 		this.estVisible = estVisible;
