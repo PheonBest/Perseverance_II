@@ -19,6 +19,9 @@ public class Symbole extends Polygon {
 		this.image=image;
 		//this.image=getImage();
 	}
+	public Symbole() {
+		this(null, null, false);
+	}
 
 	//Dans Symbole:On rajoute la méthode
 	public void majSymbole(Image img) {	
@@ -27,6 +30,14 @@ public class Symbole extends Polygon {
 
 	public Image obtenirImage() {
 		return image;
+	}
+
+	public void majEstVisible(boolean estVisible) {
+		this.estVisible = estVisible;
+	}
+	
+	public boolean obtenirEstVisible() {
+		return estVisible;
 	}
 	
 	

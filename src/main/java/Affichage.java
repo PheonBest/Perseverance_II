@@ -87,8 +87,11 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
         Point coinEnHautAGauche = getLocation();
         Insets bordures = getInsets();
-        Point coinEnHautAGaucheSansBordures = new Point((int)(coinEnHautAGauche.getX()+bordures.left),(int)(coinEnHautAGauche.getY()+bordures.top));
-        controleur.majPositionFenetre(coinEnHautAGaucheSansBordures);
+        Insets borduresDessiner = jeu.getInsets();
+
+        //Point coinEnHautAGaucheSansBordures = new Point((int)(coinEnHautAGauche.getX()+bordures.left),(int)(coinEnHautAGauche.getY()+bordures.top));
+        Point pointBordures = new Point((bordures.left+borduresDessiner.left),(bordures.top+borduresDessiner.top));
+        controleur.majBorduresFenetre(pointBordures);
 
         // On définit la largeur et la hauteur du contenu du "JFrame" après l'avoir
         // affiché
@@ -103,7 +106,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         ((Dessiner)jeu).majEnJeu(true);
         ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
         
-        ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), (int)(this.hauteur/20.));
+        ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), 50);
         
     }
 

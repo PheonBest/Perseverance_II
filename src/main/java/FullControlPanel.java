@@ -52,7 +52,7 @@ public class FullControlPanel extends JFrame implements ActionListener{
     
     //------------------------------------------------------------------ Constructeur
 
-    public FullControlPanel(int x, int y, Robot r){
+    public FullControlPanel(int x, int y, Robot r, Image imageP, Image imageR){
         // Fenêtre
         super();
         setLayout(null);
@@ -130,6 +130,9 @@ public class FullControlPanel extends JFrame implements ActionListener{
         panneauVoyants.add(titreVoyant);
         
         // Panneaux des statistiques
+        this.imageP = imageP;
+        this.imageR = imageR;
+        
         ys = ypv + panneauVoyants.getHeight() + ecartY;
         
         stat = new JPanel();
@@ -159,17 +162,6 @@ public class FullControlPanel extends JFrame implements ActionListener{
         nbCasesExp.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         stat.add(nbCasesExp);
         
-        // Images
-        
-        try {
-            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_DETAILS+"\\b.*\\.(?:jpg|gif|png)");
-            HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, Options.NOM_DOSSIER_DETAILS);
-            imageP = images.get("Mars9");
-            imageR = images.get("PerseveranceII");
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
-               
         // add finaux
         cg.add(panneauBat);
         cg.add(panneauVoyants);

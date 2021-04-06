@@ -1,6 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class ControlPanel extends JPanel implements ActionListener{
     
@@ -9,6 +13,8 @@ public class ControlPanel extends JPanel implements ActionListener{
     private Robot joueur;
     private JButton details;
     private FullControlPanel panneauComplet;
+    private Image imageP;
+    private Image imageR;
     
     public ControlPanel(int x0, int y0){
         super();
@@ -22,6 +28,16 @@ public class ControlPanel extends JPanel implements ActionListener{
         details.setBackground(Color.white);
         details.addActionListener(this);
         add(details);
+
+        // Images
+        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_DETAILS+"\\b.*\\.(?:jpg|gif|png)");
+        try {
+            HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_DETAILS+"/");
+            imageP = images.get("Mars9");
+            imageR = images.get("PerseveranceII");
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
     }
     
     public void paintComponent(Graphics g){
@@ -69,7 +85,7 @@ public class ControlPanel extends JPanel implements ActionListener{
     }
     
     public void actionPerformed(ActionEvent e){
-        panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2, joueur);
+        panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2, joueur, imageP, imageR);
     }
 }
 

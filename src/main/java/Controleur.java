@@ -21,6 +21,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.awt.Image;
+import java.util.stream.Collectors;
+import java.util.Map;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.CellEditor;
@@ -228,18 +230,22 @@ public class Controleur {
 
         
 
-        // Chargement des images des symboles (rapide)
+        // Chargement des symboles
         pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_SYMBOLE+"\\b.*\\.(?:jpg|gif|png)");
-
+        final int LARGEUR = (int) (Options.LARGEUR_CASE*0.7);
+        final int HAUTEUR = (int) (Options.LARGEUR_CASE*0.7);
         try {
             HashMap<String, Image> imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
+            for (String i : imagesSymboles.keySet()) {
+                imagesSymboles.put(i, TailleImage.resizeImage(imagesSymboles.get(i), LARGEUR, HAUTEUR, true));
+                //System.out.println("Nom de l'image : " + i + "\nimage: " + imagesSymboles.get(i)+"\n");
+            }
             donnees.majImagesSymboles(imagesSymboles);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
         
-        // for (String i : donnees.getImagesSymboles().keySet())
-        //     System.out.println("Nom de l'image : " + i + "\nimage: " + donnees.getImagesSymboles().get(i)+"\n");
+        
 
         // Chargement des images du joueur
         ArrayList<ArrayList<Image>> images = new ArrayList<ArrayList<Image>>(4);
@@ -267,12 +273,14 @@ public class Controleur {
                 
                 
                 pattern = Pattern.compile("^.*\\b"+Options.JOUEURS_IMAGES[i]+"\\b.*\\.(?:jpg|gif|png)");
-                final Collection<Image> tmp = ObtenirRessources.getImages(pattern, "res/robot/"+Options.JOUEURS_IMAGES[i]+"/");
+                final List<Image> tmp = ObtenirRessources.getImagesAndFilenames(pattern, "res/robot/"+Options.JOUEURS_IMAGES[i]+"/").entrySet()
+                                                                                                                                    .stream()
+                                                                                                                                    .sorted(Map.Entry.<String,Image>comparingByKey())
+                                                                                                                                    .map(Map.Entry::getValue)
+                                                                                                                                    .collect(Collectors.toList());
                 images.add(new ArrayList<Image>());
-                for (Image img: tmp) {
-                    images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null))), false) );
-                }
-                avancementChargement +=tmp.size();
+                for (Image img: tmp)
+                    images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null))), false) );                avancementChargement +=tmp.size();
                 publish((int)(100.*avancementChargement/nombreImages)); // On publie l'avancement du chargement (résultat intermédiaire)
                 
             }
@@ -404,7 +412,7 @@ public class Controleur {
                         indexRobot = donnees.obtenirJoueur().obtenirCase(); // Ligne et colonne du centre de la case sur lequel se trouve le joueur
                     for (int i=0; i < cellules.length; i++) {
                         for (int j=0; j < cellules[i].length; j++) {
-                            if (cellules[i][j].contains((x - donnees.obtenirLargeur()/2 + 8)/donnees.obtenirZoom(), (y - donnees.obtenirHauteur()/2 + 20)/donnees.obtenirZoom())) {
+                            if (cellules[i][j].contains((x + (-donnees.obtenirLargeur()+donnees.obtenirBorduresFenetre().getX())/2)/donnees.obtenirZoom(), (y + (-donnees.obtenirHauteur()+donnees.obtenirBorduresFenetre().getY())/2)/donnees.obtenirZoom())) {
                                 if (donnees.obtenirDerniereCellule() == cellules[i][j]) { // On compare les pointeurs (références) des 2 objets
                                     //cellules[i][j].majSourisDessus(false);
                                     donnees.majDerniereCellule(null);
@@ -528,12 +536,17 @@ public class Controleur {
                                         }
                                         if (donnees.obtenirDerniereCaseSymbole() != null) {
                                             final Image symbole = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().obtenirImage();
-                                            int taillePinceau = 1;
-                                            if (donnees.obtenirDernierBouton() != null)
-                                                taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
-                                            Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
-                                            for (Cellule c: voisins)
-                                                c.obtenirSymbole().majSymbole(symbole);
+                                            if (symbole != null) {
+                                                int taillePinceau = 1;
+                                                if (donnees.obtenirDernierBouton() != null)
+                                                    taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
+                                                Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
+                                                for (Cellule c: voisins) {
+                                                    c.obtenirSymbole().majSymbole(symbole);
+                                                    if (!c.obtenirSymbole().obtenirEstVisible())
+                                                        c.obtenirSymbole().majEstVisible(true);
+                                                }
+                                            }
                                         } 
                                     }
                                 }
@@ -785,8 +798,8 @@ public class Controleur {
         donnees.majStatutSouris(ev);
     }
 
-    public void majPositionFenetre(Point location) {
-        donnees.majPositionFenetre(location);
+    public void majBorduresFenetre(Point location) {
+        donnees.majBorduresFenetre(location);
     }
 
     // MUSIQUE
