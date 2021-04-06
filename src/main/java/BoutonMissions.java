@@ -16,7 +16,7 @@ public class BoutonMissions extends JPanel implements ActionListener {
         setSize(lx,ly);
         setLocation(x0,y0);
         
-        mission = new JButton("MISSION");
+        mission = new JButton("MISSIONS");
         mission.setLocation(0,0);
         mission.setSize(100,50);
         mission.setBackground(Color.white);
