@@ -307,7 +307,7 @@ public class Dessiner extends JPanel {
 
                 g2d.setPaint(Color.BLACK);
 
-                dessinerTexteCentre(g2d, "Cliquez pour contrôler le bras\nmécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
+                dessinerTexteCentre(g2d, "Cliquez pour contrôler le bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
                 if (effacerMinijeuExtraction)
                     dessinerTexteCentre(g2d, score+" % de précision", (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
             }
@@ -350,7 +350,7 @@ public class Dessiner extends JPanel {
                 
                 g2d.setPaint(Color.BLACK);
                 dessinerTexteCentre(g2d, str, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU), Options.police);
-                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes,\ncliquez le plus vite possible pour renvoyer les\ndonnées du scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU), Options.POLICE_PLAIN);
+                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes, cliquez\nle plus vite possible pour renvoyer les données du scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU), Options.POLICE_PLAIN);
                 
                 // On dessine les éventuelles erreurs SI le jeu n'est pas finit et qu'il y a au moins une erreur
                 if (!finMinijeuLaser && nombreErreursLaser > 0) {

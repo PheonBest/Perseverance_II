@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.BasicStroke;
@@ -119,8 +118,8 @@ public class Cellule extends Polygon implements Dessin {
             g2d.fillPolygon(this);
             if (symbole != null) {
                 System.out.println("image");
-                System.out.println(symbole.image);
-                g2d.drawImage(symbole.image, xpoints[0], ypoints[0], null);
+                System.out.println(symbole.obtenirImage());
+                g2d.drawImage(symbole.obtenirImage(), xpoints[0], ypoints[0], null);
             }
             translate((int)(COIN_EN_HAUT_A_GAUCHE[0]), (int)(COIN_EN_HAUT_A_GAUCHE[1]));
             g2d.setTransform(ANCIENNE_TRANSFORMATION);
@@ -129,7 +128,7 @@ public class Cellule extends Polygon implements Dessin {
         } else {
             g2d.fillPolygon(this);
             if (symbole != null)
-                g2d.drawImage(symbole.image, xpoints[0], ypoints[0], null);
+                g2d.drawImage(symbole.obtenirImage(), xpoints[0], ypoints[0], null);
         }
     }
 
@@ -228,9 +227,5 @@ public class Cellule extends Polygon implements Dessin {
 
     public Symbole obtenirSymbole() {
         return symbole;
-    }
-
-    public void majSymbole(Symbole symbole) {
-        this.symbole = symbole;
     }
 }
