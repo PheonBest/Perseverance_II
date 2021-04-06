@@ -4,7 +4,7 @@ import java.awt.event.*;
 
 public class BoutonMissions extends JPanel implements ActionListener {
 	private int lx = 100;
-	private int ly = 100;
+	private int ly = 50;
 	private int largeur;
 	private int hauteur;
 	private JButton mission;
@@ -18,7 +18,7 @@ public class BoutonMissions extends JPanel implements ActionListener {
         
         mission = new JButton("MISSION");
         mission.setLocation(0,0);
-        mission.setSize(100,100);
+        mission.setSize(100,50);
         mission.setBackground(Color.white);
         mission.addActionListener(this);
         this.add(mission);
