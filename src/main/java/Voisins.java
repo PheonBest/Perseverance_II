@@ -85,7 +85,7 @@ public class Voisins {
 
         for (Iterator<int[]> iterator = coordonnees.iterator(); iterator.hasNext();) {
             int[] cellule = iterator.next();
-            if (cellule[0] < 0 || cellule[0] > cellules.length - 1 || cellule[1] < 0 || cellule[1] > cellules[0].length -1)
+            if (cellule[0] < 0 || cellule[0] > cellules.length - 1 || cellule[1] < 0 || cellule[1] > cellules[1].length -1)
                 // Remove the current element from the iterator and the list.
                 iterator.remove();
         }

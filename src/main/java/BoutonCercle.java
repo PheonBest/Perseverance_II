@@ -38,23 +38,30 @@ public class BoutonCercle implements Dessin {
         Graphics2D g2d = (Graphics2D) g;
         // On dessine le cercle "Bordure"
         final int EPAISSEUR_BORDURE = 12;
-        g2d.setColor(Color.DARK_GRAY);
+        
+        g2d.setPaint(Color.BLACK);
         g2d.setStroke(new BasicStroke(EPAISSEUR_BORDURE));
         if (sourisDessus)
             g2d.drawOval(x-(int)(1.15*rayon),y-(int)(1.15*rayon),(int)(2*1.15*rayon),(int)(2*1.15*rayon));
         else
             g2d.drawOval(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
-        
+        g2d.setPaint(Color.DARK_GRAY);
         // On dessine le deuxième cercle
-        g2d.setColor(Color.white);
         if (sourisDessus)
             g2d.fillOval(x-(int)(1.15*rayon),y-(int)(1.15*rayon),(int)(2*1.15*rayon),(int)(2*1.15*rayon));
         else
             g2d.fillOval(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
 
         // On dessine l'éventuelle image par-dessus le cercle
-        if (image != null)
-            g2d.drawImage(image, (int)(x-image.getWidth(null)/2), (int)(y-image.getHeight(null)/2), null);
+        if (image != null) {
+            if (sourisDessus) {
+                Image imageAgrandie = TailleImage.resizeImage(image, (int)(image.getWidth(null)*1.1), (int)(image.getHeight(null)*1.1), true);
+                g2d.drawImage(imageAgrandie, (int)(x-imageAgrandie.getWidth(null)/2), (int)(y-imageAgrandie.getHeight(null)/2), null);
+            } else
+                g2d.drawImage(image, (int)(x-image.getWidth(null)/2), (int)(y-image.getHeight(null)/2), null);
+        }
+        
+        
     }
 
     public void majSourisDessus(boolean sourisDessus) {

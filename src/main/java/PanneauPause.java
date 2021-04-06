@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.LinkedList;
 
 public class PanneauPause extends JDialog implements ActionListener {
 	private int lx=600;
@@ -19,7 +20,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 	private int largeur;
 	private int hauteur;
 	
-	public PanneauPause(){
+	public PanneauPause() {
 		super();
         setLayout(null);
         setSize(lx,ly+40);
@@ -87,9 +88,18 @@ public class PanneauPause extends JDialog implements ActionListener {
         volume2.setBackground(new Color(255,140,0));
         panneauBas.add(volume2);
 	}
-		public void actionPerformed(ActionEvent e){
-			this.setVisible(false);
-        
+
+	private void setFocusTo(JComponent comp) {
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent ce) {
+                comp.requestFocusInWindow();
+            }
+        });
+    }
+
+	public void actionPerformed(ActionEvent e){
+		this.setVisible(false);
     }
     
     public void majTaille(int largeur, int hauteur){
@@ -98,7 +108,16 @@ public class PanneauPause extends JDialog implements ActionListener {
 			this.hauteur=hauteur;
 		
 	}
-	
+
+	public LinkedList<JComponent> obtenirComposants() {
+		// Retourne la liste des composants
+		// Auquel on doit ajouter un keylistener
+		LinkedList<JComponent> composants = new LinkedList<JComponent>();
+		composants.add(retour);
+		composants.add(volume);
+		composants.add(volume2);
+		return composants;
+	}
 	
 /*
 	public void showDialog() {

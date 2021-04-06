@@ -27,6 +27,7 @@ public class ControlPanel extends JPanel implements ActionListener{
         details.setSize(100,40);
         details.setBackground(Color.white);
         details.addActionListener(this);
+        details.setFocusable(false);
         add(details);
 
         // Images
@@ -86,6 +87,10 @@ public class ControlPanel extends JPanel implements ActionListener{
     
     public void actionPerformed(ActionEvent e){
         panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2, joueur, imageP, imageR);
+    }
+
+    public JButton obtenirBouton() {
+        return details;
     }
 }
 

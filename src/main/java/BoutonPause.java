@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class BoutonPause extends JPanel implements ActionListener {
+    private Controleur controleur;
 	private int lx = 100;
 	private int ly = 50;
 	private JButton pause;
@@ -10,7 +11,7 @@ public class BoutonPause extends JPanel implements ActionListener {
 	private int largeur;
 	private int hauteur;
 	
-	public BoutonPause(int x0, int y0){
+	public BoutonPause(Controleur controleur, int x0, int y0){
         super();
         setLayout(null);
         setSize(lx,ly);

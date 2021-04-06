@@ -25,6 +25,7 @@ public class Cellule extends Polygon implements Dessin {
     private boolean sourisDessus = false;
 
     private boolean estDecouverte = false;
+    private boolean selectionne = false;
      
     //////////////////////////////////////////////////////////////////// Constructeurs 
     
@@ -142,6 +143,10 @@ public class Cellule extends Polygon implements Dessin {
             }
         } else {
             g2d.fillPolygon(this);
+            g2d.setStroke(new BasicStroke(8));
+            g2d.setPaint(Color.BLUE);
+            if (selectionne)
+                g2d.drawPolygon(this);
             if (symbole != null && symbole.obtenirImage() != null) {
                 if (taille == 1)
                     g2d.drawImage(symbole.obtenirImage(), (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2), (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2), null);
@@ -267,5 +272,9 @@ public class Cellule extends Polygon implements Dessin {
         if (symbole == null)
             symbole = new Symbole();
         return symbole;
+    }
+
+    public void majSelectionne(boolean selectionne) {
+        this.selectionne = selectionne;
     }
 }

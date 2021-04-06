@@ -36,7 +36,10 @@ public class BoutonMissions extends JPanel implements ActionListener {
 		this.setSize(largeur,hauteur);
 		this.largeur=largeur;
 		this.hauteur=hauteur;
-		
+	}
+
+	public JButton obtenirBouton() {
+		return mission;
 	}
 }
 

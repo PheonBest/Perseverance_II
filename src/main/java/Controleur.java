@@ -384,7 +384,7 @@ public class Controleur {
                                     donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
                                 }
                                 switch (b.obtenirEffet()) {
-                                    case "Drone":
+                                    case "Grappin":
                                         donnees.majRayonDeSelection(4);
                                         donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
                                         break;
@@ -436,7 +436,7 @@ public class Controleur {
                                                 index ++;
                                             if (index < voisins.length) {
                                                 switch (donnees.obtenirDerniereCompetence().obtenirEffet()) {
-                                                    case "Drone":
+                                                    case "Grappin":
                                                         extraire(i, j);
                                                         break;
                                                     case "Scanner":
@@ -461,12 +461,12 @@ public class Controleur {
                                                 donnees.notifierObserveur(TypeMisAJour.Joueur);
                                             } else {
                                                 
-                                                // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de séléction autorisé
+                                                // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de sélection autorisé
                                                 Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, indexRobot[0], indexRobot[1], Options.RAYON_JOUEUR);
                                                 int index = 0;
                                                 while (index < casesVoisines.length && casesVoisines[index] != cellules[i][j])
                                                     index ++;
-                                                if (index < casesVoisines.length) { // Si la case fait partie des voisins, alors elle est bien dans le rayon de séléction autorisé
+                                                if (index < casesVoisines.length) { // Si la case fait partie des voisins, alors elle est bien dans le rayon de sélection autorisé
 
                                                     final int[] INDEX_CELLULE = cellules[i][j].obtenirPositionTableau();
                                                     final int[] COORDS_CELLULE = cellules[i][j].obtenirCentre();

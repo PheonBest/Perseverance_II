@@ -16,6 +16,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseListener;
+
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -34,7 +36,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private JPanel editeur;
     private JPanel jeu;
    // private JPanel options = new JPanel();
-	private PanneauPause panneauPause= new PanneauPause();
+	private PanneauPause panneauPause = new PanneauPause();
 	
     private double largeur;
     private double hauteur;
@@ -58,6 +60,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         contenu.addMouseListener(this);
         contenu.addMouseMotionListener(this);
         contenu.addKeyListener(this);
+        panneauPause.addKeyListener(this);
         contenu.setLayout(cardLayout);
 
         this.addWindowListener(new WindowAdapter() {
@@ -108,6 +111,12 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
         
         ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), 50);
+
+        // Ajout du keyListener aux widgets
+        for (JComponent j: panneauPause.obtenirComposants())
+            j.addKeyListener(this);
+        for (JComponent j: ((Dessiner) jeu).obtenirComposants())
+            j.addKeyListener(this);
         
     }
 
@@ -163,7 +172,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                    panneauPause.setVisible(true);
                 else
                     //cardLayout.show(contenu, scene);
-                    panneauPause.dispose();
+                    panneauPause.setVisible(false);
                 break;
             case ArrierePlan:
                 if (scene.equals("Jeu"))
@@ -272,6 +281,7 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
 
     @Override
     public void mousePressed(MouseEvent ev) {
+        requestFocus();
         if (scene != null && scene.equals("Jeu") && ((Dessiner)jeu).obtenirEtatMinijeuExtraction())
             controleur.majScoreExtraction(((Dessiner)jeu).obtenirScore());
         controleur.majStatutSouris(ev, true);

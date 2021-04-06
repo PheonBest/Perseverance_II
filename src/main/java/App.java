@@ -39,8 +39,8 @@ public class App
                 
                 //Compétences
                 List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
-                competences.add(new BoutonCercle(100, 200, 50, "Drone", donnees.getImagesSymboles().get("checkbox")));
-                competences.add(new BoutonCercle(100, 320, 50, "Scanner", donnees.getImagesSymboles().get("checkbox")));
+                competences.add(new BoutonCercle(100, 200, 50, "Grappin", donnees.getImagesSymboles().get(TypeSymbole.GRAPPIN.name())));
+                competences.add(new BoutonCercle(100, 320, 50, "Scanner", donnees.getImagesSymboles().get(TypeSymbole.SCANNER.name())));
                 donnees.majCompetences(competences);
                 donnees.notifierObserveur(TypeMisAJour.Competences);
                 }

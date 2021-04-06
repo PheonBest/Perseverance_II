@@ -13,7 +13,12 @@ import java.util.regex.Pattern;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.TexturePaint;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -37,7 +42,7 @@ public class Dessiner extends JPanel {
     private Robot joueur;
     private ControlPanel panneauDeControle;
     private BoutonMissions panneauMission;
-    private BoutonPause panneauPause;
+    private JButton panneauPause;
     private double zoom = 1.;
     private Point centreZoom = new Point(0,0);
     private boolean enJeu = false;
@@ -104,7 +109,15 @@ public class Dessiner extends JPanel {
             add(panneauDeControle);
             panneauMission = new BoutonMissions (625,10);
 			add(panneauMission);
-			panneauPause= new BoutonPause(625,60);
+			//panneauPause= new BoutonPause(625,60);
+            panneauPause = new JButton("PAUSE");
+            panneauPause.setBounds(625,60, 100, 50);
+            panneauPause.addActionListener(new AbstractAction("Pause") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    controleur.interactionClavier(KeyEvent.VK_ESCAPE);
+                }
+            });
 			add(panneauPause);
         }
         
@@ -155,24 +168,25 @@ public class Dessiner extends JPanel {
         Cellule[] voisins = {};
         if (joueur != null && rayonDeSelection > 0) {
             int[] caseJoueur = joueur.obtenirCase();
+            System.out.println(rayonDeSelection);
             voisins = Voisins.obtenirVoisins(cellules, caseJoueur[0], caseJoueur[1], rayonDeSelection);
         }
         // On dessine les cellules de la carte
-        int nombreCellulesVisibles = 0;
         for (int i=0; i < cellules.length; i++) {
             for (Cellule c: cellules[i]) {
                 if (c.estVisible(largeurEcran,hauteurEcran,zoom)) {
-                    nombreCellulesVisibles++;
 
                     // Si les cellules font partie des voisins du joueur, on les dessine en bleu
                     int j = 0;
                     while (j < voisins.length && voisins[j] != c)
                         j++;
                     if (j < voisins.length) {
-                        TypeCase oldType = c.obtenirType();
-                        c.majType(TypeCase.DESERT);
+                        //TypeCase oldType = c.obtenirType();
+                        //c.majType(TypeCase.DESERT);
+                        c.majSelectionne(true);
                         c.dessiner(g2d);
-                        c.majType(oldType);
+                        c.majSelectionne(false);
+                        //c.majType(oldType);
                     } else
                         c.dessiner(g2d);
 
@@ -533,5 +547,12 @@ public class Dessiner extends JPanel {
     }
     public void majArrierePlan(ArrierePlan arrierePlan) {
         this.arrierePlan = arrierePlan;
+    }
+    public LinkedList<JComponent> obtenirComposants() {
+        LinkedList<JComponent> composants = new LinkedList<JComponent>();
+        composants.add(panneauPause);
+        composants.add(panneauMission.obtenirBouton());
+        composants.add(panneauDeControle.obtenirBouton());
+        return composants;
     }
 }
