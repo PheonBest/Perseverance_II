@@ -25,6 +25,7 @@ public class Options {
     public static final double USURE_PAR_KM = 0.1;
     public static final int USURE_PAR_UTILISATION = 30; // bras, capteurs
     public static final int CHANCE_DEGRADATION = 1; // en %
+    public static final int USURE_PAR_UTILISATION = 30;
     public static final int PANNES_MAX = 2;
     
     // Animation robot

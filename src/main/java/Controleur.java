@@ -536,7 +536,7 @@ public class Controleur {
                                                 c.majType(type);
                                         }
                                         if (donnees.obtenirDerniereCaseSymbole() != null) {
-                                            final Image symbole = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().obtenirImage();
+                                            final Image symbole = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().image;
                                             if (symbole != null) {
                                                 int taillePinceau = 1;
                                                 if (donnees.obtenirDernierBouton() != null)
