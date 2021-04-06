@@ -185,7 +185,7 @@ public class Robot extends Avatar {
         }
     }
     
-    public void usureBras(){
+    public void usureBras(double nbKm){
         // définition du tiers d'usure pour adapter les voyants des composants à leur usure en fonction d'un facteur chance
         double r3u = (Options.USURE_MAX-Options.USURE_MIN)/3.0;
         int chance;
@@ -197,7 +197,7 @@ public class Robot extends Avatar {
             if (bras[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION) bras[i].degraderC();
         }
     }
-    public void usureCapteurs(){
+    public void usureCapteurs(double nbKm){
          // définition du tiers d'usure pour adapter les voyants des composants à leur usure en fonction d'un facteur chance
         double r3u = (Options.USURE_MAX-Options.USURE_MIN)/3.0;
         int chance;
