@@ -2,10 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class BoutonPause extends JPanel {
+public class BoutonPause extends JPanel implements ActionListener {
 	private int lx = 100;
 	private int ly = 50;
 	private JButton pause;
+	private PanneauPause panneauPause;
 	
 	public BoutonPause(int x0, int y0){
         super();
@@ -17,7 +18,12 @@ public class BoutonPause extends JPanel {
         pause.setLocation(0,0);
         pause.setSize(100,50);
         pause.setBackground(Color.red);
+        pause.addActionListener(this);
         this.add(pause);
+    }
+    
+    public void actionPerformed(ActionEvent e){
+        panneauPause = new PanneauPause();
     }
 	
 }
