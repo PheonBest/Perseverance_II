@@ -22,7 +22,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 	public PanneauPause(){
 		super();
         setLayout(null);
-        setSize(largeur,hauteur);
+        setSize(lx,ly+40);
         setLocation(x0,y0);
         setLayout(null);
         
