@@ -15,15 +15,14 @@ public class Options {
     // Paramètres du robot
     public static final int BATTERIE_MAX = 100;
     public static final int BATTERIE_MIN = 0;
-    public static final double CONSO_BATTERIE_PAR_KM = 0.001; // en %/Km 
-    public static final double KM_PAR_PIXELS = 0.1;
+    public static final double CONSO_BATTERIE_PAR_KM = 0.001; // en %/Km
+    public static final double KM_PAR_PIXELS = 0.1; 
     public static final int ALERTE_MAX = 2;
     public static final int ALERTE_MOY = 1;
     public static final int ALERTE_MIN = 0;
     public static final int USURE_MIN = 0;
     public static final int USURE_MAX = 100;
-    public static final double USURE_PAR_KM = 0.1;
-    public static final int USURE_PAR_UTILISATION = 30; // bras, capteurs
+    public static final double USURE_PAR_KM = 0.001;
     public static final int CHANCE_DEGRADATION = 1; // en %
     public static final int PANNES_MAX = 2;
     

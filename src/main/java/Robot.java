@@ -133,9 +133,9 @@ public class Robot extends Avatar {
         int sj=0;
         int sb=0;
         int sc=0;
-        for(int i=0; i<jambes.length; i++){ sj += jambes[i].voyant.getEtat() +1;}
-        for(int i=0; i<bras.length; i++){sb += bras[i].voyant.getEtat() +1;}
-        for(int i=0; i<capteurs.length; i++){sc += capteurs[i].voyant.getEtat() +1;}
+        for(int i=0; i<jambes.length; i++){ sj += jambes[i].voyant.getEtat();}
+        for(int i=0; i<bras.length; i++){sb += bras[i].voyant.getEtat();}
+        for(int i=0; i<capteurs.length; i++){sc += capteurs[i].voyant.getEtat();}
         
         // On définit le 1/3 de la somme des états d'une liste de composants
         double rj = (sEtatJambes/((double)(Options.ALERTE_MAX-Options.ALERTE_MIN+1)));
@@ -186,28 +186,10 @@ public class Robot extends Avatar {
     }
     
     public void usureBras(double nbKm){
-        // définition du tiers d'usure pour adapter les voyants des composants à leur usure en fonction d'un facteur chance
-        double r3u = (Options.USURE_MAX-Options.USURE_MIN)/3.0;
-        int chance;
-        // à partir d'une certaine usure, les bras risquent de disfonctionner ( indépendamment entre eux)
-        for(int i=0; i<jambes.length; i++){
-            bras[i].setUsure(bras[i].getUsure() + Options.USURE_PAR_UTILISATION);
-            chance = (int)(Math.random()*100 + 1);
-        
-            if (bras[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION) bras[i].degraderC();
-        }
+         // TODO 
     }
     public void usureCapteurs(double nbKm){
-         // définition du tiers d'usure pour adapter les voyants des composants à leur usure en fonction d'un facteur chance
-        double r3u = (Options.USURE_MAX-Options.USURE_MIN)/3.0;
-        int chance;
-        // à partir d'une certaine usure, les capteurs risquent de disfonctionner ( indépendamment entre eux)
-        for(int i=0; i<capteurs.length; i++){
-            capteurs[i].setUsure(capteurs[i].getUsure() + Options.USURE_PAR_UTILISATION);
-            chance = (int)(Math.random()*100 + 1);
-        
-            if (capteurs[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION)capteurs[i].degraderC();
-        }
+         // TODO 
     }
     
     public boolean isDead(){
@@ -309,6 +291,8 @@ public class Robot extends Avatar {
                 derniereCase = new int[] {d[2],d[3]};
                 actualiseCptKm(new Dimension(d[0], d[1]));
                 usureJambes(comptKm);
+                // usure Bras
+                // usure Capteurs
                 actualiseBatterie();
                 actualiseVP();
                 but.removeFirst();

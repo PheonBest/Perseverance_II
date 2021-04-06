@@ -49,7 +49,6 @@ public class Controleur {
     private void extraire(int ligne, int colonne) {
         donnees.majEtatMinijeuExtraction(true);
         donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
-        // + user les bras
     }
 
     // Effet quand on utilise le scanner sur une case qui contient un symbole
@@ -58,7 +57,7 @@ public class Controleur {
         donnees.majTempsAvantChrono((int)(Math.random()*((7000-3000)+1)+3000));
         donnees.majEtatMinijeuLaser(true);
         donnees.notifierObserveur(TypeMisAJour.MinijeuLaser);
-        // user les jambes
+        
     }
 
     // Effet quand on marche sur une case
