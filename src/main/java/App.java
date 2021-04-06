@@ -22,7 +22,8 @@ public class App
      * les événements non gérés sont sauvegardés et l'interface
      * Utilisateur ne répond plus.
      */
-    public static void main( String[] args ){
+    public static void main( String[] args )
+    {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -47,11 +48,20 @@ public class App
         
         
         //test
-        /*LinkedList <Symbole> listeVictoire = new LinkedList <Symbole> ();
-		Victoire maFrameVictoire = new Victoire(listeVictoire);
-		maFrameVictoire.setVisible(true);*/
-        
-		/*
+		/*List<String[]> dataLines = new ArrayList<>();
+		dataLines.add(new String[]{ "Terre", "Sable", "Eau","Terre" });
+		dataLines.add(new String[]{ "Sable", "Terre", "Eau", "Pierre" });
+		CSV print = new CSV(dataLines);
+		try {print.givenDataArray_whenConvertToCSV_thenOutputCreated();
+			}catch(Exception e){e.printStackTrace();}*/
+        /*
+		String [][] carte = {{"Terre;coucou", "Sable;null", "Pierre;null"}, {"Sable;vent","Eau;null", "Sable;bacterie"}, {"Terre;null", "Eau;null","Sable;null"}};
+		CSV c1 = new CSV(carte);
+		
+		String videtexture = "type;symbole";
+		String [] ds = videtexture.split(";");
+		System.out.println(ds[0]+"  "+ds[1]);
+		
 
         Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
         HashMap<String, InputStream> cartes;

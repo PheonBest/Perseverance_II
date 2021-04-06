@@ -98,32 +98,18 @@ public class CSV {
 
 	public static Cellule[][] dataLines (List<List<String>> liste){ //methode surchargée qui change la liste de listes en un tableau 2D
 		Cellule[][] carte = new Cellule[liste.size()][];
-		TypeCase type = null;
-		TypeSymbole symbole = null;
 		for(int i=0;i<liste.size();i++){
-			Cellule[] cellules = new Cellule[liste.get(i).size()];
+			Cellule[] s = new Cellule[liste.get(i).size()];
 			for(int j=0;j<liste.get(i).size();j++){
 				String [] ds = liste.get(i).get(j).split(";");
-				symbole = null;
-				type = null;
 				for (TypeCase t : TypeCase.values()) {
-					if (t.name().equals(ds[0])) {
-						type = t;
-						break;
-					}
-				}
-				for(TypeSymbole s : TypeSymbole.values()){
-					if(s.name().equals(ds[1])) {
-						symbole = s;
-						break;
-					}
+                    if (t.name().equals(ds[0])) {
+							s[j]=new Cellule (t, i, j);
+                        break;
+                    }
                 }
-				if (symbole != null)
-					cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, true, new Symbole(symbole, null, true));
-				else
-					cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, true, null);
 			}
-			carte[i]=cellules;
+			carte[i]=s;
 		}
 		return carte;
 	}
