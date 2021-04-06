@@ -33,8 +33,9 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     private JPanel chargement = new Chargement();
     private JPanel editeur;
     private JPanel jeu;
-    private JPanel options = new JPanel();
-
+   // private JPanel options = new JPanel();
+	private PanneauPause panneauPause= new PanneauPause();
+	
     private double largeur;
     private double hauteur;
 
@@ -69,15 +70,15 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         this.setSize(largeur, hauteur);
         this.setLocationRelativeTo(null);
 
-        options.setBounds(100,100,300,300);
-        options.setBackground(Color.RED);
+       // options.setBounds(100,100,300,300);
+       // options.setBackground(Color.RED);
         
         contenu.setLayout(cardLayout);
         contenu.add(modeDeJeu, "Choix du mode");
         contenu.add(jeu, "Jeu");
         contenu.add(chargement, "Chargement");
         contenu.add(editeur, "Editeur de carte");
-        contenu.add(options, "Options");
+        //contenu.add(options, "Options");
         jeu.setBackground(Color.DARK_GRAY);
 
         
@@ -158,9 +159,11 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 break;
             case Options:
                 if ((boolean)nouveau)
-                    cardLayout.show(contenu, "Options");
+                   // cardLayout.show(contenu, "Options");
+                   panneauPause.setVisible(true);
                 else
-                    cardLayout.show(contenu, scene);
+                    //cardLayout.show(contenu, scene);
+                    panneauPause.dispose();
                 break;
             case ArrierePlan:
                 if (scene.equals("Jeu"))
