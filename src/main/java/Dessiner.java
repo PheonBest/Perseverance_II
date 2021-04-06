@@ -94,6 +94,7 @@ public class Dessiner extends JPanel {
     private long tempsDebut = 0;
     private long tempsChrono = 0;
     private long tempsReaction = 0;
+   
 
     public Dessiner(Controleur controleur, boolean affichagePanneauDeControle){
         this.controleur = controleur;
@@ -119,6 +120,7 @@ public class Dessiner extends JPanel {
         hauteurRectangleLaser = (int) (hauteurEcran/MINIJEU_LASER_HAUTEUR_ECRAN);
         coinMinijeuX = (int)(largeurEcran/2.-largeurRectangle/2.); // Coordonnée X du coin en haut à gauche du rectangle
         coinMinijeuY = (int)(hauteurEcran/2.-hauteurRectangle/2.); // Coordonnée Y du coin en haut à gauche du rectangle
+  
     }
 
     public void paintComponent(Graphics g) {

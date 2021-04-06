@@ -7,6 +7,8 @@ public class BoutonPause extends JPanel implements ActionListener {
 	private int ly = 50;
 	private JButton pause;
 	private PanneauPause panneauPause;
+	private int largeur;
+	private int hauteur;
 	
 	public BoutonPause(int x0, int y0){
         super();
@@ -28,6 +30,13 @@ public class BoutonPause extends JPanel implements ActionListener {
        panneauPause.setVisible(true);
         //panneauPause.showDialog();
     }
+    
+     public void majTaille(int largeur, int hauteur){
+			this.setSize(largeur,hauteur);
+			this.largeur=largeur;
+			this.hauteur=hauteur;
+		
+	}
 	
 }
 
