@@ -14,11 +14,6 @@ public class Cellule extends Polygon implements Dessin {
     private TypeCase type;
     private Color couleur;
     private Symbole symbole;
-<<<<<<< Updated upstream
-=======
-    private boolean caseVisible;
-    private boolean symboleVisible;
->>>>>>> Stashed changes
     
     //Position dans la matrice de la carte            
     private int ligne;
@@ -28,12 +23,8 @@ public class Cellule extends Polygon implements Dessin {
     private double hauteur;
     private double taille;
     private boolean sourisDessus = false;
-<<<<<<< Updated upstream
 
     private boolean estDecouverte = false;
-=======
-    
->>>>>>> Stashed changes
      
     //////////////////////////////////////////////////////////////////// Constructeurs 
     
@@ -42,16 +33,11 @@ public class Cellule extends Polygon implements Dessin {
      * stocker dans des tableaux x et y, en fonction de leurs ligne et de leur colonne
      * */
     
-<<<<<<< Updated upstream
     public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase, boolean estDecouverte, Symbole symbole){
 
         this.taille = taille;
         this.symbole = symbole;
         this.estDecouverte = estDecouverte;
-=======
-    public Cellule(TypeCase unType, Symbole unSymbole, boolean caseVis, boolean symboleVis, int uneLigne, int uneColonne, double taille, int espaceInterCase){
-        
->>>>>>> Stashed changes
         //Position dans la matrice de la carte
         ligne = uneLigne;
         colonne = uneColonne;
@@ -92,7 +78,6 @@ public class Cellule extends Polygon implements Dessin {
         // Déplacement du symbole
     }
 
-<<<<<<< Updated upstream
     public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase, boolean estDecouverte){
         this(unType, uneLigne, uneColonne, taille, espaceInterCase, estDecouverte, null);
     }
@@ -103,19 +88,7 @@ public class Cellule extends Polygon implements Dessin {
 
     public Cellule(int uneLigne, int uneColonne){
         this(TypeCase.VIDE, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE, false);
-=======
-    public Cellule(TypeCase type, Symbole unSymbole, boolean caseVis, boolean symboleVis, int uneLigne, int uneColonne){
-        this(type, unSymbole, caseVis, symboleVis, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
     }
-
-    public Cellule(Symbole unSymbole, boolean caseVis, boolean symboleVis, int uneLigne, int uneColonne){
-        this(TypeCase.VIDE, unSymbole, FALSE, symboleVis, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
->>>>>>> Stashed changes
-    }
-    
-    public Cellule(int uneLigne, int uneColonne){
-		this(TypeCase.VIDE, new Symbole(TypeSymbole.AUCUN,, caseVis, symboleVis, uneLigne, uneColonne, 1, Options.ESPACE_INTER_CASE);
-	}
     
     public void dessiner(Graphics g, double agrandissement) {
         // On dessine le polygone
@@ -150,42 +123,42 @@ public class Cellule extends Polygon implements Dessin {
             translate((int)(COIN_EN_HAUT_A_GAUCHE[0]), (int)(COIN_EN_HAUT_A_GAUCHE[1]));
             g2d.setTransform(ANCIENNE_TRANSFORMATION);
 
-            if (symbole != null && symbole.obtenirImage() != null) {
-                Image imageAgrandie = TailleImage.resizeImage(symbole.obtenirImage(), (int)(symbole.obtenirImage().getWidth(null)*taille*facteurDeTaille), (int)(symbole.obtenirImage().getHeight(null)*taille*facteurDeTaille), true);
+            if (symbole != null && symbole.image != null) {
+                Image imageAgrandie = TailleImage.resizeImage(symbole.image, (int)(symbole.image.getWidth(null)*taille*facteurDeTaille), (int)(symbole.image.getHeight(null)*taille*facteurDeTaille), true);
                 g2d.drawImage(imageAgrandie, (int)(CENTRE_CASE[0] - imageAgrandie.getWidth(null)/2), (int)(CENTRE_CASE[1] - imageAgrandie.getHeight(null)/2), null);
                 /*
-                g2d.drawImage(  symbole.obtenirImage(),
-                                (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)*agrandissement*taille/2),
-                                (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)*agrandissement*taille/2),
-                                (int)(CENTRE_CASE[0] + symbole.obtenirImage().getWidth(null)*agrandissement*taille/2),
-                                (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)*agrandissement*taille/2),
+                g2d.drawImage(  symbole.image,
+                                (int)(CENTRE_CASE[0] - symbole.image.getWidth(null)*agrandissement*taille/2),
+                                (int)(CENTRE_CASE[1] - symbole.image.getHeight(null)*agrandissement*taille/2),
+                                (int)(CENTRE_CASE[0] + symbole.image.getWidth(null)*agrandissement*taille/2),
+                                (int)(CENTRE_CASE[1] + symbole.image.getHeight(null)*agrandissement*taille/2),
 
-                                (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2),
-                                (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2),
-                                (int)(CENTRE_CASE[0] + symbole.obtenirImage().getWidth(null)/2),
-                                (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)/2),
+                                (int)(CENTRE_CASE[0] - symbole.image.getWidth(null)/2),
+                                (int)(CENTRE_CASE[1] - symbole.image.getHeight(null)/2),
+                                (int)(CENTRE_CASE[0] + symbole.image.getWidth(null)/2),
+                                (int)(CENTRE_CASE[1] + symbole.image.getHeight(null)/2),
                                 null);
                 */
             }
         } else {
             g2d.fillPolygon(this);
-            if (symbole != null && symbole.obtenirImage() != null) {
+            if (symbole != null && symbole.image != null) {
                 if (taille == 1)
-                    g2d.drawImage(symbole.obtenirImage(), (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2), (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2), null);
+                    g2d.drawImage(symbole.image, (int)(CENTRE_CASE[0] - symbole.image.getWidth(null)/2), (int)(CENTRE_CASE[1] - symbole.image.getHeight(null)/2), null);
                 else {
-                    Image imageAgrandie = TailleImage.resizeImage(symbole.obtenirImage(), (int)(symbole.obtenirImage().getWidth(null)*taille), (int)(symbole.obtenirImage().getHeight(null)*taille), true);
+                    Image imageAgrandie = TailleImage.resizeImage(symbole.image, (int)(symbole.image.getWidth(null)*taille), (int)(symbole.image.getHeight(null)*taille), true);
                     g2d.drawImage(imageAgrandie, (int)(CENTRE_CASE[0] - imageAgrandie.getWidth(null)/2), (int)(CENTRE_CASE[1] - imageAgrandie.getHeight(null)/2), null);
                     /*
-                    g2d.drawImage(  symbole.obtenirImage(),
-                                    (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)*taille/2),
-                                    (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)*taille/2),
-                                    (int)(CENTRE_CASE[0] + symbole.obtenirImage().getWidth(null)*taille/2),
-                                    (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)*taille/2),
+                    g2d.drawImage(  symbole.image,
+                                    (int)(CENTRE_CASE[0] - symbole.image.getWidth(null)*taille/2),
+                                    (int)(CENTRE_CASE[1] - symbole.image.getHeight(null)*taille/2),
+                                    (int)(CENTRE_CASE[0] + symbole.image.getWidth(null)*taille/2),
+                                    (int)(CENTRE_CASE[1] + symbole.image.getHeight(null)*taille/2),
 
-                                    (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2),
-                                    (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2),
-                                    (int)(CENTRE_CASE[0] + symbole.obtenirImage().getWidth(null)/2),
-                                    (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)/2),
+                                    (int)(CENTRE_CASE[0] - symbole.image.getWidth(null)/2),
+                                    (int)(CENTRE_CASE[1] - symbole.image.getHeight(null)/2),
+                                    (int)(CENTRE_CASE[0] + symbole.image.getWidth(null)/2),
+                                    (int)(CENTRE_CASE[1] + symbole.image.getHeight(null)/2),
                                     null);
                     */
                 }
@@ -276,7 +249,10 @@ public class Cellule extends Polygon implements Dessin {
     }
 
     public String toString() {
-        return type.name()+";"+symbole.type.name()+";"+caseVisible+";"+symboleVisible;
+        if (symbole == null)
+            return type.name()+";null;"+estDecouverte+";false";
+        else
+            return type.name()+";"+symbole.type.name()+";"+estDecouverte+";"+symbole.estVisible;
     }
 
     public boolean estDecouverte() {
@@ -287,12 +263,16 @@ public class Cellule extends Polygon implements Dessin {
     }
 
     public void majEstIdentifie(boolean estIdentifie) {
-        symbole.majEstVisible(estIdentifie);
+        symbole.estVisible = estIdentifie;
     }
 
     public Symbole obtenirSymbole() {
         if (symbole == null)
             symbole = new Symbole();
         return symbole;
+    }
+
+    public void majSymbole(Symbole symbole) {
+        this.symbole = symbole;
     }
 }

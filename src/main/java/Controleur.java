@@ -535,17 +535,15 @@ public class Controleur {
                                                 c.majType(type);
                                         }
                                         if (donnees.obtenirDerniereCaseSymbole() != null) {
-                                            final Image symbole = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().obtenirImage();
-                                            if (symbole != null) {
+                                            final Image image = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().image;
+                                            final TypeSymbole symbole = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().type;
+                                            if (image != null) {
                                                 int taillePinceau = 1;
                                                 if (donnees.obtenirDernierBouton() != null)
                                                     taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
                                                 Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
-                                                for (Cellule c: voisins) {
-                                                    c.obtenirSymbole().majSymbole(symbole);
-                                                    if (!c.obtenirSymbole().obtenirEstVisible())
-                                                        c.obtenirSymbole().majEstVisible(true);
-                                                }
+                                                for (Cellule c: voisins)
+                                                    c.majSymbole(new Symbole(symbole, image, true));
                                             }
                                         } 
                                     }
