@@ -37,47 +37,6 @@ import java.awt.Image;
  */
 public class ObtenirRessources{
 
-    public static List<String> getFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
-        List<String> filenames = new ArrayList<>();
-        URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
-        if (url != null) {
-            if (url.getProtocol().equals("file")) {
-                File file = Paths.get(url.toURI()).toFile();
-                if (file != null) {
-                    File[] files = file.listFiles();
-                    if (files != null) {
-                        for (File filename : files) {
-                            final boolean accept = pattern.matcher(filename.toString()).matches();
-                            if(accept){
-                                filenames.add(filename.toString());
-                            }
-                        }
-                    }
-                }
-            } else if (url.getProtocol().equals("jar")) {
-                String dirname = directoryName + "/";
-                String path = url.getPath();
-                String jarPath = path.substring(5, path.indexOf("!"));
-                try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name()))) {
-                    Enumeration<JarEntry> entries = jar.entries();
-                    while (entries.hasMoreElements()) {
-                        JarEntry entry = entries.nextElement();
-                        String name = entry.getName();
-                        if (!dirname.equals(name)) {
-                        //if (name.startsWith(dirname) && !dirname.equals(name)) {
-                            URL resource = Thread.currentThread().getContextClassLoader().getResource(name);
-                            final boolean accept = pattern.matcher(resource.toString()).matches();
-                            if(accept){
-                                filenames.add(resource.toString());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return filenames;
-    }
-
     public static HashMap<String, AudioInputStream> getAudioAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
         HashMap<String, InputStream> readers = getStreamsAndFilenames(pattern, directoryName);
         HashMap<String, AudioInputStream> audio = new HashMap<String, AudioInputStream>();
@@ -98,9 +57,8 @@ public class ObtenirRessources{
     public static HashMap<String, Image> getImagesAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
         HashMap<String, InputStream> readers = getStreamsAndFilenames(pattern, directoryName);
         HashMap<String, Image> images = new HashMap<String, Image>();
-        for(Map.Entry<String, InputStream> entry : readers.entrySet()) {
+        for(Map.Entry<String, InputStream> entry : readers.entrySet())
             images.put(entry.getKey(), ImageIO.read(entry.getValue()));
-        }
         return images;
     }
 
@@ -112,7 +70,6 @@ public class ObtenirRessources{
         URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
         if (url == null)
             url = new File(directoryName).toURI().toURL();
-        
         if (url != null) {
             if (url.getProtocol().equals("file")) {
                 final File file = Paths.get(url.toURI()).toFile();
@@ -175,6 +132,87 @@ public class ObtenirRessources{
         return streams;
     }
 
+    // Mettre un fichier audio en cache:
+    // Par Mike Clark: https://stackoverflow.com/questions/9999961/song-plays-first-time-but-does-not-play-once-stopped-clip-in-java
+    public static AudioInputStream createReusableAudioInputStream(AudioInputStream ais) 
+        throws IOException, UnsupportedAudioFileException
+    {
+        try
+        {
+            // Pour réutiliser un AudioInputStream en appellant reset(),
+            // l'inputStream sous-jacent doit supporter reset().
+
+            // Donc on transforme l'AudioInputStream en ByteArrayInputStream,
+            // car ce stream supporte la fonction reset().
+
+            // On créée alors un nouvel AudioInputStream à partir du ByteArrayInputStream.
+            // Le nouvel AudioInputStream supporte alors le reset().
+            byte[] buffer = new byte[1024 * 32];
+            int read = 0;
+            ByteArrayOutputStream baos = 
+                new ByteArrayOutputStream(buffer.length);
+            while ((read = ais.read(buffer, 0, buffer.length)) != -1)
+            {
+                baos.write(buffer, 0, read);
+            }
+            AudioInputStream reusableAis = 
+                new AudioInputStream(
+                        new ByteArrayInputStream(baos.toByteArray()),
+                        ais.getFormat(),
+                        AudioSystem.NOT_SPECIFIED);
+            return reusableAis;
+        }
+        finally
+        {
+            if (ais != null)
+            {
+                ais.close();
+            }
+        }
+    }
+
+    /*
+    public static List<String> getFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
+        List<String> filenames = new ArrayList<>();
+        URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
+        if (url != null) {
+            if (url.getProtocol().equals("file")) {
+                File file = Paths.get(url.toURI()).toFile();
+                if (file != null) {
+                    File[] files = file.listFiles();
+                    if (files != null) {
+                        for (File filename : files) {
+                            final boolean accept = pattern.matcher(filename.toString()).matches();
+                            if(accept){
+                                filenames.add(filename.toString());
+                            }
+                        }
+                    }
+                }
+            } else if (url.getProtocol().equals("jar")) {
+                String dirname = directoryName + "/";
+                String path = url.getPath();
+                String jarPath = path.substring(5, path.indexOf("!"));
+                try (JarFile jar = new JarFile(URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name()))) {
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String name = entry.getName();
+                        if (!dirname.equals(name)) {
+                        //if (name.startsWith(dirname) && !dirname.equals(name)) {
+                            URL resource = Thread.currentThread().getContextClassLoader().getResource(name);
+                            final boolean accept = pattern.matcher(resource.toString()).matches();
+                            if(accept){
+                                filenames.add(resource.toString());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return filenames;
+    }
+
     public static List<Image> getImages(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
         List<Image> images = new ArrayList<>();
         
@@ -223,43 +261,5 @@ public class ObtenirRessources{
         }
         return images;
     }
-
-    // Mettre un fichier audio en cache:
-    // Par Mike Clark: https://stackoverflow.com/questions/9999961/song-plays-first-time-but-does-not-play-once-stopped-clip-in-java
-    public static AudioInputStream createReusableAudioInputStream(AudioInputStream ais) 
-        throws IOException, UnsupportedAudioFileException
-    {
-        try
-        {
-            // Pour réutiliser un AudioInputStream en appellant reset(),
-            // l'inputStream sous-jacent doit supporter reset().
-
-            // Donc on transforme l'AudioInputStream en ByteArrayInputStream,
-            // car ce stream supporte la fonction reset().
-
-            // On créée alors un nouvel AudioInputStream à partir du ByteArrayInputStream.
-            // Le nouvel AudioInputStream supporte alors le reset().
-            byte[] buffer = new byte[1024 * 32];
-            int read = 0;
-            ByteArrayOutputStream baos = 
-                new ByteArrayOutputStream(buffer.length);
-            while ((read = ais.read(buffer, 0, buffer.length)) != -1)
-            {
-                baos.write(buffer, 0, read);
-            }
-            AudioInputStream reusableAis = 
-                new AudioInputStream(
-                        new ByteArrayInputStream(baos.toByteArray()),
-                        ais.getFormat(),
-                        AudioSystem.NOT_SPECIFIED);
-            return reusableAis;
-        }
-        finally
-        {
-            if (ais != null)
-            {
-                ais.close();
-            }
-        }
-    }
+    */
 }  

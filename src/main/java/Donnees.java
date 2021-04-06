@@ -51,7 +51,7 @@ public class Donnees implements Observable {
     private HashMap<String, Image> imagesSymboles;
 
     private int avancementChargement;
-    private Point positionFenetre;
+    private Point borduresFenetres;
 
     // Lecteurs de sons
     private Son lecteurMusique;
@@ -310,12 +310,12 @@ public class Donnees implements Observable {
         return this.statutSouris;
     }
 
-    public void majPositionFenetre(Point location) {
-        this.positionFenetre = location;
+    public void majBorduresFenetre(Point location) {
+        this.borduresFenetres = location;
     }
 
-    public Point obtenirPositionFenetre() {
-        return positionFenetre;
+    public Point obtenirBorduresFenetre() {
+        return borduresFenetres;
     }
 
     public void majImagesSymboles(HashMap<String, Image> imagesSymboles) {

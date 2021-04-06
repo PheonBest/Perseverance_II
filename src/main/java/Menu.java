@@ -62,6 +62,7 @@ public class Menu extends JPanel {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        
         if (boutonsCercle != null) {
             for (BoutonCercle b: boutonsCercle) {
                 if (b != null)
