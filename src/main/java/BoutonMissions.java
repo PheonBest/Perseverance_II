@@ -22,10 +22,14 @@ public class BoutonMissions extends JPanel implements ActionListener {
         mission.setBackground(Color.white);
         mission.addActionListener(this);
         this.add(mission);
+        
+        this.panneauMission = new Missions(250,0);
     }
-    
+        
     public void actionPerformed(ActionEvent e){
-        panneauMission = new Missions(250,0);
+		if (e.getSource()==mission){
+			panneauMission.setVisible(true);
+		}
     }
     
 	public void majTaille(int largeur, int hauteur){

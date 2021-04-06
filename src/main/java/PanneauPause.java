@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class PanneauPause extends JFrame {
+public class PanneauPause extends JDialog {
 	private int lx=600;
 	private int ly=600;
 	private int x0=250;
@@ -15,8 +15,7 @@ public class PanneauPause extends JFrame {
         setLayout(null);
         setSize(lx,ly);
         setLocation(x0,y0);
-        setVisible(true);
-        this.setLayout(null);
+        setLayout(null);
         setTitle("panneau pause");
         
         rouge= new JPanel();
@@ -32,7 +31,22 @@ public class PanneauPause extends JFrame {
 		
 	
 		rouge.add(monImage);
+		
+		this.setModal(true);
 	}
+/*
+	public void showDialog() {
+
+    JDialog dialog = new JDialog(this, Dialog.ModalityType.APPLICATION_MODAL);
+    //OR, you can do the following...
+    //JDialog dialog = new JDialog();
+    //dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+	dialog.setLayout(null);
+    dialog.setBounds(350, 350, 600, 600);
+    dialog.setVisible(true);
+    setTitle("panneau pause");
+    
+	}*/
 }
 
 

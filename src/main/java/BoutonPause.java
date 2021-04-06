@@ -20,10 +20,13 @@ public class BoutonPause extends JPanel implements ActionListener {
         pause.setBackground(Color.red);
         pause.addActionListener(this);
         this.add(pause);
+        
+        panneauPause = new PanneauPause();
     }
     
     public void actionPerformed(ActionEvent e){
-        panneauPause = new PanneauPause();
+       panneauPause.setVisible(true);
+        //panneauPause.showDialog();
     }
 	
 }

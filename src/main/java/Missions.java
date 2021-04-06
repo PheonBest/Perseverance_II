@@ -20,7 +20,7 @@ public class Missions extends JFrame {
         setLocation(x,y);
         setSize(lx,ly);
         setTitle("MISSIONS");
-        this.setVisible(true);
+        //this.setVisible(true);
 	}
 	
 }
