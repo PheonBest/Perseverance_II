@@ -898,6 +898,12 @@ public class Controleur {
 				return donnees.getImagesSymboles().get("RAVIN");
 			case INCONNUE:
 				return donnees.getImagesSymboles().get("INCONNUE");
+			case BRAS:
+				return donnees.getImagesSymboles().get("BRAS");
+			case JAMBE:
+				return donnees.getImagesSymboles().get("JAMBE");
+			case CAPTEUR:
+				return donnees.getImagesSymboles().get("CAPTEUR");
 			default:
 				return null;
 		

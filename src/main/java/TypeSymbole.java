@@ -5,7 +5,10 @@ public enum TypeSymbole{
 	RAVIN,
 	SCANNER,
 	GRAPPIN,
-	INCONNUE
+	INCONNUE,
+	JAMBE,
+	BRAS,
+	CAPTEUR
 	
 }
 
