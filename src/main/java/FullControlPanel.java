@@ -155,7 +155,7 @@ public class FullControlPanel extends JFrame implements ActionListener{
         nbKmTot.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         stat.add(nbKmTot);
         
-        nbCasesExp = new JLabel("Exploration de planète : 0 %");
+        nbCasesExp = new JLabel("Exploration de planète : "+joueur.obtenirPExploration()+" %");
         nbCasesExp.setLayout(null);
         nbCasesExp.setLocation(30,80);
         nbCasesExp.setSize(400,30);
@@ -189,6 +189,10 @@ public class FullControlPanel extends JFrame implements ActionListener{
                 titre.setText("Donnnées en temps réel ...");
                 break;
         }
+        nbRecharges.setText("Nombre de recharges : "+this.joueur.getNbRecharges());
+        nivBat.setText("Niveau : "+this.joueur.getBatterie()+" %");
+        nbKmTot.setText("Distance totale parcourue : "+(int)(this.joueur.getKmParcourus())+" km");
+        nbCasesExp.setText("Exploration de planète : "+joueur.obtenirPExploration()+" %");
         this.repaint();
     }
     

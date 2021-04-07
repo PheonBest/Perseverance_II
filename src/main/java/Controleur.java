@@ -112,8 +112,10 @@ public class Controleur {
         placerJoueur(0,0);
         Cellule[] voisins = Voisins.obtenirVoisins(donnees.obtenirCellules(), donnees.obtenirJoueur().obtenirDerniereCase()[0], donnees.obtenirJoueur().obtenirDerniereCase()[1], Options.RAYON_DECOUVERTE);
         for (int i=0; i < voisins.length; i++) {
-            if (!voisins[i].estDecouverte())
+            if (!voisins[i].estDecouverte()){
                 voisins[i].majEstDecouverte(true);
+                donnees.obtenirJoueur().majCasesExplorees();
+            }
         }
 
         /*
@@ -172,6 +174,7 @@ public class Controleur {
                     for (int i=0; i < voisins.length; i++) {
                         if (!voisins[i].estDecouverte())
                             voisins[i].majEstDecouverte(true);
+                            donnees.obtenirJoueur().majCasesExplorees();
                     }
                 }
                     

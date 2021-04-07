@@ -13,12 +13,14 @@ public class Robot extends Avatar {
     private int nbRecharges;
     // 3 voyants principaux: Jambes, Bras Mécatro, Capteurs
     private Voyants[] voyantsPrincipaux = new Voyants[3]; 
-    // Plusieurs éléments désignés par ces voyants
+    // Composants
     private ComposantRobot[] jambes = new ComposantRobot[2];
     private ComposantRobot[] bras = new ComposantRobot[2];
     private ComposantRobot[] capteurs = new ComposantRobot[3];
+    // Statistiques
     private double kmTot;
     private double comptKm;
+    private int nbCasesExplorees = 0;  
     private int[] derniereCase = null;
     
     // Trajectoire
@@ -356,5 +358,18 @@ public class Robot extends Avatar {
 
     public LinkedList<int[]> obtenirTrajectoire() {
         return but;
+    }
+    
+    public int obtenirCasesExplorees(){
+        return this.nbCasesExplorees;
+    }
+    
+    public void majCasesExplorees(){
+        int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
+        if(this.nbCasesExplorees>=0 && this.nbCasesExplorees<nbCasesTotales)this.nbCasesExplorees += 1;
+    }
+    public int obtenirPExploration(){
+        int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
+        return ((int)((((double)this.nbCasesExplorees)/((double)nbCasesTotales))*100));
     }
 }
