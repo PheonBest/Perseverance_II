@@ -5,5 +5,8 @@ public enum TypeCase{
     DESERT,
     SABLE_MOUVANTS,
     NEIGE,
-    FORET
+    FORET,
+    REPARATION_JAMBES,
+    REPARATION_BRAS,
+    REPARATION_CAPTEURS
 }

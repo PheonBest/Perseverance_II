@@ -130,9 +130,6 @@ public class FullControlPanel extends JFrame implements ActionListener{
         panneauVoyants.add(titreVoyant);
         
         // Panneaux des statistiques
-        this.imageP = imageP;
-        this.imageR = imageR;
-        
         ys = ypv + panneauVoyants.getHeight() + ecartY;
         
         stat = new JPanel();
@@ -161,6 +158,10 @@ public class FullControlPanel extends JFrame implements ActionListener{
         nbCasesExp.setSize(400,30);
         nbCasesExp.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         stat.add(nbCasesExp);
+        
+        // Images
+        this.imageP = imageP;
+        this.imageR = imageR;
         
         // add finaux
         cg.add(panneauBat);

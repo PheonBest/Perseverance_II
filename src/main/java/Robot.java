@@ -73,13 +73,18 @@ public class Robot extends Avatar {
     }
     
     //---------------------------------------------------------------------------------------------------- Setters et getters
-    
-    public Dimension getCoordonnees() {
-        return new Dimension(xFictif,yFictif);
-    }
-    
+
     public int getBatterie(){
         return this.batterie;
+    }
+    public void setBatterie(int nivBatterie){
+        if(nivBatterie <= Options.BATTERIE_MIN){
+            batterie = Options.BATTERIE_MIN;
+        }
+        else if(nivBatterie >= Options.BATTERIE_MAX){
+            batterie = Options.BATTERIE_MAX;
+        }
+        else batterie = nivBatterie;
     }
     public int getNbRecharges(){
         return this.nbRecharges;
@@ -88,7 +93,6 @@ public class Robot extends Avatar {
     public Voyants[] getVP(){
         return this.voyantsPrincipaux;
     }
-    
     public ComposantRobot[] getJambes(){
         return this.jambes;
     }
@@ -102,29 +106,72 @@ public class Robot extends Avatar {
     public double getKmParcourus(){
         return this.kmTot;
     }
-   
-    public void setBatterie(int nivBatterie){
-        if(nivBatterie <= Options.BATTERIE_MIN){
-            batterie = Options.BATTERIE_MIN;
-        }
-        else if(nivBatterie >= Options.BATTERIE_MAX){
-            batterie = Options.BATTERIE_MAX;
-        }
-        else batterie = nivBatterie;
-    }
-    
     public void setCompteurkm(int nb){
         if(nb>=0){
             this.comptKm = nb;
         }else this.comptKm=0;
     }
-    
     public void resetCompteurkm(){
         this.comptKm=0;
     }
     
+    public Dimension getCoordonnees() {
+        return new Dimension(xFictif,yFictif);
+    }
+    public int[] obtenirCoordonnees() {
+        return new int[]{xFictif, yFictif};
+    }
+    public LinkedList<int[]> obtenirTrajectoire() {
+        return but;
+    }
+    
+    public int[] obtenirCase() {
+        return new int[]{ligne, colonne};
+    }
+    public void majCase(int ligne, int colonne) {
+        derniereCase = new int[] {ligne,colonne};
+        this.ligne = ligne;
+        this.colonne = colonne;
+
+        // On modifie l'état précédent des lignes/colonnes
+        // Donc la case sur laquelle on place le joueur n'aura pas d'effet
+        lignePrecedente = ligne;
+        colonnePrecedente = colonne;
+    }
+    public int[] obtenirCasePrecedente() {
+        return new int[]{lignePrecedente, colonnePrecedente};
+    }
+    public int[] obtenirDerniereCase() {
+        return derniereCase;
+    }
+    public void majDerniereCase(int[] derniereCase) {
+        this.derniereCase = derniereCase;
+    }
+    
+    public int obtenirCasesExplorees(){
+        return this.nbCasesExplorees;
+    }
+    public void majCasesExplorees(){
+        int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
+        if(this.nbCasesExplorees>=0 && this.nbCasesExplorees<nbCasesTotales)this.nbCasesExplorees += 1;
+    }
+    public int obtenirPExploration(){
+        int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
+        return ((int)((((double)this.nbCasesExplorees)/((double)nbCasesTotales))*100));
+    }
+    
     
     //---------------------------------------------------------------------------------------------------- Méthodes de fonctionnalités du robot
+    
+    public void actualiseBatterie(){
+        setBatterie(Options.BATTERIE_MAX - (int)(comptKm*Options.CONSO_BATTERIE_PAR_KM));
+        //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
+    }
+    public void rechargerBat(){
+        resetCompteurkm();
+        setBatterie(Options.BATTERIE_MAX);
+        this.nbRecharges += 1;
+    }
     
     // Actualise les voyants principaux
     public void actualiseVP(){
@@ -159,21 +206,10 @@ public class Robot extends Avatar {
         
     }
 
-    public void actualiseBatterie(){
-        setBatterie(Options.BATTERIE_MAX - (int)(comptKm*Options.CONSO_BATTERIE_PAR_KM));
-        //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
-    }
-    
     public void actualiseCptKm(Dimension but){
         double d = Math.sqrt(but.getWidth()*but.getWidth()+but.getHeight()*but.getHeight())*Options.KM_PAR_PIXELS;
         comptKm += d;
         kmTot += d;
-    }
-    
-    public void rechargerBat(){
-        resetCompteurkm();
-        setBatterie(Options.BATTERIE_MAX);
-        this.nbRecharges += 1;
     }
     
     public void usureJambes(double nbKm){
@@ -211,6 +247,23 @@ public class Robot extends Avatar {
             chance = (int)(Math.random()*100 + 1);
         
             if (capteurs[i].getUsure()>2*r3u && chance<=Options.CHANCE_DEGRADATION_AUTRES)capteurs[i].degraderC();
+        }
+    }
+    
+    public void reparer(int numListe){
+        switch(numListe){
+            case 1 : 
+                for(int i=0; i<jambes.length; i++){ jambes[i].reparerC();} 
+                break;
+            case 2 :
+                for(int i=0; i<bras.length; i++){ bras[i].reparerC();} 
+                break;
+            case 3 : 
+                for(int i=0; i<capteurs.length; i++){ capteurs[i].reparerC();} 
+                break;
+            default : 
+                System.out.println("le numéro de la liste doit être compris entre 1 et 3 pour que la réparation ait lieue ! ");
+                break;
         }
     }
     
@@ -328,48 +381,5 @@ public class Robot extends Avatar {
                 
             }
         }
-    }
-    
-    public int[] obtenirCasePrecedente() {
-        return new int[]{lignePrecedente, colonnePrecedente};
-    }
-    public int[] obtenirCase() {
-        return new int[]{ligne, colonne};
-    }
-    public void majCase(int ligne, int colonne) {
-        derniereCase = new int[] {ligne,colonne};
-        this.ligne = ligne;
-        this.colonne = colonne;
-
-        // On modifie l'état précédent des lignes/colonnes
-        // Donc la case sur laquelle on place le joueur n'aura pas d'effet
-        lignePrecedente = ligne;
-        colonnePrecedente = colonne;
-    }
-    public int[] obtenirCoordonnees() {
-        return new int[]{xFictif, yFictif};
-    }
-    public int[] obtenirDerniereCase() {
-        return derniereCase;
-    }
-    public void majDerniereCase(int[] derniereCase) {
-        this.derniereCase = derniereCase;
-    }
-
-    public LinkedList<int[]> obtenirTrajectoire() {
-        return but;
-    }
-    
-    public int obtenirCasesExplorees(){
-        return this.nbCasesExplorees;
-    }
-    
-    public void majCasesExplorees(){
-        int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
-        if(this.nbCasesExplorees>=0 && this.nbCasesExplorees<nbCasesTotales)this.nbCasesExplorees += 1;
-    }
-    public int obtenirPExploration(){
-        int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
-        return ((int)((((double)this.nbCasesExplorees)/((double)nbCasesTotales))*100));
     }
 }

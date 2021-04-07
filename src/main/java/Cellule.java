@@ -201,6 +201,12 @@ public class Cellule extends Polygon implements Dessin {
                 return Color.white;
             case FORET:
                 return Color.green;
+            case REPARATION_JAMBES:
+                return Color.pink;
+            case REPARATION_BRAS:
+                return Color.pink;
+            case REPARATION_CAPTEURS:
+                return Color.pink;
             default :
                 return null;
                 
