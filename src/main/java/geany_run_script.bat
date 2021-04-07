@@ -1,4 +1,4 @@
-java "App"
+java "Dessiner"
 
 pause
 del "%0"
