@@ -39,6 +39,8 @@ public class Donnees implements Observable {
     private double positionCurseurExtraction;
     private String scoreExtraction;
     private boolean etatOptions = false;
+    private Cellule derniereCelluleMinijeu = null;
+    private int nombrePonts = 0;
     
     // CSV des cartes
     private HashMap<String, InputStream> cartes;
@@ -74,12 +76,9 @@ public class Donnees implements Observable {
     private int nombreErreursLaser = 0;
     private long tempsDeReaction = 0;
     
-    public Donnees(int largeur, int hauteur) {
-        this.largeur = largeur;
-        this.hauteur = hauteur;
+    public Donnees() {
 
         // Création d'une carte par défaut si elle n'existe pas déjà
-        List<String[]> data = new ArrayList<String[]>();
 
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
         for (int i=0; i < cellules.length; i++) {
@@ -563,5 +562,27 @@ public class Donnees implements Observable {
 
     public void majDerniereCaseSymbole(Cellule derniereCaseSymbole) {
         this.derniereCaseSymbole = derniereCaseSymbole;
+    }
+
+    public void majDerniereCelluleMinijeu(Cellule derniereCelluleMinijeu) {
+        this.derniereCelluleMinijeu = derniereCelluleMinijeu;
+    }
+    public Cellule obtenirDerniereCelluleMinijeu() {
+        return derniereCelluleMinijeu;
+    }
+
+    public int obtenirNombrePont() {
+        return nombrePonts;
+    }
+
+    public void majNombrePonts(int nombrePonts) {
+        this.nombrePonts = nombrePonts;
+    }
+
+    public void majLargeur(int largeur) {
+        this.largeur = largeur;
+    }
+    public void majHauteur(int hauteur) {
+        this.hauteur = hauteur;
     }
 }

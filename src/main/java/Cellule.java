@@ -260,7 +260,10 @@ public class Cellule extends Polygon implements Dessin {
     }
 
     public String toString() {
-        return type.name()+";null";
+        if (symbole != null)
+            return type.name()+";"+symbole.type+";"+estDecouverte+";"+symbole.estVisible;
+        else
+            return type.name()+";null;"+estDecouverte+";null";
     }
 
     public boolean estDecouverte() {

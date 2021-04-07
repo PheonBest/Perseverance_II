@@ -24,7 +24,8 @@ public class Symbole extends Polygon {
 	}
 
 	//Dans Symbole:On rajoute la méthode
-	public void majSymbole(Image img) {	
+	public void majSymbole(TypeSymbole type, Image img) {
+		this.type = type;
 		this.image = img;
 	}
 

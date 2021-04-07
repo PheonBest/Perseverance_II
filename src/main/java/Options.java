@@ -77,7 +77,7 @@ public class Options {
 
     public static final int MUSIQUE_VOLUME_MIN = 0;
 	public static final int MUSIQUE_VOLUME_MAX = 100;
-    public static final int MUSIQUE_VOLUME_INIT = 100;
+    public static final int MUSIQUE_VOLUME_INIT = 70;
     public static final String NOM_DOSSIER_MUSIQUES = "musiques";
     public static final String NOM_DOSSIER_EFFETS = "effets";
     public static final String NOM_DOSSIER_CARTES = "cartes";

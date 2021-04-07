@@ -24,7 +24,7 @@ import javax.swing.Timer;
 import java.awt.Point;
 import java.awt.Image;
 
-public class Affichage extends JFrame implements Observer, ActionListener, KeyListener, MouseWheelListener, MouseMotionListener, MouseListener {
+public class Affichage extends JFrame implements Observer, ActionListener, KeyListener {
     private Controleur controleur;
     private CardLayout cardLayout = new CardLayout();
     private String scene = "";
@@ -38,10 +38,51 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
    // private JPanel options = new JPanel();
 	private PanneauPause panneauPause = new PanneauPause();
 	
-    private double largeur;
-    private double hauteur;
+    private int largeur;
+    private int hauteur;
 
     private Timer timer;
+
+    private MouseAdapter clicJeuMaintenu = new MouseAdapter() {
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            controleur.ajusterZoom(e.getWheelRotation(), e.getPoint());
+        }
+
+        @Override
+        // On veut mettre à jour la position de la souris
+        // Lorsque le clic est maintenu.
+        // Cet évènement appelle mouseDragged, et non pas mouseMoved
+        public void mouseDragged(MouseEvent ev) {
+            controleur.majStatutSouris(ev);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent ev) {
+            controleur.majStatutSouris(ev, true);
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent ev) {
+            controleur.majStatutSouris(ev, false);
+        }
+    };
+    private MouseAdapter clicJeuSansMaintien = new MouseAdapter() {
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            controleur.ajusterZoom(e.getWheelRotation(), e.getPoint());
+        }
+        @Override
+        public void mousePressed(MouseEvent ev) {
+            controleur.click(ev.getX(), ev.getY(), false);
+        }
+    };
+    private MouseAdapter clicMenu = new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent ev) {
+            controleur.click(ev.getX(),ev.getY(), true); // True signifie qu'on clique depuis le menu
+        }
+    };
 
     public Affichage(int largeur, int hauteur, Controleur controleur) {
         
@@ -56,9 +97,18 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         super.setFocusable(true);
         this.addKeyListener(this);
 
-        contenu.addMouseWheelListener(this);
-        contenu.addMouseListener(this);
-        contenu.addMouseMotionListener(this);
+        jeu.addMouseWheelListener(clicJeuSansMaintien);
+        jeu.addMouseListener(clicJeuSansMaintien);
+        jeu.addMouseMotionListener(clicJeuSansMaintien);
+
+        ((Editeur) editeur).obtenirPanneauJeu().addMouseWheelListener(clicJeuMaintenu);
+        ((Editeur) editeur).obtenirPanneauJeu().addMouseListener(clicJeuMaintenu);
+        ((Editeur) editeur).obtenirPanneauJeu().addMouseMotionListener(clicJeuMaintenu);
+
+        ((Editeur) editeur).obtenirPanneauMenu().addMouseWheelListener(clicMenu);
+        ((Editeur) editeur).obtenirPanneauMenu().addMouseListener(clicMenu);
+        ((Editeur) editeur).obtenirPanneauMenu().addMouseMotionListener(clicMenu);
+        
         contenu.addKeyListener(this);
         panneauPause.addKeyListener(this);
         contenu.setLayout(cardLayout);
@@ -100,15 +150,17 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
         // On définit la largeur et la hauteur du contenu du "JFrame" après l'avoir
         // affiché
         // Si on obtient sa taille avant son affichage, la dimension retournée est (0,0)
-        this.largeur = this.getContentPane().getSize().getWidth();
-        this.hauteur = this.getContentPane().getSize().getHeight();
+        this.largeur = (int) this.getContentPane().getSize().getWidth();
+        this.hauteur = (int) this.getContentPane().getSize().getHeight();
+        controleur.majLargeur(this.largeur);
+        controleur.majHauteur(this.hauteur);
         ((Dessiner)jeu).majLargeur(this.largeur);
         ((Dessiner)jeu).majHauteur(this.hauteur);
         ((Dessiner)jeu).initialiser();
-        ((ModeDeJeu)modeDeJeu).majTaille((int)this.largeur,(int)this.hauteur);
+        ((ModeDeJeu)modeDeJeu).majTaille(this.largeur,this.hauteur);
 		((ModeDeJeu)modeDeJeu).initialiser();
         ((Dessiner)jeu).majEnJeu(true);
-        ((Editeur)editeur).initialiser((int)this.largeur, (int)this.hauteur);
+        ((Editeur)editeur).initialiser(this.largeur, this.hauteur);
         
         ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), 50);
 
@@ -260,53 +312,5 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                     editeur.repaint();
                 break;
         }
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        controleur.ajusterZoom(e.getWheelRotation(), e.getPoint());
-    }
-
-    @Override
-    // On veut mettre à jour la position de la souris
-    // Lorsque le clic est maintenu.
-    // Cet évènement appelle mouseDragged, et non pas mouseMoved
-    public void mouseDragged(MouseEvent ev) {
-        controleur.majStatutSouris(ev);
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent ev) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent ev) {
-        requestFocus();
-        if (scene != null && scene.equals("Jeu") && ((Dessiner)jeu).obtenirEtatMinijeuExtraction())
-            controleur.majScoreExtraction(((Dessiner)jeu).obtenirScore());
-        controleur.majStatutSouris(ev, true);
-    }
-    
-    @Override
-    public void mouseReleased(MouseEvent ev) {
-        controleur.majStatutSouris(ev, false);
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
     }
 }

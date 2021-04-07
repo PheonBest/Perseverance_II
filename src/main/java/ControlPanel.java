@@ -45,8 +45,12 @@ public class ControlPanel extends JPanel implements ActionListener{
         super.paintComponent(g);
         if (joueur != null) {
             // Panneaux de contrôle
-            g.setColor(new Color(175,175,175));
-            g.fill3DRect(0,0,lx,ly,true);
+
+            
+            //g.setColor(new Color(175,175,175));
+            //g.fill3DRect(0,0,lx,ly,true);
+            Formes.dessinerRectangle((Graphics2D)g, 0, 0, lx, ly, 20, 20);
+
             g.setColor(Color.black);
             g.drawString("# --------------------------------------------------| PANNEAU DE CONTRÔLE |-------------------------------------------------- #",10,15);
             

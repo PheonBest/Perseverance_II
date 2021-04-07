@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.BasicStroke;
 import java.awt.Image;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 
 public class BoutonCercle implements Dessin {
     private boolean sourisDessus = false;
@@ -12,6 +14,8 @@ public class BoutonCercle implements Dessin {
     private int taillePinceau;
     private Image image;
     private String effet;
+    private boolean disponible = true;
+    private final double FACTEUR_TAILLE = 1.13;
     
     public BoutonCercle(int x, int y, double rayon, int taillePinceau) {
         this.x = x;
@@ -21,12 +25,13 @@ public class BoutonCercle implements Dessin {
         this.taillePinceau = taillePinceau;
     }
 
-    public BoutonCercle(int x, int y, double rayon, String effet, Image image) {
+    public BoutonCercle(int x, int y, double rayon, String effet, Image image, boolean disponible) {
         this.x = x;
         this.y = y;
         this.rayon = rayon;
         this.image = image;
         this.effet = effet;
+        this.disponible = disponible;
     }
 
     public void dessiner(Graphics g) {
@@ -41,17 +46,15 @@ public class BoutonCercle implements Dessin {
         
         g2d.setPaint(Color.BLACK);
         g2d.setStroke(new BasicStroke(EPAISSEUR_BORDURE));
+        Shape cercle = null;
         if (sourisDessus)
-            g2d.drawOval(x-(int)(1.15*rayon),y-(int)(1.15*rayon),(int)(2*1.15*rayon),(int)(2*1.15*rayon));
+            cercle = new Ellipse2D.Double(x-FACTEUR_TAILLE*rayon, y-FACTEUR_TAILLE*rayon, 2*FACTEUR_TAILLE*rayon, 2*FACTEUR_TAILLE*rayon);
         else
-            g2d.drawOval(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
+            cercle = new Ellipse2D.Double(x-rayon,y-rayon,2*rayon,2*rayon);    
+        g2d.draw(cercle);
         g2d.setPaint(Color.DARK_GRAY);
         // On dessine le deuxième cercle
-        if (sourisDessus)
-            g2d.fillOval(x-(int)(1.15*rayon),y-(int)(1.15*rayon),(int)(2*1.15*rayon),(int)(2*1.15*rayon));
-        else
-            g2d.fillOval(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
-
+       g2d.fill(cercle);
         // On dessine l'éventuelle image par-dessus le cercle
         if (image != null) {
             if (sourisDessus) {
@@ -60,8 +63,19 @@ public class BoutonCercle implements Dessin {
             } else
                 g2d.drawImage(image, (int)(x-image.getWidth(null)/2), (int)(y-image.getHeight(null)/2), null);
         }
-        
-        
+
+        if (!disponible) {
+            // Si le bouton est indisponible, on souhaite appliquer un "filtre" gris au-dessus du bouton
+            // Donc on dessine un rectangle de couleur transparente avec un clip sur le cercle
+            final int ALPHA = 127; // 50% transparent
+            g2d.setPaint(new Color(200, 200, 200, ALPHA));
+            g2d.setClip(cercle);
+            if (sourisDessus)
+                g2d.fillRect(x-(int)(FACTEUR_TAILLE*rayon),y-(int)(FACTEUR_TAILLE*rayon),(int)(2*FACTEUR_TAILLE*rayon),(int)(2*FACTEUR_TAILLE*rayon));
+            else
+                g2d.fillRect(x-(int)rayon,y-(int)rayon,(int)(2*rayon),(int)(2*rayon));
+            g2d.setClip(null);
+        }
     }
 
     public void majSourisDessus(boolean sourisDessus) {
@@ -73,7 +87,7 @@ public class BoutonCercle implements Dessin {
         // distance^2 < rayon^2
         // (x-xEvent)^2+(y-yEvent)^2 < rayon^2
         if (sourisDessus)
-            return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(1.15*rayon,2));
+            return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(FACTEUR_TAILLE*rayon,2));
         return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(rayon,2));
     }
 
@@ -89,5 +103,9 @@ public class BoutonCercle implements Dessin {
 
     public int obtenirTaillePinceau() {
         return taillePinceau;
+    }
+
+    public void majDisponible(boolean disponible) {
+        this.disponible = disponible;
     }
 }

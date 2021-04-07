@@ -63,16 +63,10 @@ public class Dessiner extends JPanel {
     private int hauteurRectangle;
     private int hauteurRectangleLaser;
     
-    
-    private final Color[] COULEURS_DIAGONALES = {  
-        new Color(229,229,229), // gris clair  
-        new Color(222,222,222)  // gris
-    };
     private final double MINIJEU_EXTRACTION_LARGEUR_ECRAN = 3.; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
     private final double MINIJEU_EXTRACTION_HAUTEUR_ECRAN = 3.; // La hauteur du rectangle correspond au tiers de la hauteur de la fenêtre
     private final double MINIJEU_LASER_HAUTEUR_ECRAN = 2.7;
-    private final int ESPACE = 40;
-    private final int LARGEUR_LIGNE = ESPACE/2;
+    
     
     private final int RAYON = 20;
     private final Color[] COULEURS_MINIJEU = {
@@ -168,7 +162,6 @@ public class Dessiner extends JPanel {
         Cellule[] voisins = {};
         if (joueur != null && rayonDeSelection > 0) {
             int[] caseJoueur = joueur.obtenirCase();
-            System.out.println(rayonDeSelection);
             voisins = Voisins.obtenirVoisins(cellules, caseJoueur[0], caseJoueur[1], rayonDeSelection);
         }
         // On dessine les cellules de la carte
@@ -210,7 +203,7 @@ public class Dessiner extends JPanel {
             // On dessine la minimap sur un rectangle
             g2d.setColor(Color.gray);
 
-            dessinerRectangle(g2d,
+            Formes.dessinerRectangle(g2d,
             (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[0]),
             (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - (hauteurEcran/2)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[1]),
             (int)(tailleMinimap[0] + 9./4.*Options.DIMENSIONS_CASES[0]),
@@ -260,7 +253,7 @@ public class Dessiner extends JPanel {
             if (etatMinijeuExtraction) {
                 
                 ((Graphics2D) g2d).setTransform(transformationInitiale);
-                dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangle, RAYON, RAYON);
+                Formes.dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangle, RAYON, RAYON);
 
                 int largeur = LARGEUR_TOTALE_CLAVETTE;
                 for (int i=COULEURS_MINIJEU.length-1; i > -1 ; i--) {
@@ -338,7 +331,7 @@ public class Dessiner extends JPanel {
             final int coinY = (int) ((hauteurEcran-LARGEUR_CROIX)/2+RAYON_FEU*4);
             if (etatMinijeuLaser) {
                 ((Graphics2D) g2d).setTransform(transformationInitiale);
-                dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangleLaser, RAYON, RAYON);
+                Formes.dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangleLaser, RAYON, RAYON);
                 g2d.setStroke(new BasicStroke(10));
                 
                 int largeurTotale = NOMBRE_FEUX*(RAYON_FEU*2)+(NOMBRE_FEUX-1)*ESPACE_INTRER_FEU;
@@ -406,27 +399,6 @@ public class Dessiner extends JPanel {
         }
     }
 
-    private void dessinerRectangle(Graphics2D g2d, int coinX, int coinY, int largeur, int hauteur, int rayonX, int rayonY) {
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        g2d.setPaint(COULEURS_DIAGONALES[0]);
-
-        Shape rectangle = new RoundRectangle2D.Float(coinX, coinY, largeur - 1f, hauteur -1f, RAYON, RAYON);
-        g2d.setClip(rectangle);
-        g2d.fill(rectangle);
-        
-
-        // dessin des lignes diagonales
-        g2d.setColor(COULEURS_DIAGONALES[1]);
-        g2d.setStroke(new BasicStroke(LARGEUR_LIGNE));
-        
-        for (int x = coinX, y = coinY; y < (coinY + largeur + hauteur); y += ESPACE)
-            g2d.drawLine(x, y ,  x + (int) largeur , y  - (int) largeur);
-        // On trace les lignes:
-        // On part du coin en haut à gauche
-        // On arrive tout à droite du rectangle en X, et on translate vers le bas en y à chaque itération
-    }
-    
     public void majCellules(Cellule[][] cellules) {
         this.cellules = cellules;
         majTailleMinimap();
@@ -491,10 +463,6 @@ public class Dessiner extends JPanel {
     
     public void majRayon(Integer rayonDeSelection) {
         this.rayonDeSelection = rayonDeSelection;
-    }
-
-    public String obtenirScore() {
-        return score;
     }
 
     public void majEtatMinijeuExtraction(boolean etatMinijeuExtraction) {

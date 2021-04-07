@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -66,5 +67,13 @@ public class Editeur extends JPanel {
 
     public void majArrierePlan(ArrierePlan arrierePlan) {
         ((Dessiner)carte).majArrierePlan(arrierePlan);
+    }
+
+    public JPanel obtenirPanneauMenu() {
+        return menu;
+    }
+
+    public JPanel obtenirPanneauJeu() {
+        return carte;
     }
 }

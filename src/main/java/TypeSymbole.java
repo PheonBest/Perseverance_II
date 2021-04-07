@@ -8,7 +8,8 @@ public enum TypeSymbole{
 	INCONNUE,
 	JAMBE,
 	BRAS,
-	CAPTEUR
-	
+	CAPTEUR,
+	BOIS,
+	PONT
 }
 
