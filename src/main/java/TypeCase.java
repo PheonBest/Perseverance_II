@@ -6,7 +6,4 @@ public enum TypeCase{
     SABLE_MOUVANTS,
     NEIGE,
     FORET,
-    REPARATION_JAMBES,
-    REPARATION_BRAS,
-    REPARATION_CAPTEURS
 }

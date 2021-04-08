@@ -67,24 +67,35 @@ public class Controleur {
     private void effetCase(int[] coordonnees) {
         if (coordonnees != null) {
             TypeCase typeActif = donnees.obtenirCellules()[coordonnees[0]][coordonnees[1]].obtenirType();
+            Symbole symboleActif = donnees.obtenirCellules()[coordonnees[0]][coordonnees[1]].obtenirSymbole();
+            boolean aChangeDeCase = (donnees.obtenirJoueur().obtenirCase()[0] != donnees.obtenirJoueur().obtenirDerniereCase()[0] && donnees.obtenirJoueur().obtenirCase()[1] != donnees.obtenirJoueur().obtenirDerniereCase()[1]);
             switch(typeActif){
                 case VIDE:
                     break;
                 case EAU:
+                    if(aChangeDeCase)donnees.obtenirJoueur().malusBatterie(TypeCase.EAU);
                     break;
                 case MONTAGNE:
                     break;
                 case DESERT:
                     break;
                 case SABLE_MOUVANTS :
+                    if(aChangeDeCase)donnees.obtenirJoueur().malusBatterie(TypeCase.SABLE_MOUVANTS);
                     break;
                 case NEIGE:
+                    if(aChangeDeCase)donnees.obtenirJoueur().malusBatterie(TypeCase.NEIGE);
                     break;
                 case FORET:
                     break;
                 default :
                     break;
             }
+            TypeSymbole s = symboleActif.type;
+            if(symboleActif != null && symboleActif.estVisible && (s==TypeSymbole.JAMBE || s==TypeSymbole.BRAS || s==TypeSymbole.CAPTEUR || s==TypeSymbole.ENERGIE)){
+                 donnees.obtenirJoueur().maintenance(s);
+                 donnees.obtenirJoueur().actualiseVP();
+            }
+                
         }
     }
 
@@ -923,6 +934,8 @@ public class Controleur {
 				return donnees.getImagesSymboles().get("JAMBE");
 			case CAPTEUR:
 				return donnees.getImagesSymboles().get("CAPTEUR");
+            case ENERGIE:
+                return donnees.getImagesSymboles().get("ENERGIE");
 			default:
 				return null;
 		

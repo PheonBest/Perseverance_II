@@ -10,6 +10,7 @@ public enum TypeSymbole{
 	BRAS,
 	CAPTEUR,
 	BOIS,
-	PONT
+	PONT,
+    ENERGIE
 }
 
