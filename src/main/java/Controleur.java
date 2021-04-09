@@ -577,16 +577,15 @@ public class Controleur {
                                             if (donnees.obtenirDerniereCaseSymbole() != null) {
                                                 final Image image = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().image;
                                                 final TypeSymbole type = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().type;
-                                                if (image != null) {
-                                                    int taillePinceau = 1;
-                                                    if (donnees.obtenirDernierBouton() != null)
-                                                        taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
-                                                    Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
-                                                    for (Cellule c: voisins) {
-                                                        c.obtenirSymbole().majSymbole(type, image);
-                                                        if (!c.obtenirSymbole().obtenirEstVisible())
-                                                            c.obtenirSymbole().majEstVisible(true);
-                                                    }
+
+                                                int taillePinceau = 1;
+                                                if (donnees.obtenirDernierBouton() != null)
+                                                    taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
+                                                Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
+                                                for (Cellule c: voisins) {
+                                                    c.obtenirSymbole().majSymbole(type, image);
+                                                    if (!c.obtenirSymbole().obtenirEstVisible())
+                                                        c.obtenirSymbole().majEstVisible(true);
                                                 }
                                             } 
                                         }
@@ -691,8 +690,9 @@ public class Controleur {
         final double TAILLE = 0.5;
         final int NOMBRE_COLONNES = (int) Math.ceil(TYPES.length/(double)Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE);
         final int LONGUEUR_ESPACEMENTS_CASE = (Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE+1)*Options.ESPACE_INTER_CASE_BOUTON;
-        final int LONGUEUR_CASES = (int)(Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE*Options.LARGEUR_BOUTON_CASE*TAILLE + (Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE-1)*Options.ESPACE_INTER_CASE_BOUTON);
+        final int LONGUEUR_CASES = (int)(Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE*Options.LARGEUR_BOUTON_CASE*TAILLE);
         final int LONGUEUR_TOTALE_CASES = LONGUEUR_ESPACEMENTS_CASE + LONGUEUR_CASES;
+        //final int HAUTEUR_TOTALE_CASES = (int)((NOMBRE_COLONNES-1)*Options.ESPACE_INTER_CASE_BOUTON + NOMBRE_COLONNES*Options.LARGEUR_BOUTON_CASE*Options.RATIO_LARGEUR_HAUTEUR*TAILLE);
         int index = 0;
         Cellule[] boutonsType = new Cellule[TYPES.length];
         for (int i=0; i<NOMBRE_COLONNES; i++) {
@@ -715,7 +715,7 @@ public class Controleur {
                 if (index < SYMBOLES.length) {
                     //System.out.println("Image: "+SYMBOLES[index].name()+" "+donnees.getImagesSymboles().get(SYMBOLES[index].name()));
                     boutonsSymbole[index] = new Cellule(TypeCase.VIDE, i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON, true, new Symbole(SYMBOLES[index], donnees.getImagesSymboles().get(SYMBOLES[index].name()), true));
-                    boutonsSymbole[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[1]+80+160);
+                    boutonsSymbole[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[2]+80);
                 }
                 index++;
             }
