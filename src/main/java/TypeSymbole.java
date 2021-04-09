@@ -1,5 +1,6 @@
 
 public enum TypeSymbole{
+	VIDE,
 	BACTERIE, 
 	MINERAI,
 	RAVIN,
