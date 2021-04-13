@@ -20,7 +20,7 @@ public class FullControlPanel extends JFrame implements ActionListener{
     
     // Panneaux principaux de la fenêtre
     private JPanel cg; // panneau principal de gauche
-    private JPanel cp; // panneau principal global
+    private AntiBugPanel cp; // panneau principal global
     
     // Partie de gauche - Panneaux de données
     private JLabel titre;
@@ -54,6 +54,7 @@ public class FullControlPanel extends JFrame implements ActionListener{
 
     public FullControlPanel(int x, int y, Robot r, Image imageP, Image imageR){
         // Fenêtre
+        
         super();
         setLayout(null);
         setLocation(x,y);
@@ -63,12 +64,12 @@ public class FullControlPanel extends JFrame implements ActionListener{
         t = new Timer(500,this);
         t.start();
         
+        // Images
+        this.imageP = imageP;
+        this.imageR = imageR;
+        
         // Panneaux principaux
-        cp = new JPanel();
-        cp.setLayout(null);
-        cp.setLocation(0,0);
-        cp.setSize(lx,ly);
-        cp.setBackground(Color.black);
+        cp = new AntiBugPanel(xb, yb, yb+150+ecartY, lx, ly, joueur, imageP, imageR);
         
         cg = new JPanel();
         cg.setLayout(null);
@@ -159,10 +160,6 @@ public class FullControlPanel extends JFrame implements ActionListener{
         nbCasesExp.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
         stat.add(nbCasesExp);
         
-        // Images
-        this.imageP = imageP;
-        this.imageR = imageR;
-        
         // add finaux
         cg.add(panneauBat);
         cg.add(panneauVoyants);
@@ -195,140 +192,6 @@ public class FullControlPanel extends JFrame implements ActionListener{
         nbKmTot.setText("Distance totale parcourue : "+(int)(this.joueur.getKmParcourus())+" km");
         nbCasesExp.setText("Exploration de planète : "+joueur.obtenirPExploration()+" %");
         this.repaint();
+        cp.repaint();
     }
-    
-    public void paint(Graphics g){
-        super.paint(g);
-        
-        // batterie : origine (xb,yb)
-        int Xb = xb + 210;
-        int Yb = yb + 120;
-        g.setColor(Color.black);
-        g.fillRect(Xb,Yb,118,48);
-        g.setColor(Color.white);
-        g.fillRect(Xb+3,Yb+3,112,42);
-        g.setColor(Color.black);
-        g.fillRect(Xb+6,Yb+6,106,36);
-        g.fillRect(Xb+6,Yb+19,112,10);
-        // Jauge de batterie de couleur ajustable
-        float c1 = (float) (1.0-joueur.getBatterie()*0.01);
-        float c2 = (float)(joueur.getBatterie()*0.01);
-        if (c1 < 0) c1 = 0;
-        else if (c1 > 1) c1 = 1;
-        if (c2 < 0) c2 = 0;
-        else if (c2 > 1) c2 = 1;
-        g.setColor(new Color(c1, c2, (float)(0.0)));
-        g.fillRect(Xb+9,Yb+9,joueur.getBatterie(),30);
-        
-        // Voyants
-        int xv = xb + 100;
-        int yv = ypv + 120;
-        for(int i=0; i<joueur.getJambes().length; i++){
-            joueur.getJambes()[i].voyant.setPositionR(xv+i*120,yv,20); 
-            joueur.getJambes()[i].voyant.dessinerVoyant(g);
-        }
-        yv += 65;
-        for(int i=0; i<joueur.getBras().length; i++){
-            joueur.getBras()[i].voyant.setPositionR(xv+i*120,yv,20); 
-            joueur.getBras()[i].voyant.dessinerVoyant(g);
-        }
-        yv += 65;
-        for(int i=0; i<joueur.getCapteurs().length; i++){
-            joueur.getCapteurs()[i].voyant.setPositionR(xv+i*120,yv,20); 
-            joueur.getCapteurs()[i].voyant.dessinerVoyant(g);
-        }
-        
-        // Images
-        g.drawImage(imageP,lx/2 +17,37,this);
-        g.drawImage(imageR,lx/2 -115, 100, this);
-        
-        // Warnings robots;
-        int xc;
-        int yc;
-        //Jambe droite
-        if(joueur.getJambes()[0].voyant.getEtat()>Options.ALERTE_MIN){
-            xc = lx/2 + 175;
-            yc = 600;
-            g.setColor(Color.black);
-            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
-            g.setColor(Color.orange);
-            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
-            g.setColor(Color.black);
-            g.setFont(new Font("Times New Roman",Font.BOLD,40));
-            g.drawString("!",xc-5,yc+10);
-        }
-        //Jambe gauche
-        if(joueur.getJambes()[1].voyant.getEtat()>Options.ALERTE_MIN){
-            xc = lx/2 + 255;
-            yc = 600;
-            g.setColor(Color.black);
-            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
-            g.setColor(Color.orange);
-            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
-            g.setColor(Color.black);
-            g.setFont(new Font("Times New Roman",Font.BOLD,40));
-            g.drawString("!",xc-5,yc+10);
-        }
-        // Bras droit xc = 125, yc = 500
-        if(joueur.getBras()[0].voyant.getEtat()>Options.ALERTE_MIN){
-            xc = lx/2 + 140;
-            yc = 450;
-            g.setColor(Color.black);
-            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
-            g.setColor(Color.orange);
-            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
-            g.setColor(Color.black);
-            g.setFont(new Font("Times New Roman",Font.BOLD,40));
-            g.drawString("!",xc-5,yc+10);
-        }
-        // Bras gauche 
-        if(joueur.getBras()[1].voyant.getEtat()>Options.ALERTE_MIN){
-            xc = lx/2 + 285;
-            yc = 450;
-            g.setColor(Color.black);
-            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
-            g.setColor(Color.orange);
-            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
-            g.setColor(Color.black);
-            g.setFont(new Font("Times New Roman",Font.BOLD,40));
-            g.drawString("!",xc-5,yc+10);
-        }
-        // capteurs températures
-        if(joueur.getCapteurs()[0].voyant.getEtat()>Options.ALERTE_MIN){
-            xc = lx/2 + 310;
-            yc = 350;
-            g.setColor(Color.black);
-            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
-            g.setColor(Color.orange);
-            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
-            g.setColor(Color.black);
-            g.setFont(new Font("Times New Roman",Font.BOLD,40));
-            g.drawString("!",xc-5,yc+10);
-        }
-        if(joueur.getCapteurs()[1].voyant.getEtat()>Options.ALERTE_MIN){
-        // Caméras
-            xc = lx/2 + 150;
-            yc = 350;
-            g.setColor(Color.black);
-            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
-            g.setColor(Color.orange);
-            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
-            g.setColor(Color.black);
-            g.setFont(new Font("Times New Roman",Font.BOLD,40));
-            g.drawString("!",xc-5,yc+10);
-        }
-        // Capteurs pressions
-        if(joueur.getCapteurs()[1].voyant.getEtat()>Options.ALERTE_MIN){
-            xc = lx/2 + 320;
-            yc = 515;
-            g.setColor(Color.black);
-            g.fillPolygon(new int[]{xc,xc+30,xc-30}, new int[]{yc-40,yc+20,yc+20}, 3);
-            g.setColor(Color.orange);
-            g.fillPolygon(new int[]{xc,xc+23,xc-23}, new int[]{yc-30,yc+15,yc+15}, 3);
-            g.setColor(Color.black);
-            g.setFont(new Font("Times New Roman",Font.BOLD,40));
-            g.drawString("!",xc-5,yc+10);
-        }
-    }
-    
 }
