@@ -22,6 +22,8 @@ public class Robot extends Avatar {
     private double comptKm;
     private int nbCasesExplorees = 0;  
     private int[] derniereCase = null;
+    //Compétences
+    private boolean surChenilles = false;
     
     // Trajectoire
     /* Pour aller d'un point à un autre sur la carte, on utilise une liste de cases ciblées, appelées but (à atteindre).
@@ -345,8 +347,8 @@ public class Robot extends Avatar {
         float angle = (float) Math.atan2(caseCiblee.getHeight() - yFictif, caseCiblee.getWidth() - xFictif);
         //System.out.println(Math.toDegrees(angle));
         
-        dx = (int) (Math.cos(angle)*10); // 10 est la vitesse (pixel/itération de la boucle du jeu)
-        dy = (int) (Math.sin(angle)*10);
+        dx = (int) (Math.cos(angle)*Options.VITESSE_DEPLACEMENT_ROBOT); 
+        dy = (int) (Math.sin(angle)*Options.VITESSE_DEPLACEMENT_ROBOT);
         animationIndex = 2; // Image qui montre le robot en marche
     }
     
@@ -401,5 +403,11 @@ public class Robot extends Avatar {
                 
             }
         }
+    }
+    public boolean obtenirSurChenilles() {
+        return surChenilles;
+    }
+    public void majSurChenilles(boolean surChenilles) {
+        this.surChenilles = surChenilles;
     }
 }

@@ -61,10 +61,6 @@ public class Editeur extends JPanel {
         ((Dessiner)carte).majZoom(zoom);
     }
 
-    public void majCentreZoom(Point centreZoom) {
-        ((Dessiner)carte).majCentreZoom(centreZoom);
-    }
-
     public void majArrierePlan(ArrierePlan arrierePlan) {
         ((Dessiner)carte).majArrierePlan(arrierePlan);
     }

@@ -12,6 +12,9 @@ public enum TypeSymbole{
 	CAPTEUR,
 	BOIS,
 	PONT,
-    ENERGIE
+    ENERGIE,
+	CHENILLES,
+	MONTAGNE,
+	FUSEE
 }
 

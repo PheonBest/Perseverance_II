@@ -34,7 +34,7 @@ public class App
                 Donnees donnees = new Donnees();
                 Controleur controleur = new Controleur(donnees);
                 Affichage affichage = new Affichage(largeur, hauteur, controleur);
-                donnees.addObserver(affichage);
+                donnees.ajouterObservateur(affichage);
                 affichage.initialiser();
                 
                 //Compétences
@@ -46,45 +46,9 @@ public class App
                 competences.add(new BoutonCercle(X_INIT, Y_INIT+DISTANCE_INTER_COMPETENCE, 50, "Scanner", donnees.getImagesSymboles().get(TypeSymbole.SCANNER.name()), true));
                 competences.add(new BoutonCercle(X_INIT, Y_INIT+2*DISTANCE_INTER_COMPETENCE, 50, "Pont", donnees.getImagesSymboles().get(TypeSymbole.PONT.name()), false)); // False signifie que la compétence est indiponible
                 donnees.majCompetences(competences);
-                donnees.notifierObserveur(TypeMisAJour.Competences);
+                donnees.notifierObservateur(TypeMisAJour.Competences);
                 }
         });
-        
-        
-        //test
-		/*List<String[]> dataLines = new ArrayList<>();
-		dataLines.add(new String[]{ "Terre", "Sable", "Eau","Terre" });
-		dataLines.add(new String[]{ "Sable", "Terre", "Eau", "Pierre" });
-		CSV print = new CSV(dataLines);
-		try {print.givenDataArray_whenConvertToCSV_thenOutputCreated();
-			}catch(Exception e){e.printStackTrace();}*/
-        /*
-		String [][] carte = {{"Terre;coucou", "Sable;null", "Pierre;null"}, {"Sable;vent","Eau;null", "Sable;bacterie"}, {"Terre;null", "Eau;null","Sable;null"}};
-		CSV c1 = new CSV(carte);
-		
-		String videtexture = "type;symbole";
-		String [] ds = videtexture.split(";");
-		System.out.println(ds[0]+"  "+ds[1]);
-		
-
-        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
-        HashMap<String, InputStream> cartes;
-        try {
-            cartes = ObtenirRessources.getStreamsAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_CARTES+"/");
-            for (String i : cartes.keySet())
-                System.out.println("Nom du CSV : " + i);
-
-            String [][]records = c1.lecture(cartes.get("testCSV"));
-            for(int i=0;i<records.length;i++){
-                for(int j=0;j<records[i].length;j++){
-                    System.out.print(" "+records[i][j]);
-                }
-                System.out.println();
-            }
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
-        */
     }
     
 }

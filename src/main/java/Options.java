@@ -10,7 +10,8 @@ public class Options {
 	public static final int LARGEUR_CASE = 80;
 	public static final int HAUTEUR_CASE = (int)(LARGEUR_CASE*RATIO_LARGEUR_HAUTEUR);
     public static final int ESPACE_INTER_CASE = 5;
-	public static final int DELAI_ANIMATION = 16;
+	public static final int DELAI_ANIMATION = 15; // Le jeu se met à jour toutes les 16 milisecondes
+    public static final double VITESSE_DEPLACEMENT_ROBOT = 7; // vitesse (pixel/durée d'itération de la boucle du jeu, c.à.d pixel/DELAI_ANIMATION)
     
     // Paramètres du robot
     public static final int BATTERIE_MIN = 0;
@@ -35,11 +36,13 @@ public class Options {
 	public static final int JOUERUR_TOLERANCE_DEPLACEMENT = 5;
     public static final int JOUEUR_TOLERANCE_CLICK = 500;
 
-    public static final int ESPACE_INTER_BOUTON = 50;
+    public static final int ESPACE_INTER_BOUTON = 20;
 	public static final int LARGEUR_BOUTON_CIRCULAIRE = 30;
 	public static final int LARGEUR_BOUTON_CASE = 30;
-	public static final double RAYON_BOUTON_CERCLE = 20;
+	public static final int RAYON_BOUTON_CERCLE = 17;
 	public static final int NOMBRE_BOUTONS_TYPE_PAR_LIGNE = 4;
+
+    public static final int EPAISSEUR_BORDURE_CERCLE = 12;
 
     
 	public static final double RATIO_LARGEUR_MENU = 5.; // La largeur du menu correspond à largeurEcran/RATIO_LARGEUR_MENU
@@ -53,8 +56,8 @@ public class Options {
                                             "Type de case",
                                             "Symboles"};
     public static final int[] yLabels = {   0,
-                                      		150,
-                                      		320};
+                                      		110,
+                                      		240};
 											  
     public static final int INCREMENT_DE_DEPLACEMENT = 15; // Ajout de l'incrément à chaque appui sur une touche de déplacement (dans l'éditeur de carte)
     public static final double MULTIPLICATEUR_ZOOM = 1.1;
@@ -88,4 +91,8 @@ public class Options {
     public static final int RAYON_JOUEUR = 4; // Rayon de sélection autorisé du joueur
     public static final int RAYON_DECOUVERTE = 3;
     public static final String NOM_DOSSIER_DETAILS = "details";
+    public static final int NOMBRE_MAX_ITERATIONS_TRAJECTOIRE = 15;
+
+    // Mini-jeu Extraction
+    public static final double INCREMENT_CURSEUR = 0.05;
 }

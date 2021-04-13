@@ -20,6 +20,7 @@ import java.lang.ProcessBuilder.Redirect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.awt.Image;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -32,34 +33,38 @@ import java.awt.MouseInfo;
 public class Controleur {
     
     private Donnees donnees;
-    private boolean estModifie = true;
 
     public Controleur(Donnees donnees) {
         this.donnees = donnees;
     }
 
     private boolean aucunJeuEnCours() {
-        return (!donnees.obtenirEtatMiniJeuExtraction()
-                && !donnees.obtenirEffacerMinijeuExtraction()
-                && !donnees.obtenirEtatMiniJeuLaser()
-                && !donnees.obtenirDemarrerMinijeuLaser()
-                && !donnees.obtenirEffacerMiniJeuLaser());
+        return (donnees.obtenirEtatMiniJeuExtraction().equals(Etat.OFF) && donnees.obtenirEtatMiniJeuLaser().equals(Etat.OFF));
     }
     // Effet quand on utilise le bras robot sur une case qui contient un symbole (use les bras)
     private void extraire(int ligne, int colonne) {
         donnees.majDerniereCelluleMinijeu(donnees.obtenirCellules()[ligne][colonne]);
-        donnees.majEtatMinijeuExtraction(true);
-        donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
+        donnees.majSensVariationExtraction(true);
+        donnees.majPositionCurseurExtraction(0);
+        donnees.majEtatMinijeuExtraction(Etat.IN);
+        donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
+        donnees.notifierObservateur(TypeMisAJour.PositionCurseurExtraction);
+        donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
         donnees.obtenirJoueur().usureBras();
     }
 
     // Effet quand on utilise le scanner sur une case qui contient un symbole (une les capteurs)
     private void scan(int ligne, int colonne) {
         donnees.majDerniereCelluleMinijeu(donnees.obtenirCellules()[ligne][colonne]);
-        donnees.majChronometreMinijeuLaser(System.currentTimeMillis());
+
+        donnees.majRepereMinijeuLaser(System.currentTimeMillis());
         donnees.majTempsAvantChrono((int)(Math.random()*((7000-3000)+1)+3000));
-        donnees.majEtatMinijeuLaser(true);
-        donnees.notifierObserveur(TypeMisAJour.MinijeuLaser);
+        donnees.majChronometreMinijeuLaser("0.0000 secondes"); // On met à jour l'affichage du temps
+        donnees.majNombreErreursLaser(0);
+        donnees.majEtatMinijeuLaser(Etat.ON);
+        donnees.notifierObservateur(TypeMisAJour.NombreErreursLaser);
+        donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+        donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
         donnees.obtenirJoueur().usureCapteurs();
     }
 
@@ -131,17 +136,10 @@ public class Controleur {
             }
         }
 
-        /*
-        buts.add(donnees.obtenirCellules()[0][1].obtenirCentre());
-        buts.add(donnees.obtenirCellules()[0][2].obtenirCentre());
-        buts.add(donnees.obtenirCellules()[0][3].obtenirCentre());
-        buts.add(donnees.obtenirCellules()[0][4].obtenirCentre());
-        donnees.obtenirJoueur().definirBut(buts);
-        */
-        
-        donnees.notifierObserveur(TypeMisAJour.Scene);
-        donnees.notifierObserveur(TypeMisAJour.Cellules);
-        donnees.notifierObserveur(TypeMisAJour.ArrierePlan);
+        donnees.notifierObservateur(TypeMisAJour.Scene);
+        donnees.notifierObservateur(TypeMisAJour.Joueur);   // On transmet une unique fois la référence à l'objet Joueur (la valeur de l'objet joueur est un pointeur)
+        donnees.notifierObservateur(TypeMisAJour.Cellules); // On transmet une unique fois la référence du tableau de cellules
+        donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
 	}
 
 	public void rafraichir() {
@@ -155,43 +153,84 @@ public class Controleur {
             }
             if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
                 
-                // Si on doit effacer le minijeu de l'extraction
-                if (donnees.obtenirEffacerMinijeuExtraction() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuExtraction() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
-                    donnees.majEffacerMinijeuExtraction(false);
-                    donnees.notifierObserveur(TypeMisAJour.EffacerMinijeuExtraction);
-                    donnees.notifierObserveur(TypeMisAJour.MinijeuExtraction);
-                    System.out.println("Précision du bras robotique: "+donnees.obtenirScoreExtraction()+" %");
-                    switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
-                        case BOIS:
-                            // On a extrait 1 de bois, donc on peut construire 1 pont
-                            for (BoutonCercle b: donnees.obtenirCompetences()) {
-                                if (b.obtenirEffet().equals("Pont"))
-                                    b.majDisponible(true);
+                switch (donnees.obtenirEtatMiniJeuExtraction()) {
+                    case ON:
+                        break;
+                    case IN: // On fait varier la position du curseur entre 0 et 1
+                        
+                        if (donnees.obtenirSensVariationExtraction()) { //On déplace le curseur vers la droite
+                            donnees.majPositionCurseurExtraction(donnees.obtenirPositionCurseurExtraction() + Options.INCREMENT_CURSEUR);
+                            if (donnees.obtenirPositionCurseurExtraction() > 1) {
+                                donnees.majPositionCurseurExtraction(1);
+                                donnees.majSensVariationExtraction(false);
+                                donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
                             }
-                            donnees.majNombrePonts(donnees.obtenirNombrePont()+1);
-                        default:
-                            donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(null, null); // On enlève le symbole
-                            break;
-                    }
-                    desactiverCompetence();
+                        } else { // On déplace le curseur vers la gauche
+                            donnees.majPositionCurseurExtraction(donnees.obtenirPositionCurseurExtraction() - Options.INCREMENT_CURSEUR);
+                            if (donnees.obtenirPositionCurseurExtraction() < 0) {
+                                donnees.majPositionCurseurExtraction(0);
+                                donnees.majSensVariationExtraction(true);
+                                donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
+                            }
+                        }
+                        donnees.notifierObservateur(TypeMisAJour.PositionCurseurExtraction);
+                        break;
+                    case OUT: // Si on est en train d'afficher le score
+                        if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) { // Si on doit fermer la fenêtre du minijeu
+                            donnees.majEtatMinijeuExtraction(Etat.OFF);
+                            donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
+                            System.out.println("Précision du bras robotique: "+new DecimalFormat("0.00").format(-200.*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100)+" %");
+                            
+                            switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
+                                case BOIS:
+                                    // On a extrait 1 de bois, donc on peut construire 1 pont
+                                    for (BoutonCercle b: donnees.obtenirCompetences()) {
+                                        if (b.obtenirEffet().equals("Pont"))
+                                            b.majDisponible(true);
+                                    }
+                                    donnees.majNombrePonts(donnees.obtenirNombrePont()+1);
+                                case CHENILLES:
+                                    donnees.obtenirJoueur().majSurChenilles(true);
+                                default:
+                                    donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
+                                    break;
+                            }
+                            desactiverCompetence();
+                        }
+                        break;
+                    case OFF:
+                        break;
                 }
 
-                // Si le minijeu du laser est actif
-                // ET si le le temps avant le départ du chronomètre est atteint
-                // On envoie l'ordre d'allumer les feux du minijeu en vert
-                if (donnees.obtenirEtatMiniJeuLaser() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() > donnees.obtenirTempsAvantChrono()) {
-                    donnees.majEtatMinijeuLaser(false);
-                    donnees.majDemarrerMinijeuLaser(true);
-                    donnees.majChronometreMinijeuLaser(System.currentTimeMillis());
-                    donnees.notifierObserveur(TypeMisAJour.DemarrerMinijeuLaser);
-                } else if (donnees.obtenirEffacerMiniJeuLaser() && System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
-                    donnees.majEffacerMiniJeuLaser(false);
-                    donnees.notifierObserveur(TypeMisAJour.MinijeuLaser);
-                    System.out.println("Temps de réaction: "+donnees.obtenirTempsDeReaction()+" ms");
-                    donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().estVisible = true;
-                    desactiverCompetence();
+                switch (donnees.obtenirEtatMiniJeuLaser()) {
+                    case ON:
+                        
+                        // Si il est temps de démarrer le mini-jeu
+                        if (System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser() > donnees.obtenirTempsAvantChrono()) {
+                            donnees.majEtatMinijeuLaser(Etat.IN);
+                            donnees.majRepereMinijeuLaser(System.currentTimeMillis()); // On met à jour le repère de temps
+                            donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+                        }
+                        // On met à jour l'affichage du temps
+                        donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0000").format((System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser()) / 1000.) + " secondes");
+                        donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+                        break;
+                    case IN:
+                        // On arrondie le temps (en seconde) au millième
+                        donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0000").format((System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser()) / 1000.) + " secondes");
+                        donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+                        break;
+                    case OUT:
+                        if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
+                            donnees.majEtatMinijeuLaser(Etat.OFF);
+                            donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+                            donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().estVisible = true;
+                            desactiverCompetence();
+                        }
+                        break;
+                    case OFF:
+                        break;
                 }
-                    
                 donnees.obtenirJoueur().move();
 
                 // Si on a changé de case
@@ -207,7 +246,6 @@ public class Controleur {
                     
 
                 donnees.obtenirJoueur().rafraichirImage();
-                donnees.notifierObserveur(TypeMisAJour.Joueur);
                 int dx = -donnees.obtenirJoueur().getDx();
                 int dy = -donnees.obtenirJoueur().getDy();
                 if (dx != 0 || dy != 0) {
@@ -216,10 +254,9 @@ public class Controleur {
                         for (int j=0; j < donnees.obtenirCellules()[i].length; j++)
                             donnees.obtenirCellules()[i][j].translate(dx, dy);
                     }
-                    donnees.notifierObserveur(TypeMisAJour.ArrierePlan);
-                    donnees.notifierObserveur(TypeMisAJour.Cellules);
+                    donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
                 }
-                donnees.notifierObserveur(TypeMisAJour.Peindre);
+                donnees.notifierObservateur(TypeMisAJour.Peindre);
             }
         }
 	}
@@ -234,10 +271,10 @@ public class Controleur {
         try {
             HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_IMAGES+"/");
             donnees.majArrierePlan(new ArrierePlan(images.get("surface_texture")));
-            donnees.notifierObserveur(TypeMisAJour.ArrierePlan);
+            donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
             donnees.majImageMenu(TailleImage.resizeImage(images.get("planetes"), donnees.obtenirLargeur(), donnees.obtenirHauteur(), true));
             
-            donnees.notifierObserveur(TypeMisAJour.ImageMenu);
+            donnees.notifierObservateur(TypeMisAJour.ImageMenu);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
@@ -268,10 +305,8 @@ public class Controleur {
         final int HAUTEUR = (int) (Options.LARGEUR_CASE*0.7);
         try {
             HashMap<String, Image> imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
-            for (String i : imagesSymboles.keySet()) {
+            for (String i : imagesSymboles.keySet())
                 imagesSymboles.put(i, TailleImage.resizeImage(imagesSymboles.get(i), LARGEUR, HAUTEUR, true));
-                //System.out.println("Nom de l'image : " + i + "\nimage: " + imagesSymboles.get(i)+"\n");
-            }
             donnees.majImagesSymboles(imagesSymboles);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
@@ -328,7 +363,7 @@ public class Controleur {
             // pendant que le thread s'exécute
             int avancement = (int) historique.get(historique.size()-1);
             donnees.majAvancement(avancement);
-            donnees.notifierObserveur(TypeMisAJour.Avancement);
+            donnees.notifierObservateur(TypeMisAJour.Avancement);
         }
 
         @Override
@@ -341,7 +376,7 @@ public class Controleur {
                 majMusique(0);
                 boucleMusique();
                 donnees.majScene("Choix du mode");
-                donnees.notifierObserveur(TypeMisAJour.Scene);
+                donnees.notifierObservateur(TypeMisAJour.Scene);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -352,40 +387,50 @@ public class Controleur {
         donnees.majScene(scene);
     }
 
-    private void majCelluleType(int ligne, int colonne, TypeCase type) {
-        if (ligne > -1 && ligne < donnees.obtenirCellules().length && colonne > -1 && colonne < donnees.obtenirCellules()[0].length)
-            donnees.obtenirCellules()[ligne][colonne].majType(type);
-    }
-
     public void click(int x, int y, boolean estDansMenu) {
-        if (!donnees.obtenirEtatOptions()) {
+        if (!donnees.obtenirEtatOptions()) { // Si on est pas en pause
             boolean estModifie = false;
 
             if (!aucunJeuEnCours()) {
-                if (donnees.obtenirEtatMiniJeuExtraction()) {
+                estModifie = true;
+                // Si le mini-jeu extraction est en cours
+                if (donnees.obtenirEtatMiniJeuExtraction().equals(Etat.IN)) {
                     donnees.majEffet("win");
-                    donnees.majEtatMinijeuExtraction(false);
-                    donnees.majChronometreMinijeuExtraction(System.currentTimeMillis());
-                    donnees.majEffacerMinijeuExtraction(true);
-                    donnees.notifierObserveur(TypeMisAJour.EffacerMinijeuExtraction);
-                } else if (donnees.obtenirEtatMiniJeuLaser()) { // Si on on clique avant le début, on reçoit une croix. Au bout de 3 croix, le joueur reçoit un malus
-                    if (System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() < donnees.obtenirTempsAvantChrono()) {
+                    donnees.majChronometreSuppression(System.currentTimeMillis());
+                    donnees.majEtatMinijeuExtraction(Etat.OUT);
+
+                    // Pourcentage de précision final
+                    System.out.println(new DecimalFormat("0.0").format(-200*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100)+" % de précision");
+                    donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
+                }
+                // Si le mini-jeu laser est en cours
+                else if (donnees.obtenirEtatMiniJeuLaser().equals(Etat.IN)) {
+                    donnees.majEffet("win");
+                    donnees.majChronometreSuppression(System.currentTimeMillis());
+
+                    // Mise à jour du temps de réaction final en MILLISECONDES
+                    // on arrondie le temps au millième
+                    donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0").format(System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser())+" millisecondes"); 
+                    System.out.println("Temps de réaction: "+donnees.obtenirChronometreMinijeuLaser()+" ms"); // Temps de réaction final
+                    donnees.majEtatMinijeuLaser(Etat.OUT);
+                    donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+                    donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+                }
+                // Si le mini-jeu laser est en lancement (mais pas en cours !)
+                // Si on on clique avant le début, on reçoit une croix. Au bout de 3 croix, le joueur reçoit un malus
+                else if (donnees.obtenirEtatMiniJeuLaser().equals(Etat.ON)) { 
+                    if (System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser() < donnees.obtenirTempsAvantChrono()) {
                         donnees.majEffet("loose");
-                        donnees.majChronometreMinijeuLaser(System.currentTimeMillis()); // On réinitialise le chronomètre
-                        if (donnees.obtenirNombreErreursLaser() != Options.NOMBRE_ERREURS_LASER) {
-                            donnees.majNombreErreursLaser(donnees.obtenirNombreErreursLaser()+1);
-                            if (donnees.obtenirNombreErreursLaser() == Options.NOMBRE_ERREURS_LASER) {
+                        donnees.majRepereMinijeuLaser(System.currentTimeMillis()); // On réinitialise le repère
+                        donnees.majChronometreMinijeuLaser("0.0000 secondes"); // On réinitalise l'affichage du temps écoulé
+                        if (donnees.obtenirNombreErreursLaser() != Options.NOMBRE_ERREURS_LASER) { // Si on a pas déjà atteint le maximum de croix
+                            donnees.majNombreErreursLaser(donnees.obtenirNombreErreursLaser()+1); // On ajoute une croix
+                            donnees.notifierObservateur(TypeMisAJour.NombreErreursLaser);
+                            if (donnees.obtenirNombreErreursLaser() == Options.NOMBRE_ERREURS_LASER) { // Si on atteint le maximum de croix
                                 // MALUS
                             }
                         }
-                        donnees.notifierObserveur(TypeMisAJour.NombreErreursLaser);
                     }
-                } else if (donnees.obtenirDemarrerMinijeuLaser()) {
-                    donnees.majEffet("win");
-                    donnees.majDemarrerMinijeuLaser(false);
-                    donnees.notifierObserveur(TypeMisAJour.DemarrerMinijeuLaser);
-                    donnees.majChronometreMinijeuLaser(System.currentTimeMillis());
-                    donnees.majEffacerMiniJeuLaser(true);
                 }
             } else {
             
@@ -414,20 +459,20 @@ public class Controleur {
                                     b.majSourisDessus(true);
                                     if (donnees.obtenirRayonDeSelection() != 0) {
                                         donnees.majRayonDeSelection(0);
-                                        donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                        donnees.notifierObservateur(TypeMisAJour.RayonDeSelection);
                                     }
                                     switch (b.obtenirEffet()) {
                                         case "Grappin":
                                             donnees.majRayonDeSelection(4);
-                                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                            donnees.notifierObservateur(TypeMisAJour.RayonDeSelection);
                                             break;
                                         case "Scanner":
                                             donnees.majRayonDeSelection(2);
-                                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                            donnees.notifierObservateur(TypeMisAJour.RayonDeSelection);
                                             break;
                                         case "Pont":
                                             donnees.majRayonDeSelection(2);
-                                            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+                                            donnees.notifierObservateur(TypeMisAJour.RayonDeSelection);
                                             break;
                                         case "Réparation":
                                             break;
@@ -435,7 +480,7 @@ public class Controleur {
                                 }
                             }
                             estModifie = true;
-                            donnees.notifierObserveur(TypeMisAJour.Competences);
+                            donnees.notifierObservateur(TypeMisAJour.Competences);
                             break;
                         }
                     }
@@ -452,6 +497,7 @@ public class Controleur {
                         for (int i=0; i < cellules.length; i++) {
                             for (int j=0; j < cellules[i].length; j++) {
                                 if (cellules[i][j].contains(x/donnees.obtenirZoom(),y/donnees.obtenirZoom())) {
+                                    estModifie = true;
                                     if (donnees.obtenirDerniereCellule() == cellules[i][j]) { // On compare les pointeurs (références) des 2 objets
                                         donnees.majDerniereCellule(null);
                                     } else {
@@ -463,7 +509,6 @@ public class Controleur {
                                         */
                                         
                                         if (donnees.getScene().equals("Jeu")) {  // Calcul et transmission de la trajectoire
-
                                             // Si on a une compétence de sélectionnée ET que le robot n'est pas en train de se déplacer
                                             if (donnees.obtenirRayonDeSelection() > 0 && donnees.obtenirJoueur().obtenirTrajectoire().isEmpty()) {
                                                 // Si la case est dans le rayon d'action de la compétence:
@@ -497,63 +542,74 @@ public class Controleur {
                                                 
                                                 if (i == indexRobot[0] && j == indexRobot[1]) {
                                                     donnees.obtenirJoueur().definirBut(new LinkedList<int[]>());
-                                                    donnees.notifierObserveur(TypeMisAJour.Joueur);
                                                 } else {
                                                     
-                                                    // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de sélection autorisé
-                                                    Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, indexRobot[0], indexRobot[1], Options.RAYON_JOUEUR);
-                                                    int index = 0;
-                                                    while (index < casesVoisines.length && casesVoisines[index] != cellules[i][j])
-                                                        index ++;
-                                                    if (index < casesVoisines.length) { // Si la case fait partie des voisins, alors elle est bien dans le rayon de sélection autorisé
+                                                    // Si le joueur n'a pas de chenilles, on l'empêche d'aller sur une case montagne
+                                                    // Joueur a des chenilles = a
+                                                    // La case est une montagne = b
+                                                    // On va sur la case ssi    !(!a&&b)
+                                                    //                          a||!b
+                                                    if (donnees.obtenirJoueur().obtenirSurChenilles() || cellules[i][j].obtenirSymbole().type != TypeSymbole.MONTAGNE) {
 
-                                                        final int[] INDEX_CELLULE = cellules[i][j].obtenirPositionTableau();
-                                                        final int[] COORDS_CELLULE = cellules[i][j].obtenirCentre();
-                                                        LinkedList<int[]> listeBut = new LinkedList<int[]>();
-                                                        HashMap<Cellule, Double> distances = new HashMap<Cellule, Double>();
-                                                        Cellule celluleOptimale = null;
+                                                        // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de sélection autorisé
+                                                        Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, indexRobot[0], indexRobot[1], Options.RAYON_JOUEUR);
+                                                        int index = 0;
+                                                        while (index < casesVoisines.length && casesVoisines[index] != cellules[i][j])
+                                                            index ++;
+                                                        if (index < casesVoisines.length) { // Si la case fait partie des voisins, alors elle est bien dans le rayon de sélection autorisé
 
-                                                        int[] centreVoisins = indexRobot;
+                                                            final int[] INDEX_CELLULE = cellules[i][j].obtenirPositionTableau();
+                                                            final int[] COORDS_CELLULE = cellules[i][j].obtenirCentre();
+                                                            LinkedList<int[]> listeBut = new LinkedList<int[]>();
+                                                            HashMap<Cellule, Double> distances = new HashMap<Cellule, Double>();
+                                                            Cellule celluleOptimale = null;
 
-                                                        while( listeBut.isEmpty() || !(INDEX_CELLULE[0] == celluleOptimale.obtenirPositionTableau()[0] && INDEX_CELLULE[1] == celluleOptimale.obtenirPositionTableau()[1]) ) { // On réitère le processecus pour chaque déplacement jusqu'à l'arrivée
-                                                            
-                                                            casesVoisines = Voisins.obtenirVoisins(cellules, centreVoisins[0], centreVoisins[1], 2);
-                                                            
-                                                            int k = 0;
-                                                            distances.clear();
-                                                            while (k < casesVoisines.length){
-                                                                if (casesVoisines[k] != cellules[centreVoisins[0]][centreVoisins[1]])
-                                                                    distances.put(casesVoisines[k], Math.pow((double)(COORDS_CELLULE[0]-casesVoisines[k].obtenirCentre()[0]),2)+Math.pow((double)(COORDS_CELLULE[1]-casesVoisines[k].obtenirCentre()[1]),2)); // Distance au carré
-                                                                k++;
-                                                            }
+                                                            int[] centreVoisins = indexRobot;
 
-                                                            // Déplacement sur la cellule où la distance restante est optimale = but1
-                                                            double min = Collections.min(distances.values());
-                                                            
-                                                            for (Entry<Cellule, Double> entry : distances.entrySet()) {
-                                                                if (entry.getValue()==min) {
-                                                                    celluleOptimale = entry.getKey();
-                                                                    break;
+                                                            int nombreIterations = 0;
+                                                            // On vérifie qu'on a pas atteint un nombre maximal de tentatives de recherche d'une trajectoire vers un point (car un point peut ne pas être atteint)
+                                                            // On arrête la boucle dans le cas où la dernière cellule du but est celle sur laquelle l'utilisateur a cliqué
+                                                            // Si il n'y a pas de dernière cellule (liste de buts vide), on ne vérifie pas la correspondence entre la dernière cellule et celle cliquée
+                                                            while( nombreIterations < Options.NOMBRE_MAX_ITERATIONS_TRAJECTOIRE && (listeBut.isEmpty() || !(INDEX_CELLULE[0] == celluleOptimale.obtenirPositionTableau()[0] && INDEX_CELLULE[1] == celluleOptimale.obtenirPositionTableau()[1])) ) { // On réitère le processecus pour chaque déplacement jusqu'à l'arrivée
+                                                                nombreIterations++;
+                                                                casesVoisines = Voisins.obtenirVoisins(cellules, centreVoisins[0], centreVoisins[1], 2);
+                                                                
+                                                                int k = 0;
+                                                                distances.clear();
+                                                                while (k < casesVoisines.length){
+                                                                    if (casesVoisines[k] != cellules[centreVoisins[0]][centreVoisins[1]]) {
+                                                                        // Si le joueur n'a pas de chenilles, on l'empêche d'aller sur une case montagne
+                                                                        // Joueur a des chenilles = a
+                                                                        // La case est une montagne = b
+                                                                        // On ajoute la casse ssi   !(!a&&b)
+                                                                        //                          a||!b
+                                                                        if (donnees.obtenirJoueur().obtenirSurChenilles() || casesVoisines[k].obtenirSymbole().type != TypeSymbole.MONTAGNE)
+                                                                            distances.put(casesVoisines[k], Math.pow((double)(COORDS_CELLULE[0]-casesVoisines[k].obtenirCentre()[0]),2)+Math.pow((double)(COORDS_CELLULE[1]-casesVoisines[k].obtenirCentre()[1]),2)); // Distance au carré
+                                                                    }
+                                                                    k++;
                                                                 }
+
+                                                                // Déplacement sur la cellule où la distance restante est optimale = but1
+                                                                double min = Collections.min(distances.values());
+                                                                
+                                                                for (Entry<Cellule, Double> entry : distances.entrySet()) {
+                                                                    if (entry.getValue()==min) {
+                                                                        celluleOptimale = entry.getKey();
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                
+                                                                final int[] INDEX_CASE_OPTIMALE = celluleOptimale.obtenirPositionTableau();
+                                                                
+                                                                final int[] DELTA_POSITION_JOUEUR = donnees.obtenirJoueur().obtenirCoordonnees();
+                                                                int[] deltaPosition = {celluleOptimale.obtenirCentre()[0] + DELTA_POSITION_JOUEUR[0], celluleOptimale.obtenirCentre()[1] + DELTA_POSITION_JOUEUR[1], INDEX_CASE_OPTIMALE[0], INDEX_CASE_OPTIMALE[1]};
+                                                                listeBut.add(deltaPosition);
+                                                                centreVoisins = celluleOptimale.obtenirPositionTableau();
+                                                            
                                                             }
-
-                                                            
-                                                            final int[] INDEX_CASE_OPTIMALE = celluleOptimale.obtenirPositionTableau();
-
-                                                            /*
-                                                            System.out.println("Centre Robot: "+indexRobot[0]+","+indexRobot[1]);
-                                                            System.out.println("Case à atteindre: "+INDEX_CELLULE[0]+","+INDEX_CELLULE[1]);
-                                                            System.out.println("Case atteinte: "+INDEX_CASE_OPTIMALE[0]+","+INDEX_CASE_OPTIMALE[1]);
-                                                            */
-                                                            
-                                                            final int[] DELTA_POSITION_JOUEUR = donnees.obtenirJoueur().obtenirCoordonnees();
-                                                            int[] deltaPosition = {celluleOptimale.obtenirCentre()[0] + DELTA_POSITION_JOUEUR[0], celluleOptimale.obtenirCentre()[1] + DELTA_POSITION_JOUEUR[1], INDEX_CASE_OPTIMALE[0], INDEX_CASE_OPTIMALE[1]};
-                                                            listeBut.add(deltaPosition);
-                                                            centreVoisins = celluleOptimale.obtenirPositionTableau();
-                                                        
+                                                            donnees.obtenirJoueur().definirBut(listeBut);
                                                         }
-                                                        donnees.obtenirJoueur().definirBut(listeBut);
-                                                        //donnees.notifierObserveur(TypeMisAJour.Joueur);
                                                     }
                                                 }
                                             }
@@ -577,10 +633,18 @@ public class Controleur {
                                             if (donnees.obtenirDerniereCaseSymbole() != null) {
                                                 final Image image = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().image;
                                                 final TypeSymbole type = donnees.obtenirDerniereCaseSymbole().obtenirSymbole().type;
-
+                                                
                                                 int taillePinceau = 1;
                                                 if (donnees.obtenirDernierBouton() != null)
                                                     taillePinceau = donnees.obtenirDernierBouton().obtenirTaillePinceau();
+                                                
+                                                if (type == TypeSymbole.FUSEE) { // Si on place le point d'apparition du joueur (symbole de fusée)
+                                                    if (donnees.obtenirCelluleDepart() != null) // Si un point d'apparition a déjà été fixé
+                                                        cellules[donnees.obtenirCelluleDepart()[0]][donnees.obtenirCelluleDepart()[1]].obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole de la case
+                                                    taillePinceau = 1; // On place uniquement 1 symbole de point d'apparition
+                                                    donnees.majCelluleDepart(new int[]{i,j});
+                                                }
+                                                
                                                 Cellule[] voisins = Voisins.obtenirVoisins(cellules, i, j, taillePinceau);
                                                 for (Cellule c: voisins) {
                                                     c.obtenirSymbole().majSymbole(type, image);
@@ -590,8 +654,6 @@ public class Controleur {
                                             } 
                                         }
                                     }
-                                    estModifie = true;
-                                    donnees.notifierObserveur(TypeMisAJour.Cellules);
                                     break;
                                 }
                             }
@@ -616,7 +678,6 @@ public class Controleur {
                             donnees.majDerniereCaseSymbole(boutonsSymbole[i]);
                         }
                         estModifie = true;
-                        donnees.notifierObserveur(TypeMisAJour.BoutonsSymbole);
                         break;
                     }
                 }
@@ -634,7 +695,6 @@ public class Controleur {
                             donnees.majDerniereCaseType(boutonsType[i]);
                         }
                         estModifie = true;
-                        donnees.notifierObserveur(TypeMisAJour.BoutonsType);
                         break;
                     }
                 }
@@ -652,13 +712,12 @@ public class Controleur {
                             donnees.majDernierBouton(boutonsCercle[i]);
                         }
                         estModifie = true;
-                        donnees.notifierObserveur(TypeMisAJour.BoutonsCercle);
                         break;
                     }
                 }
             }
             if (estModifie)
-                donnees.notifierObserveur(TypeMisAJour.Peindre);
+                donnees.notifierObservateur(TypeMisAJour.Peindre);
         }
     }
 
@@ -669,19 +728,27 @@ public class Controleur {
         
         //BoutonsCercles
         final int NOMBRE_BOUTONS_CIRCULAIRES = 3;
-        // Longueur totale des cercles:
-        // Somme de i=1 à n de (R+0,25*R*i) = nR+0,25*R*n*(n+1)/2 = n*R*(1+(n+1)/8)
-        // où R est le rayon initiale du cercle
-        final int LONGUEUR_BOUTONS = NOMBRE_BOUTONS_CIRCULAIRES*Options.LARGEUR_BOUTON_CASE*(1+(NOMBRE_BOUTONS_CIRCULAIRES+1)/8);
-        final int LONGUEUR_ESPACEMENTS = (NOMBRE_BOUTONS_CIRCULAIRES-1)*Options.ESPACE_INTER_BOUTON;
+        // Longueur totale des cercles: Suite arithmétique de raison 0.25*R
+        // Un+1 = Un+INCREMENT_TAILLE*R où R est le rayon du bouton
+        // Un = Up + (n-p)*r où r est la raison de la suite
+        // U(n-1) = R + (n-1)*INCREMENT_TAILLE*R = R*(1 + (n-1)*INCREMENT_TAILLE)
+        // Sn = 3 * (R + R*(1 + (n-1)*INCREMENT_TAILLE))/2 = 3R/2 *(2 + (n-1)*INCREMENT_TAILLE))
+        
+        final double INCREMENT_TAILLE = 0.25;
+        // On multiplie par 2 la somme des rayons pour obtenir la longueur totale des boutons
+        final int LONGUEUR_BOUTONS = (int) (2*(3*Options.RAYON_BOUTON_CERCLE/2 *(2 + (NOMBRE_BOUTONS_CIRCULAIRES-1)*INCREMENT_TAILLE)));
+        final int LONGUEUR_ESPACEMENTS = (NOMBRE_BOUTONS_CIRCULAIRES-1)*Options.ESPACE_INTER_BOUTON;;
         final int LONGUEUR_TOTALE = LONGUEUR_ESPACEMENTS + LONGUEUR_BOUTONS;
         
+        int rayonBouton = Options.RAYON_BOUTON_CERCLE;
+        int longueurBoutons = 0;
         BoutonCercle[] boutonsCercle = new BoutonCercle[NOMBRE_BOUTONS_CIRCULAIRES];
         for (int i=0; i<NOMBRE_BOUTONS_CIRCULAIRES; i++) {
-            final int longueuBoutons = i*Options.LARGEUR_BOUTON_CASE*(1+(i+1)/8);
-            final int x = (int)((LARGEUR_MENU-LONGUEUR_TOTALE)/2+i*Options.ESPACE_INTER_BOUTON+longueuBoutons);
+            final int x = (int)((LARGEUR_MENU - LONGUEUR_TOTALE + Options.RAYON_BOUTON_CERCLE)/2 + Options.EPAISSEUR_BORDURE_CERCLE + i*(Options.ESPACE_INTER_BOUTON+Options.EPAISSEUR_BORDURE_CERCLE)+longueurBoutons);
             final int y = 100;
-            boutonsCercle[i] = new BoutonCercle(x,y,Options.RAYON_BOUTON_CERCLE*(1+i*0.25), i+1);
+            boutonsCercle[i] = new BoutonCercle(x,y,rayonBouton, i+1);
+            longueurBoutons += rayonBouton*2;
+            rayonBouton += Options.RAYON_BOUTON_CERCLE*INCREMENT_TAILLE;
         }
 
         //BoutonsHex
@@ -699,7 +766,7 @@ public class Controleur {
             for (int j=0; j<Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE; j++) {
                 if (index < TYPES.length) {
                     boutonsType[index] = new Cellule(TYPES[index], i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON, true);
-                    boutonsType[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[1]+80);
+                    boutonsType[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[1]+60);
                 }
                 index++;
             }
@@ -715,7 +782,7 @@ public class Controleur {
                 if (index < SYMBOLES.length) {
                     //System.out.println("Image: "+SYMBOLES[index].name()+" "+donnees.getImagesSymboles().get(SYMBOLES[index].name()));
                     boutonsSymbole[index] = new Cellule(TypeCase.VIDE, i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON, true, new Symbole(SYMBOLES[index], donnees.getImagesSymboles().get(SYMBOLES[index].name()), true));
-                    boutonsSymbole[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[2]+80);
+                    boutonsSymbole[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[2]+60);
                 }
                 index++;
             }
@@ -738,13 +805,13 @@ public class Controleur {
 
         donnees.obtenirArrierePlan().majCoords(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2);
 
-        donnees.notifierObserveur(TypeMisAJour.Scene);
-        donnees.notifierObserveur(TypeMisAJour.ArrierePlan);
-        donnees.notifierObserveur(TypeMisAJour.Cellules);
-        donnees.notifierObserveur(TypeMisAJour.BoutonsCercle);
-        donnees.notifierObserveur(TypeMisAJour.BoutonsType);
-        donnees.notifierObserveur(TypeMisAJour.BoutonsSymbole);
-        donnees.notifierObserveur(TypeMisAJour.Peindre);
+        donnees.notifierObservateur(TypeMisAJour.Scene);
+        donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
+        donnees.notifierObservateur(TypeMisAJour.Cellules);       // On transmet une unique fois la référence à la liste
+        donnees.notifierObservateur(TypeMisAJour.BoutonsCercle);  // On transmet une unique fois la référence à la liste
+        donnees.notifierObservateur(TypeMisAJour.BoutonsType);    // On transmet une unique fois la référence à la liste
+        donnees.notifierObservateur(TypeMisAJour.BoutonsSymbole); // On transmet une unique fois la référence à la liste
+        donnees.notifierObservateur(TypeMisAJour.Peindre);
     }
 
     public void interactionClavier(int code) {
@@ -769,15 +836,18 @@ public class Controleur {
                     case KeyEvent.VK_ESCAPE :
                         donnees.majEtatOptions(!donnees.obtenirEtatOptions());
 
-                        if (!donnees.obtenirEtatOptions() && donnees.obtenirEtatMiniJeuLaser()) {// Si on sort des options et qu'on joue au mini-jeu laser
-                            if (System.currentTimeMillis() - donnees.obtenirChronometreMinijeuLaser() < donnees.obtenirTempsAvantChrono()) {
+                        // Si on sort des options et qu'on joue au mini-jeu laser (le jeu allait se lancer)
+                        if (!donnees.obtenirEtatOptions() && donnees.obtenirEtatMiniJeuLaser().equals(Etat.ON)) {
+                            if (System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser() < donnees.obtenirTempsAvantChrono()) {
                                 donnees.majEffet("swoosh");
-                                donnees.majChronometreMinijeuLaser(System.currentTimeMillis()); // On réinitialise le chronomètre
-                                donnees.notifierObserveur(TypeMisAJour.NombreErreursLaser);
+                                donnees.majRepereMinijeuLaser(System.currentTimeMillis()); // On réinitialise le repère
+                                donnees.majChronometreMinijeuLaser("0.0000 secondes"); // On réinitalise l'affichage du temps écoulé
+                                donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+                                donnees.notifierObservateur(TypeMisAJour.NombreErreursLaser);
                             }
                         }
 
-                        donnees.notifierObserveur(TypeMisAJour.Options);
+                        donnees.notifierObservateur(TypeMisAJour.Options);
                         break;
                 }
             }
@@ -794,31 +864,31 @@ public class Controleur {
                 cellules[i][j].translate((int)(dx*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()), (int)(dy*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()));
         }
 
-        donnees.notifierObserveur(TypeMisAJour.ArrierePlan);
-        donnees.notifierObserveur(TypeMisAJour.Cellules);
-        donnees.notifierObserveur(TypeMisAJour.Peindre);
+        donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
+        donnees.notifierObservateur(TypeMisAJour.Cellules);
+        donnees.notifierObservateur(TypeMisAJour.Peindre);
     }
 
     public void ajusterZoom(int notches, Point point) {
-        // convert target coordinates to zoomTarget coordinates
-        if (notches < 1) {
-            double tmpZoom = donnees.obtenirZoom()/Options.MULTIPLICATEUR_ZOOM;
-            if (donnees.getScene() != null) {
-                if (donnees.getScene().equals("Editeur de carte")) {
-                    if (tmpZoom < 0.01)
-                        tmpZoom = 0.01; 
-                } else if (donnees.getScene().equals("Jeu")) {
-                    if (tmpZoom < 0.47)
-                        tmpZoom = 0.47;
+        if (aucunJeuEnCours()) {
+            // convert target coordinates to zoomTarget coordinates
+            if (notches < 1) {
+                double tmpZoom = donnees.obtenirZoom()/Options.MULTIPLICATEUR_ZOOM;
+                if (donnees.getScene() != null) {
+                    if (donnees.getScene().equals("Editeur de carte")) {
+                        if (tmpZoom < 0.01)
+                            tmpZoom = 0.01; 
+                    } else if (donnees.getScene().equals("Jeu")) {
+                        if (tmpZoom < 0.47)
+                            tmpZoom = 0.47;
+                    }
+                    donnees.majZoom(tmpZoom);
                 }
-                donnees.majZoom(tmpZoom);
-            }
-        } else
-            donnees.majZoom(donnees.obtenirZoom()*Options.MULTIPLICATEUR_ZOOM);
-        donnees.majCentreZoom(point);
-        donnees.notifierObserveur(TypeMisAJour.CentreZoom);
-        donnees.notifierObserveur(TypeMisAJour.Zoom);
-        donnees.notifierObserveur(TypeMisAJour.Peindre);
+            } else
+                donnees.majZoom(donnees.obtenirZoom()*Options.MULTIPLICATEUR_ZOOM);
+            donnees.notifierObservateur(TypeMisAJour.Zoom);
+            donnees.notifierObservateur(TypeMisAJour.Peindre);
+        }
     }
 
     public void majStatutSouris(MouseEvent ev, boolean clic) {
@@ -895,7 +965,7 @@ public class Controleur {
 
     public void retourMenu() {
         donnees.majScene("Choix du mode");
-        donnees.notifierObserveur(TypeMisAJour.Scene);
+        donnees.notifierObservateur(TypeMisAJour.Scene);
         chargerCartes();
     }
 
@@ -904,7 +974,7 @@ public class Controleur {
         try {
             Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
             donnees.majCartes(ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES));
-            donnees.notifierObserveur(TypeMisAJour.Cartes);
+            donnees.notifierObservateur(TypeMisAJour.Cartes);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
@@ -943,13 +1013,6 @@ public class Controleur {
 	
 	}
 
-    public void majTempsDeReaction(long tempsDeReaction) {
-        donnees.majTempsDeReaction(tempsDeReaction);
-    }
-    public void majScoreExtraction(String scoreExtraction) {
-        donnees.majScoreExtraction(scoreExtraction);
-    }
-
     public void majLargeur(int largeur) {
         donnees.majLargeur(largeur);
     }
@@ -963,7 +1026,7 @@ public class Controleur {
         donnees.majDerniereCompetence(null);
         if (donnees.obtenirRayonDeSelection() != 0) {
             donnees.majRayonDeSelection(0);
-            donnees.notifierObserveur(TypeMisAJour.RayonDeSelection);
+            donnees.notifierObservateur(TypeMisAJour.RayonDeSelection);
         }
     }
 }

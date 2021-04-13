@@ -43,7 +43,7 @@ public class Cellule extends Polygon implements Dessin {
         ligne = uneLigne;
         colonne = uneColonne;
         type = unType;
-        couleur = this.getColor();
+        couleur = this.obtenirCouleur();
         largeur = Options.LARGEUR_CASE*taille;
         hauteur = Options.HAUTEUR_CASE*taille;
         // On créée les points du polygone
@@ -80,7 +80,7 @@ public class Cellule extends Polygon implements Dessin {
     }
 
     public Cellule(TypeCase unType, int uneLigne, int uneColonne, double taille, int espaceInterCase, boolean estDecouverte){
-        this(unType, uneLigne, uneColonne, taille, espaceInterCase, estDecouverte, null);
+        this(unType, uneLigne, uneColonne, taille, espaceInterCase, estDecouverte, new Symbole(TypeSymbole.VIDE, null, false));
     }
 
     public Cellule(TypeCase type, int uneLigne, int uneColonne){
@@ -97,7 +97,7 @@ public class Cellule extends Polygon implements Dessin {
         //Graphics2D g2d = (Graphics2D) g.create();
         
         if (!estDecouverte)
-            g2d.setColor(getColor(TypeCase.VIDE));
+            g2d.setColor(obtenirCouleur(TypeCase.VIDE));
         else
             g2d.setColor(couleur);
 
@@ -116,7 +116,7 @@ public class Cellule extends Polygon implements Dessin {
 
             translate((int)(-COIN_EN_HAUT_A_GAUCHE[0]), (int)(-COIN_EN_HAUT_A_GAUCHE[1]));
             AffineTransform at = g2d.getTransform();
-            at.translate(COIN_EN_HAUT_A_GAUCHE[0]-DELTA_LARGEUR*facteurDeTaille/2.,COIN_EN_HAUT_A_GAUCHE[1]-DELTA_HAUTEUR*facteurDeTaille/2.);
+            at.translate(COIN_EN_HAUT_A_GAUCHE[0]-DELTA_LARGEUR,COIN_EN_HAUT_A_GAUCHE[1]-DELTA_HAUTEUR);
             at.scale(facteurDeTaille, facteurDeTaille);
             g2d.setTransform(at);
 
@@ -135,7 +135,7 @@ public class Cellule extends Polygon implements Dessin {
                                 (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)*agrandissement*taille/2),
 
                                 (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2),
-                                (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2),
+                                (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2)•,
                                 (int)(CENTRE_CASE[0] + symbole.obtenirImage().getWidth(null)/2),
                                 (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)/2),
                                 null);
@@ -181,29 +181,29 @@ public class Cellule extends Polygon implements Dessin {
         return (this.type==uneCellule.type);
     }
     
-    public Color getColor() {
-        return getColor(type);
+    public Color obtenirCouleur() {
+        return obtenirCouleur(type);
     }
 
-    public Color getColor(TypeCase type) {
+    public Color obtenirCouleur(TypeCase type) {
+
         switch(type){
             case VIDE:
-                return Color.black;
+                return new Color(44, 62, 80);   // noir
             case EAU:
-                return Color.blue; 
+                return new Color(52, 152, 219); // bleu
             case MONTAGNE:
-                return Color.gray;
+                return new Color(189, 195, 199);// gris
             case DESERT:
-                return Color.yellow;
+                return new Color(241, 196, 15); // jaune
             case SABLE_MOUVANTS :
-                return Color.orange;
+                return new Color(230, 126, 34); // orange
             case NEIGE:
-                return Color.white;
+                return new Color(236, 240, 241);// blanc
             case FORET:
-                return Color.green;
-            default :
+                return new Color(46, 204, 113); //vert
+            default:
                 return null;
-                
         }
     }
 
@@ -233,7 +233,7 @@ public class Cellule extends Polygon implements Dessin {
 
     public void majType(TypeCase unType) {
         type = unType;
-        couleur = this.getColor();
+        couleur = this.obtenirCouleur();
     }
     
     // Renvoie les coordonnées du centre de la cellule et sa position dans la matrice de cellule

@@ -20,7 +20,7 @@ public class Symbole extends Polygon {
 		//this.image=getImage();
 	}
 	public Symbole() {
-		this(null, null, false);
+		this(TypeSymbole.VIDE, null, false);
 	}
 
 	//Dans Symbole:On rajoute la méthode
