@@ -52,7 +52,7 @@ public class Options {
     public static final double RATIO_TAILLE_SELECTION = 1.15;
 	public static final int ESPACE_INTER_CASE_BOUTON = 8;
 
-	public static final String[] infoLabels = {   "Taille de pinceau",
+	public static final String[] infoLabels = {   "Taille",
                                             "Type de case",
                                             "Symboles"};
     public static final int[] yLabels = {   0,
@@ -66,8 +66,8 @@ public class Options {
     public static final int INCREMENT_MINIMAP = 6;
     public static final double ZOOM_MINIMAP = 0.02;
     public static final double AGRANDISSEMENT_CELLULE_MINICARTE = 5.5;
-    public static final double POSITION_X_MINIMAP = 9./10.; // e.g: 11/12 de la largeur de l'écran
-    public static final double POSITION_Y_MINIMAP = 1./10.; //  e.g: 1/10 de la hauteur de l'écran
+    public static final double POSITION_X_MINIMAP = 0.85; // e.g: 0.9 de la largeur de l'écran
+    public static final double POSITION_Y_MINIMAP = 0.08; //  e.g: 1/10 de la hauteur de l'écran
     public static final int[] DIMENSIONS_CASES =  {
         (int) (Options.LARGEUR_CASE*Options.ZOOM_MINIMAP*Options.AGRANDISSEMENT_CELLULE_MINICARTE),
         (int) (Options.LARGEUR_CASE*Options.RATIO_LARGEUR_HAUTEUR*Options.ZOOM_MINIMAP*Options.AGRANDISSEMENT_CELLULE_MINICARTE)

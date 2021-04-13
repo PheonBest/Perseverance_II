@@ -53,9 +53,9 @@ public class Dessiner extends JPanel {
     private int largeurRectangle;
     private int hauteurRectangle;
     private int hauteurRectangleLaser;
-    private final double MINIJEU_EXTRACTION_LARGEUR_ECRAN = 3.; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
+    private final double MINIJEU_EXTRACTION_LARGEUR_ECRAN = 2.7; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
     private final double MINIJEU_EXTRACTION_HAUTEUR_ECRAN = 3.; // La hauteur du rectangle correspond au tiers de la hauteur de la fenêtre
-    private final double MINIJEU_LASER_HAUTEUR_ECRAN = 2.7;
+    private final double MINIJEU_LASER_HAUTEUR_ECRAN = 2.1;
     
     // Mini-jeu "Extraction"
     private Etat etatMinijeuExtraction = Etat.OFF;
@@ -307,6 +307,8 @@ public class Dessiner extends JPanel {
             // MINI-JEU EXTRACTION -------------
 
             // MINI-JEU LASER -------------
+            final int DECALAGE_Y_TEXTE = 20;
+            final int DECALAGE_Y_FEUX = 30;
             final int NOMBRE_FEUX = 3;
             final int RAYON_FEU = 30;
             final int ESPACE_INTRER_FEU = 30;
@@ -343,14 +345,14 @@ public class Dessiner extends JPanel {
                 }
                 for (int i=0; i < 3; i++) {
                     g2d.setPaint(couleurFondFeux);
-                    g2d.fillOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU + 20), RAYON_FEU*2, RAYON_FEU*2);
+                    g2d.fillOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU + DECALAGE_Y_FEUX), RAYON_FEU*2, RAYON_FEU*2);
                     g2d.setPaint(couleurBordureFeux);
-                    g2d.drawOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU + 20), RAYON_FEU*2, RAYON_FEU*2);
+                    g2d.drawOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU + DECALAGE_Y_FEUX), RAYON_FEU*2, RAYON_FEU*2);
                 }
 
                 g2d.setPaint(Color.BLACK);
-                dessinerTexteCentre(g2d, chronometreMinijeuLaser, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU), Options.police);
-                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes,\ncliquez le plus vite possible\npour renvoyer les données\ndu scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU), Options.POLICE_PLAIN);
+                dessinerTexteCentre(g2d, chronometreMinijeuLaser, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU+DECALAGE_Y_FEUX), Options.police);
+                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes,\ncliquez le plus vite possible\npour renvoyer les données\ndu scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU+DECALAGE_Y_TEXTE), Options.POLICE_PLAIN);
                 
                 // On dessine les éventuelles erreurs SI il y a au moins une erreur
                 if (nombreErreursLaser > 0) {
@@ -361,9 +363,9 @@ public class Dessiner extends JPanel {
                         else // Dessin de croix vides
                             g2d.setPaint(Color.DARK_GRAY);  // gris
                         // Ligne allant d'en bas à gauche à en haut à droite
-                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY+LARGEUR_CROIX, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY);
+                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY+LARGEUR_CROIX+DECALAGE_Y_FEUX, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY+DECALAGE_Y_FEUX);
                         // Ligne allant d'en haut à gauche à en bas à droite
-                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY+LARGEUR_CROIX);
+                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY+DECALAGE_Y_FEUX, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY+LARGEUR_CROIX+DECALAGE_Y_FEUX);
                     }
                 }
             }
