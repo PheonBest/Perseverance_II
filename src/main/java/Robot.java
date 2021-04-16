@@ -22,6 +22,8 @@ public class Robot extends Avatar {
     private double comptKm;
     private int nbCasesExplorees = 0;  
     private int[] derniereCase = null;
+    //Compétences
+    private boolean surChenilles = false;
     
     // Trajectoire
     /* Pour aller d'un point à un autre sur la carte, on utilise une liste de cases ciblées, appelées but (à atteindre).
@@ -165,12 +167,29 @@ public class Robot extends Avatar {
     
     public void actualiseBatterie(){
         setBatterie(Options.BATTERIE_MAX - (int)(comptKm*Options.CONSO_BATTERIE_PAR_KM));
-        //TODO : AJOUTER CAS EN FONCTION DU TYPE DE CASE ACTUEL
     }
     public void rechargerBat(){
         resetCompteurkm();
         setBatterie(Options.BATTERIE_MAX);
         this.nbRecharges += 1;
+    }
+    public void malusBatterie(TypeCase t){
+        switch(t){
+            case EAU :
+                setCompteurkm((int)(comptKm + 5000));
+                actualiseBatterie();
+                break;
+            case NEIGE :
+                setCompteurkm((int)(comptKm + 5000));
+                actualiseBatterie();
+                break;
+            case SABLE_MOUVANTS : 
+                setCompteurkm((int)(comptKm + 10000));
+                actualiseBatterie();
+                break;
+            default :
+                break;
+        }
     }
     
     // Actualise les voyants principaux
@@ -250,19 +269,22 @@ public class Robot extends Avatar {
         }
     }
     
-    public void reparer(int numListe){
-        switch(numListe){
-            case 1 : 
+    public void maintenance(TypeSymbole s){
+        switch(s){
+            case JAMBE : 
                 for(int i=0; i<jambes.length; i++){ jambes[i].reparerC();} 
                 break;
-            case 2 :
+            case BRAS :
                 for(int i=0; i<bras.length; i++){ bras[i].reparerC();} 
                 break;
-            case 3 : 
+            case CAPTEUR : 
                 for(int i=0; i<capteurs.length; i++){ capteurs[i].reparerC();} 
                 break;
+            case ENERGIE :
+                rechargerBat();
+                break;
             default : 
-                System.out.println("le numéro de la liste doit être compris entre 1 et 3 pour que la réparation ait lieue ! ");
+                System.out.println("Erreur : la maintenance n'a pas lieu ! ");
                 break;
         }
     }
@@ -325,8 +347,8 @@ public class Robot extends Avatar {
         float angle = (float) Math.atan2(caseCiblee.getHeight() - yFictif, caseCiblee.getWidth() - xFictif);
         //System.out.println(Math.toDegrees(angle));
         
-        dx = (int) (Math.cos(angle)*10); // 10 est la vitesse (pixel/itération de la boucle du jeu)
-        dy = (int) (Math.sin(angle)*10);
+        dx = (int) (Math.cos(angle)*Options.VITESSE_DEPLACEMENT_ROBOT); 
+        dy = (int) (Math.sin(angle)*Options.VITESSE_DEPLACEMENT_ROBOT);
         animationIndex = 2; // Image qui montre le robot en marche
     }
     
@@ -381,5 +403,11 @@ public class Robot extends Avatar {
                 
             }
         }
+    }
+    public boolean obtenirSurChenilles() {
+        return surChenilles;
+    }
+    public void majSurChenilles(boolean surChenilles) {
+        this.surChenilles = surChenilles;
     }
 }

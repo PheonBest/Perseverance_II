@@ -26,7 +26,7 @@ public class Chargement extends JPanel {
     }
 
     public void majTailleBar(double xCenter, double yCenter, double largeur, double hauteur) {
-        barreChargement.setBounds((int)(xCenter-largeur/2.), (int)(yCenter-largeur/2.), (int)largeur, (int)hauteur);
+        barreChargement.setBounds((int)(xCenter-largeur/2.), (int)(yCenter-hauteur/2.), (int)largeur, (int)hauteur);
         //barreChargement.setPreferredSize(new Dimension((int)largeur,(int)60));
         //barreChargement.setMinimumSize(new Dimension((int)largeur,(int)60));
         this.revalidate();

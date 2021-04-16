@@ -32,9 +32,9 @@ public class TailleImage {
 
         if (preserveAspectRatio) {
             if (biggerWidth > biggerHeight)
-                biggerHeight = biggerHeight*originalImage.getWidth(null)/originalImage.getHeight(null);
+                biggerHeight = biggerWidth*originalImage.getHeight(null)/originalImage.getWidth(null);
             else
-                biggerWidth = biggerWidth*originalImage.getHeight(null)/originalImage.getWidth(null);
+                biggerWidth = biggerHeight*originalImage.getWidth(null)/originalImage.getHeight(null);
         }
         BufferedImage resizedImage = new BufferedImage(biggerWidth, biggerHeight, type);
         Graphics2D g = resizedImage.createGraphics();

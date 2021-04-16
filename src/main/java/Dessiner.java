@@ -44,30 +44,25 @@ public class Dessiner extends JPanel {
     private BoutonMissions panneauMission;
     private JButton panneauPause;
     private double zoom = 1.;
-    private Point centreZoom = new Point(0,0);
     private boolean enJeu = false;
     private int[] tailleMinimap = {100,100};
-    private int ligneTmp;
-    private int colonneTmp;
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
     
-    // Mini-jeu "Extraction"
-    private boolean etatMinijeuExtraction = false;
-    private boolean effacerMinijeuExtraction = false;
-    private double positionCurseur = 0;
-    private String score;
-    private boolean sensVariationCurseur = true;
-
+    // Mini-jeu
     private int largeurRectangle;
     private int hauteurRectangle;
     private int hauteurRectangleLaser;
-    
-    private final double MINIJEU_EXTRACTION_LARGEUR_ECRAN = 3.; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
+    private final double MINIJEU_EXTRACTION_LARGEUR_ECRAN = 2.7; // La largeur du rectangle correspond au tiers de la largeur de la fenêtre
     private final double MINIJEU_EXTRACTION_HAUTEUR_ECRAN = 3.; // La hauteur du rectangle correspond au tiers de la hauteur de la fenêtre
-    private final double MINIJEU_LASER_HAUTEUR_ECRAN = 2.7;
+    private final double MINIJEU_LASER_HAUTEUR_ECRAN = 2.1;
     
-    
+    // Mini-jeu "Extraction"
+    private Etat etatMinijeuExtraction = Etat.OFF;
+    private String scoreExtraction = "";
+    private double positionCurseurExtraction = 0;
+    private boolean sensVariationExtraction = false;
+
     private final int RAYON = 20;
     private final Color[] COULEURS_MINIJEU = {
         new Color(46, 204, 113), // vert
@@ -81,18 +76,13 @@ public class Dessiner extends JPanel {
     private final int LARGEUR_CURSEUR = 3;
     private final int RAYON_CURSEUR = HAUTEUR_CLAVETTE/3;
     private final int PLAGE_DE_VALEURS = LARGEUR_TOTALE_CLAVETTE-RAYON_CURSEUR*2;
-    private final double INCREMENT_CURSEUR = 0.05;
     private int coinMinijeuX;
     private int coinMinijeuY;
 
     // Mini-jeu "Laser"
-    private boolean etatMinijeuLaser = false;
-    private boolean demarrerMinijeuLaser = false;
-    private boolean finMinijeuLaser = false;
+    private Etat etatMinijeuLaser = Etat.OFF;
     private int nombreErreursLaser = 0;
-    private long tempsDebut = 0;
-    private long tempsChrono = 0;
-    private long tempsReaction = 0;
+    private String chronometreMinijeuLaser = "";
    
 
     public Dessiner(Controleur controleur, boolean affichagePanneauDeControle){
@@ -203,13 +193,16 @@ public class Dessiner extends JPanel {
             // On dessine la minimap sur un rectangle
             g2d.setColor(Color.gray);
 
+            final double DELTA_LARGEUR = 9./4.*Options.DIMENSIONS_CASES[0];
+            final double DELTA_HAUTEUR = 9./4.*Options.DIMENSIONS_CASES[1];
             Formes.dessinerRectangle(g2d,
-            (int)(Options.POSITION_X_MINIMAP*largeurEcran - (largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[0]),
-            (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - (hauteurEcran/2)*Options.ZOOM_MINIMAP - 2*Options.DIMENSIONS_CASES[1]),
-            (int)(tailleMinimap[0] + 9./4.*Options.DIMENSIONS_CASES[0]),
-            (int)(tailleMinimap[1] + 9./4.*Options.DIMENSIONS_CASES[1]),
-            15,
-            15);
+                (int)(Options.POSITION_X_MINIMAP*largeurEcran - DELTA_LARGEUR/2),
+                (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - DELTA_HAUTEUR/2),
+                (int)(tailleMinimap[0] + DELTA_LARGEUR),
+                (int)(tailleMinimap[1] + DELTA_HAUTEUR),
+                15,
+                15
+            );
 
             // On dessine la minimap
             
@@ -219,17 +212,16 @@ public class Dessiner extends JPanel {
             // Donc on annule ce déplacement. Or ce déplacement est le même pour toutes les cases. On s'intérésse donc ici à la case en [0,0]
             // Lorsque le joueur n'a pas bougé, le déplacement doit être nul.
             // Les coordonnées du coin en haut à gauche de la première cellule valent [xpoints[0] + Options.LARGEUR_CASE/4,ypoints[0]]
-            // On prend en compte le décalage (demi largeur d'écran)
-            // D'où le déplacement -(cellules[0][0].xpoints[0] + largeurEcran/2 + Options.LARGEUR_CASE/4)
+            // D'où le déplacement -(cellules[0][0].xpoints[0] + Options.LARGEUR_CASE/4)
             // Or on applique un facteur de zoom à ce décalage
-            // D'où l'annulation du décalage -(cellules[0][0].xpoints[0] + largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP)
+            // D'où l'annulation du décalage -(cellules[0][0].xpoints[0] + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP)
 
             // POSITION Y DE LA MINIMAP
             // Sa position en y est la même que celle du rectangle ci-dessus.
-            // De la même manière que pour la coordonnée x, on annule le décalage en y: -(cellules[0][0].ypoints[0] + hauteurEcran/2)*Options.ZOOM_MINIMAP
+            // De la même manière que pour la coordonnée x, on obtient le déplacement en y: -(cellules[0][0].ypoints[0])*Options.ZOOM_MINIMAP
             transformationMinimap.translate(
-                (Options.POSITION_X_MINIMAP*largeurEcran - (cellules[0][0].xpoints[0] + largeurEcran/2 + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP),
-                (Options.POSITION_Y_MINIMAP*hauteurEcran - (cellules[0][0].ypoints[0] + hauteurEcran/2)*Options.ZOOM_MINIMAP)
+                (Options.POSITION_X_MINIMAP*largeurEcran - (cellules[0][0].xpoints[0] + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP),
+                (Options.POSITION_Y_MINIMAP*hauteurEcran - (cellules[0][0].ypoints[0])*Options.ZOOM_MINIMAP)
             );
 
             transformationMinimap.scale(Options.ZOOM_MINIMAP, Options.ZOOM_MINIMAP);
@@ -249,8 +241,8 @@ public class Dessiner extends JPanel {
                 }
             }
 
-            // Affichage du mini-jeu
-            if (etatMinijeuExtraction) {
+            // MINI-JEU EXTRACTION -------------
+            if (!etatMinijeuExtraction.equals(Etat.OFF)) {
                 
                 ((Graphics2D) g2d).setTransform(transformationInitiale);
                 Formes.dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangle, RAYON, RAYON);
@@ -262,30 +254,20 @@ public class Dessiner extends JPanel {
                     largeur /= MULTIPLICATEUR_DIFFERENCE_LONGUEUR;
                 }
 
-                int xCurseur = (int) ((largeurEcran-LARGEUR_TOTALE_CLAVETTE)/2 + PLAGE_DE_VALEURS*positionCurseur);
-                if (!effacerMinijeuExtraction) {
+                int xCurseur = (int) ((largeurEcran-LARGEUR_TOTALE_CLAVETTE)/2 + PLAGE_DE_VALEURS*positionCurseurExtraction);
+                if (etatMinijeuExtraction.equals(Etat.IN)) {
 
+                    // Si on se déplace vers la gauche, on dessigne des lignes
+                    // représentant le mouvement du curseur
+                    // sur le demi-cercle droit du curseur
                     double angleDepart = -Math.PI/2.;
                     double angleFin = Math.PI/2.;
-                    int sens = -1;
-                    if (sensVariationCurseur) { // On déplace le curseur vers la droite
-                        positionCurseur += INCREMENT_CURSEUR;
-                        if (positionCurseur > 1) {
-                            positionCurseur = 1;
-                            sensVariationCurseur = false;
-                        }
-                    } else { // On déplace le curseur vers la gauche
-                        positionCurseur -= INCREMENT_CURSEUR;
+                    if (!sensVariationExtraction) { // Si on se déplace vers la gauche
                         angleDepart += Math.PI;
                         angleFin += Math.PI;
-                        sens *= -1;
-                        if (positionCurseur < 0) {
-                            positionCurseur = 0;
-                            sensVariationCurseur = true;
-                        }
                     }
                     // On dessine les lignes qui suivent le curseur (effet de vitesse)
-                    xCurseur = (int) ((largeurEcran-LARGEUR_TOTALE_CLAVETTE)/2 + PLAGE_DE_VALEURS*positionCurseur);
+                    xCurseur = (int) ((largeurEcran-LARGEUR_TOTALE_CLAVETTE)/2 + PLAGE_DE_VALEURS*positionCurseurExtraction);
                     final int NOMBRE_LIGNES = 20;
                     final int LONGUEUR_LIGNES = 10;
                     Color c1 = new Color(223, 228, 234); // blanc
@@ -297,13 +279,15 @@ public class Dessiner extends JPanel {
                     // On fait varier l'angle de Pi/2 à 3Pi/2 (vers la gauche) OU de -Pi/2 à Pi/2
                     for (double theta = angleDepart; theta <= angleFin; theta += deltaTheta) {
                         mixCouleurs = (mixCouleurs+deltaMix)%1;
-                        if (sens == -1)
-                            g2d.setColor(mixColors(c2, c1, mixCouleurs));
-                        else
-                            g2d.setColor(mixColors(c1, c2, mixCouleurs));
                         int xLine = (int)(xCurseur+RAYON_CURSEUR-RAYON_CURSEUR*Math.cos(theta));
                         int yLine = (int)(hauteurEcran/2-RAYON_CURSEUR+RAYON_CURSEUR-RAYON_CURSEUR*Math.sin(theta));
-                        g2d.drawLine(xLine, yLine, xLine+LONGUEUR_LIGNES*sens, yLine);
+                        if (sensVariationExtraction) { // Si on se déplace vers la droite
+                            g2d.setColor(mixColors(c2, c1, mixCouleurs)); // on inverse les couleurs
+                            g2d.drawLine(xLine, yLine, xLine - LONGUEUR_LIGNES, yLine); // On trace les lignes vers la gauche (elles représentent le souffle du mouvement)
+                        } else {
+                            g2d.setColor(mixColors(c1, c2, mixCouleurs));
+                            g2d.drawLine(xLine, yLine, xLine + LONGUEUR_LIGNES, yLine);
+                        }
                     }
                 }
 
@@ -316,10 +300,15 @@ public class Dessiner extends JPanel {
 
                 g2d.setPaint(Color.BLACK);
 
-                dessinerTexteCentre(g2d, "Cliquez pour contrôler le bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
-                if (effacerMinijeuExtraction)
-                    dessinerTexteCentre(g2d, score+" % de précision", (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
+                dessinerTexteCentre(g2d, "Cliquez pour contrôler\nle bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
+                if (etatMinijeuExtraction.equals(Etat.OUT)) // On affiche le score
+                    dessinerTexteCentre(g2d, new DecimalFormat("0.0").format(-200.*Math.abs(0.5 - positionCurseurExtraction) + 100.)+" % de précision", (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
             }
+            // MINI-JEU EXTRACTION -------------
+
+            // MINI-JEU LASER -------------
+            final int DECALAGE_Y_TEXTE = 20;
+            final int DECALAGE_Y_FEUX = 30;
             final int NOMBRE_FEUX = 3;
             final int RAYON_FEU = 30;
             final int ESPACE_INTRER_FEU = 30;
@@ -327,42 +316,46 @@ public class Dessiner extends JPanel {
             final int ESPACE_INTER_CROIX = 30;
             final int NOMBRE_CROIX = 3;
             final int LONGUEUR_TOTALE = NOMBRE_CROIX*LARGEUR_CROIX+(NOMBRE_CROIX-1)*ESPACE_INTER_CROIX;
-            final int coinX = (int) ((largeurEcran-LONGUEUR_TOTALE)/2);
-            final int coinY = (int) ((hauteurEcran-LARGEUR_CROIX)/2+RAYON_FEU*4);
-            if (etatMinijeuLaser) {
+            final int coinX = (int) ((largeurEcran-LONGUEUR_TOTALE)/2); // Coordonnée x du coin où on dessine les croix
+            final int coinY = (int) ((hauteurEcran-LARGEUR_CROIX)/2+RAYON_FEU*4); // Coordonnée y du coin où on dessine les croix
+            if (!etatMinijeuLaser.equals(Etat.OFF)) {
                 ((Graphics2D) g2d).setTransform(transformationInitiale);
                 Formes.dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangleLaser, RAYON, RAYON);
                 g2d.setStroke(new BasicStroke(10));
                 
                 int largeurTotale = NOMBRE_FEUX*(RAYON_FEU*2)+(NOMBRE_FEUX-1)*ESPACE_INTRER_FEU;
-                for (int i=0; i < 3; i++) {
-                    if (finMinijeuLaser)
-                        g2d.setPaint(new Color(52, 152, 219)); // bleu
-                    else if (!demarrerMinijeuLaser)
-                        g2d.setPaint(new Color(231, 76, 60)); // rouge clair
-                    else
-                        g2d.setPaint(new Color(46, 204, 113)); // vert clair
-                    g2d.fillOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU), RAYON_FEU*2, RAYON_FEU*2);
-                    if (finMinijeuLaser)
-                        g2d.setPaint(new Color(34, 129, 191)); // bleu foncé
-                    else if (!demarrerMinijeuLaser)
-                        g2d.setPaint(new Color(214,46,27)); // rouge foncé
-                    else
-                        g2d.setPaint(new Color(38,168,94)); // vert foncé
-                    g2d.drawOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU), RAYON_FEU*2, RAYON_FEU*2);
-                }
+                Color couleurFondFeux = null;
+                Color couleurBordureFeux = null;
                 String str;
-                if (finMinijeuLaser)
-                    str = new DecimalFormat("0.0").format(tempsReaction)+" millisecondes"; // on arrondie le temps au millième
-                else
-                    str = new DecimalFormat("0.0000").format((System.currentTimeMillis()-tempsDebut)/1000.)+" secondes"; // on arrondie le temps au millième
-                
+                switch (etatMinijeuLaser) {
+                    case ON: // Lancement
+                        couleurFondFeux = new Color(231, 76, 60);       // rouge clair
+                        couleurBordureFeux = new Color(214, 46, 27);    // rouge foncé
+                        break;
+                    case IN: // En cours
+                        couleurFondFeux = new Color(46, 204, 113);      // vert clair
+                        couleurBordureFeux = new Color(38, 168, 94);    // vert foncé
+                        break;
+                    case OUT: // Affichage du score
+                        couleurFondFeux = new Color(52, 152, 219);      // bleu clair
+                        couleurBordureFeux = new Color(34, 129, 191);   // bleu foncé
+                        break;
+                    case OFF:
+                        break;
+                }
+                for (int i=0; i < 3; i++) {
+                    g2d.setPaint(couleurFondFeux);
+                    g2d.fillOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU + DECALAGE_Y_FEUX), RAYON_FEU*2, RAYON_FEU*2);
+                    g2d.setPaint(couleurBordureFeux);
+                    g2d.drawOval((int)((largeurEcran-largeurTotale)/2. + i*(2*RAYON_FEU + ESPACE_INTRER_FEU)), (int)(hauteurEcran/2. - RAYON_FEU + DECALAGE_Y_FEUX), RAYON_FEU*2, RAYON_FEU*2);
+                }
+
                 g2d.setPaint(Color.BLACK);
-                dessinerTexteCentre(g2d, str, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU), Options.police);
-                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes, cliquez\nle plus vite possible pour renvoyer les données du scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU), Options.POLICE_PLAIN);
+                dessinerTexteCentre(g2d, chronometreMinijeuLaser, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU+DECALAGE_Y_FEUX), Options.police);
+                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes,\ncliquez le plus vite possible\npour renvoyer les données\ndu scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU+DECALAGE_Y_TEXTE), Options.POLICE_PLAIN);
                 
-                // On dessine les éventuelles erreurs SI le jeu n'est pas finit et qu'il y a au moins une erreur
-                if (!finMinijeuLaser && nombreErreursLaser > 0) {
+                // On dessine les éventuelles erreurs SI il y a au moins une erreur
+                if (nombreErreursLaser > 0) {
                     g2d.setStroke(new BasicStroke(10));
                     for (int i=0; i< NOMBRE_CROIX; i++) {
                         if (i < nombreErreursLaser) // Dessin de croix pleines
@@ -370,12 +363,13 @@ public class Dessiner extends JPanel {
                         else // Dessin de croix vides
                             g2d.setPaint(Color.DARK_GRAY);  // gris
                         // Ligne allant d'en bas à gauche à en haut à droite
-                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY+LARGEUR_CROIX, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY);
+                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY+LARGEUR_CROIX+DECALAGE_Y_FEUX, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY+DECALAGE_Y_FEUX);
                         // Ligne allant d'en haut à gauche à en bas à droite
-                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY+LARGEUR_CROIX);
+                        g2d.drawLine(coinX+i*(LARGEUR_CROIX+ESPACE_INTER_CROIX), coinY+DECALAGE_Y_FEUX, coinX+LARGEUR_CROIX*(i+1)+i*ESPACE_INTER_CROIX, coinY+LARGEUR_CROIX+DECALAGE_Y_FEUX);
                     }
                 }
             }
+            // MINI-JEU LASER -------------
         }
 
     }
@@ -422,10 +416,6 @@ public class Dessiner extends JPanel {
         this.zoom = zoom;
     }
 
-    public void majCentreZoom(Point centreZoom) {
-        this.centreZoom = centreZoom;
-    }
-
     public void majEnJeu(boolean enJeu) {
         this.enJeu = enJeu;
     }
@@ -465,30 +455,26 @@ public class Dessiner extends JPanel {
         this.rayonDeSelection = rayonDeSelection;
     }
 
-    public void majEtatMinijeuExtraction(boolean etatMinijeuExtraction) {
+    // Minijeu extraction
+    public void majEtatMinijeuExtraction(Etat etatMinijeuExtraction) {
         this.etatMinijeuExtraction = etatMinijeuExtraction;
-        if (etatMinijeuExtraction)
-            positionCurseur = 0;
     }
-    public boolean obtenirEtatMinijeuExtraction() {
-        return etatMinijeuExtraction;
+    public void majPositionCurseurExtraction(double positionCurseurExtraction) {
+        this.positionCurseurExtraction = positionCurseurExtraction;
     }
-    public void majEffacerMinijeuExtraction(boolean effacerMinijeuExtraction) {
-        if (effacerMinijeuExtraction) {
-            score = new DecimalFormat("0.0").format(-200*Math.abs(0.5 - positionCurseur) + 100);
-            controleur.majScoreExtraction(score);
-        }
-        this.effacerMinijeuExtraction = effacerMinijeuExtraction;
-    }
+	public void majSensVariationExtraction(boolean sensVariationExtraction) {
+        this.sensVariationExtraction = sensVariationExtraction;
+	}
 
-    public void majEtatMinijeuLaser(boolean etatMinijeuLaser) {
-        if (etatMinijeuLaser)
-            finMinijeuLaser = false;
-        tempsDebut = System.currentTimeMillis();
+    // Minijeu laser
+    public void majEtatMinijeuLaser(Etat etatMinijeuLaser) {
         this.etatMinijeuLaser = etatMinijeuLaser;
     }
-    public boolean obtenirEtatMinijeuLaser() {
-        return etatMinijeuLaser;
+    public void majChronometreMinijeuLaser(String chronometreMinijeuLaser) {
+        this.chronometreMinijeuLaser = chronometreMinijeuLaser;
+    }
+    public void majNombreErreursLaser(int nombreErreursLaser) {
+        this.nombreErreursLaser = nombreErreursLaser;
     }
 
     // Par Martin Larsson, https://stackoverflow.com/questions/17544157/generate-n-colors-between-two-colors
@@ -498,20 +484,6 @@ public class Dessiner extends JPanel {
         int greenPart = (int) (color1.getGreen()*percent + color2.getGreen()*inverse_percent);
         int bluePart = (int) (color1.getBlue()*percent + color2.getBlue()*inverse_percent);
         return new Color(redPart, greenPart, bluePart);
-    }
-    public void demarrerMinijeuLaser(boolean demarrerMinijeuLaser) {
-        this.demarrerMinijeuLaser = demarrerMinijeuLaser;
-        if (demarrerMinijeuLaser) {
-            tempsChrono = System.currentTimeMillis();
-        } else {
-            finMinijeuLaser = true;
-            tempsReaction = System.currentTimeMillis()-tempsChrono;
-            controleur.majTempsDeReaction(tempsReaction);
-        }
-    }
-    public void majNombreErreursLaser(int nombreErreursLaser) {
-        this.nombreErreursLaser = nombreErreursLaser;
-        tempsDebut = System.currentTimeMillis();
     }
     public void majArrierePlan(ArrierePlan arrierePlan) {
         this.arrierePlan = arrierePlan;

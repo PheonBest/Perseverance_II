@@ -1,5 +1,5 @@
 public interface Observable {
-    public void addObserver(Observer obs);
-    public void removeObserver();
-    public void notifierObserveur(TypeMisAJour type);
+    public void ajouterObservateur(Observateur obs);
+    public void enleverObservateur();
+    public void notifierObservateur(TypeMisAJour type);
 }

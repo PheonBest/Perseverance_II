@@ -18,8 +18,8 @@ public class BoutonCercle implements Dessin {
     private final double FACTEUR_TAILLE = 1.13;
     
     public BoutonCercle(int x, int y, double rayon, int taillePinceau) {
-        this.x = x;
-        this.y = y;
+        this.x = x - Options.EPAISSEUR_BORDURE_CERCLE;
+        this.y = y - Options.EPAISSEUR_BORDURE_CERCLE;
         this.rayon = rayon;
         this.image = image;
         this.taillePinceau = taillePinceau;
@@ -42,10 +42,9 @@ public class BoutonCercle implements Dessin {
         
         Graphics2D g2d = (Graphics2D) g;
         // On dessine le cercle "Bordure"
-        final int EPAISSEUR_BORDURE = 12;
         
         g2d.setPaint(Color.BLACK);
-        g2d.setStroke(new BasicStroke(EPAISSEUR_BORDURE));
+        g2d.setStroke(new BasicStroke(Options.EPAISSEUR_BORDURE_CERCLE));
         Shape cercle = null;
         if (sourisDessus)
             cercle = new Ellipse2D.Double(x-FACTEUR_TAILLE*rayon, y-FACTEUR_TAILLE*rayon, 2*FACTEUR_TAILLE*rayon, 2*FACTEUR_TAILLE*rayon);
@@ -87,8 +86,8 @@ public class BoutonCercle implements Dessin {
         // distance^2 < rayon^2
         // (x-xEvent)^2+(y-yEvent)^2 < rayon^2
         if (sourisDessus)
-            return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(FACTEUR_TAILLE*rayon,2));
-        return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(rayon,2));
+            return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(FACTEUR_TAILLE*rayon + Options.EPAISSEUR_BORDURE_CERCLE/2,2));
+        return (Math.pow(x-xEvent,2)+Math.pow(y-yEvent,2) < Math.pow(rayon + Options.EPAISSEUR_BORDURE_CERCLE/2,2));
     }
 
     public boolean equals(BoutonCercle b) {

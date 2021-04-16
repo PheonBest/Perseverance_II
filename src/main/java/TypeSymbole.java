@@ -1,5 +1,6 @@
 
 public enum TypeSymbole{
+	VIDE,
 	BACTERIE, 
 	MINERAI,
 	RAVIN,
@@ -11,6 +12,9 @@ public enum TypeSymbole{
 	CAPTEUR,
 	BOIS,
 	PONT,
-	
+    ENERGIE,
+	CHENILLES,
+	MONTAGNE,
+	FUSEE
 }
 

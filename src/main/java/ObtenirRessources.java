@@ -64,12 +64,22 @@ public class ObtenirRessources{
 
     public static HashMap<String, InputStream> getStreamsAndFilenames(Pattern pattern, String directoryName) throws URISyntaxException, UnsupportedEncodingException, IOException {
         HashMap<String, InputStream> streams = new HashMap<String, InputStream>();
-        Pattern filenamePattern = Pattern.compile("[ \\w-]+?(?=\\.)");
+        Pattern filenamePattern = Pattern.compile("[ \\w-]+?(?=\\.(?!exe|jar|dmg))");
         Matcher filenameMatcher;
 
         URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
         if (url == null)
             url = new File(directoryName).toURI().toURL();
+        
+        /*
+        URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
+        if (url == null) {
+            File dossier = new File("./././"+directoryName);
+            if (dossier.exists())
+                url = dossier.toURI().toURL();
+        }
+        */
+
         if (url != null) {
             if (url.getProtocol().equals("file")) {
                 final File file = Paths.get(url.toURI()).toFile();

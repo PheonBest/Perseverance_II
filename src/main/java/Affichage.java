@@ -1,30 +1,29 @@
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseListener;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import java.awt.Point;
-import java.awt.Image;
 
-public class Affichage extends JFrame implements Observer, ActionListener, KeyListener {
+public class Affichage extends JFrame implements Observateur, ActionListener, KeyListener {
     private Controleur controleur;
     private CardLayout cardLayout = new CardLayout();
     private String scene = "";
@@ -169,6 +168,14 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
             j.addKeyListener(this);
         for (JComponent j: ((Dessiner) jeu).obtenirComposants())
             j.addKeyListener(this);
+
+        // Lorsqu'on appuie sur le bouton "Retour" du panneauPause, on simule l'appui sur le clavier de la touche Echap
+        ((JButton)(panneauPause.obtenirComposants().get(0))).addActionListener(new AbstractAction("Pause") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controleur.interactionClavier(KeyEvent.VK_ESCAPE);
+            }
+        });
         
     }
 
@@ -215,61 +222,19 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
-            case ImageMenu:
-                ((ModeDeJeu) modeDeJeu).majImageMenu((Image)nouveau);
-                break;
-            case Options:
-                if ((boolean)nouveau)
-                   // cardLayout.show(contenu, "Options");
-                   panneauPause.setVisible(true);
-                else
-                    //cardLayout.show(contenu, scene);
-                    panneauPause.setVisible(false);
-                break;
-            case ArrierePlan:
-                if (scene.equals("Jeu"))
-                    ((Dessiner)jeu).majArrierePlan((ArrierePlan) nouveau);
-                else if (scene.equals("Editeur de carte"))
-                    ((Editeur)editeur).majArrierePlan((ArrierePlan) nouveau);
-                break;
-            case NombreErreursLaser:
-                ((Dessiner)jeu).majNombreErreursLaser((int) nouveau);
-                break;
-            case DemarrerMinijeuLaser:
-                ((Dessiner)jeu).demarrerMinijeuLaser((boolean) nouveau);
-                break;
-            case MinijeuLaser:
-                ((Dessiner)jeu).majEtatMinijeuLaser((boolean) nouveau);
-                break;
-            case EffacerMinijeuExtraction:
-                ((Dessiner)jeu).majEffacerMinijeuExtraction((boolean) nouveau);
-                break;
-            case MinijeuExtraction:
-                ((Dessiner)jeu).majEtatMinijeuExtraction((boolean) nouveau);
-                break;
-            case RayonDeSelection:
-                ((Dessiner)jeu).majRayon((Integer) nouveau);
-                break;
-            case Competences:
-                ((Dessiner)jeu).majCompetences((List<BoutonCercle>) nouveau);
-                break;
-            case BoutonsSymbole:
-                ((Editeur)editeur).majBoutonsSymbole((Cellule[]) nouveau);
-                break;
-            case BoutonsCercle:
-                ((Editeur)editeur).majBoutonsCercle((BoutonCercle[]) nouveau);
-                break;
-            case BoutonsType:
-                ((Editeur)editeur).majBoutonsType((Cellule[]) nouveau);
-                break;
+            //Carte
             case Cellules:
                 if (scene.equals("Jeu"))
                     ((Dessiner)jeu).majCellules((Cellule[][]) nouveau);
                 else if (scene.equals("Editeur de carte"))
                     ((Editeur)editeur).majCellules((Cellule[][]) nouveau);
                 break;
-            case Joueur:
-                ((Dessiner)jeu).majJoueur((Robot) nouveau);
+            case Peindre:
+                if (scene.equals("Jeu"))
+                    jeu.repaint();  // Prévoit de mettre à jour le composant
+                                    // n'appelle pas la méthode paint() !
+                else if (scene.equals("Editeur de carte"))
+                    editeur.repaint();
                 break;
             case Avancement:
                 ((Chargement)chargement).majChargement((int) nouveau);
@@ -289,12 +254,6 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
                 }
                 cardLayout.show(contenu, (String) nouveau);
                 break;
-            case CentreZoom:
-                if (scene.equals("Jeu"))
-                    ((Dessiner) jeu).majCentreZoom((Point) nouveau);
-                else if (scene.equals("Editeur de carte"))
-                    ((Editeur) editeur).majCentreZoom((Point) nouveau);
-                break;
             case Zoom:
                 if (scene.equals("Jeu"))
                     ((Dessiner) jeu).majZoom((Double) nouveau);
@@ -304,12 +263,68 @@ public class Affichage extends JFrame implements Observer, ActionListener, KeyLi
             case Cartes:
                 ((ModeDeJeu) modeDeJeu).majCartes((HashMap<String, InputStream>) nouveau);
                 break;
-            case Peindre:
+            case ArrierePlan:
                 if (scene.equals("Jeu"))
-                    jeu.repaint();  // Prévoit de mettre à jour le composant
-                                    // n'appelle pas la méthode paint() !
+                    ((Dessiner)jeu).majArrierePlan((ArrierePlan) nouveau);
                 else if (scene.equals("Editeur de carte"))
-                    editeur.repaint();
+                    ((Editeur)editeur).majArrierePlan((ArrierePlan) nouveau);
+                break;
+            
+            // Joueur
+            case Joueur:
+                ((Dessiner)jeu).majJoueur((Robot) nouveau);
+                break;
+            case Competences:
+                ((Dessiner)jeu).majCompetences((List<BoutonCercle>) nouveau);
+                break;
+            case RayonDeSelection:
+                ((Dessiner)jeu).majRayon((Integer) nouveau);
+                break;
+            
+            // Editeur de carte
+            case BoutonsType:
+                ((Editeur)editeur).majBoutonsType((Cellule[]) nouveau);
+                break;
+            case BoutonsCercle:
+                ((Editeur)editeur).majBoutonsCercle((BoutonCercle[]) nouveau);
+                break;
+            case BoutonsSymbole:
+                ((Editeur)editeur).majBoutonsSymbole((Cellule[]) nouveau);
+                break;
+            
+            // Mini jeu extraction
+            case MinijeuExtraction:
+                ((Dessiner)jeu).majEtatMinijeuExtraction((Etat) nouveau);
+                break;
+            case PositionCurseurExtraction:
+                ((Dessiner)jeu).majPositionCurseurExtraction((double) nouveau);
+                break;
+            case SensVariationExtraction:
+                ((Dessiner)jeu).majSensVariationExtraction((boolean) nouveau);
+                break;
+            
+            // Mini jeu laser
+            case MinijeuLaser:
+                ((Dessiner)jeu).majEtatMinijeuLaser((Etat) nouveau);
+                break;
+            case ChronometreLaser:
+                ((Dessiner)jeu).majChronometreMinijeuLaser((String) nouveau);
+                break;
+            case NombreErreursLaser:
+                ((Dessiner)jeu).majNombreErreursLaser((int) nouveau);
+                break;
+            
+            // Menus
+            case Options:
+                if ((boolean)nouveau)
+                   // cardLayout.show(contenu, "Options");
+                   panneauPause.setVisible(true);
+                else
+                    //cardLayout.show(contenu, scene);
+                    panneauPause.setVisible(false);
+                break;
+            case ImageMenu:
+                ((ModeDeJeu) modeDeJeu).majImageMenu((Image)nouveau);
                 break;
         }
     }

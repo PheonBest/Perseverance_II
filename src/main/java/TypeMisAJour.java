@@ -1,24 +1,35 @@
 
 public enum TypeMisAJour {
+    // Carte
     Cellules,
     Peindre,
-    Joueur,
     Avancement,
     Scene,
-    BoutonsType,
-    BoutonsCercle,
     Zoom,
-    CentreZoom,
     Cartes,
+    ArrierePlan,
+
+    // Joueur
+    Joueur,
     Competences,
     RayonDeSelection,
+
+    // Editeur de carte
+    BoutonsType,
+    BoutonsCercle,
+    BoutonsSymbole,
+
+    // Mini jeu extraction
     MinijeuExtraction,
+    PositionCurseurExtraction,
+    SensVariationExtraction,
+
+    // Mini jeu laser
     MinijeuLaser,
-    DemarrerMinijeuLaser,
-    EffacerMinijeuExtraction,
+    ChronometreLaser,
     NombreErreursLaser,
-    ArrierePlan,
+
+    // Menus
     Options,
-    ImageMenu,
-    BoutonsSymbole
+    ImageMenu
 }
