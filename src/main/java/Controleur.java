@@ -103,7 +103,9 @@ public class Controleur {
     }
 	public void jouer(InputStream carte) {
 
-        donnees.majCellules(CSV.lecture(carte, 0, 0));
+
+        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles));
+
         donnees.obtenirArrierePlan().majCoords(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2);
         
         donnees.majJoueur(new Robot(donnees.getImagesJoueur(), 0, 0));
@@ -710,9 +712,12 @@ public class Controleur {
             }
         }
         
-        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2));
+
 
         // On rend toutes les cases visibles
+
+        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles));
+
         for (int i=0; i< donnees.obtenirCellules().length; i++) {
             for (Cellule c: donnees.obtenirCellules()[i]) {
                 if (c.obtenirSymbole() != null)

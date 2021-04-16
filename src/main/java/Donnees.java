@@ -50,7 +50,7 @@ public class Donnees implements Observable {
     // On les stocke car elles mettent un certain temps à charger
     private ArrayList<ArrayList<Image>> images;
     //Images des symboles
-    private HashMap<String, Image> imagesSymboles;
+    public HashMap<String, Image> imagesSymboles;
 
     private int avancementChargement;
     private Point borduresFenetres;
