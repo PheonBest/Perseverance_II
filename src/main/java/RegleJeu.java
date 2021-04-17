@@ -39,7 +39,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 		public RegleJeu() {
 			
 			super();
-			this.setSize(500,540);
+			this.setSize(500,640);
 			this.setLocation(largeur/2,hauteur/2);
 			this.setLayout(null);
 			this.setTitle("Regles du jeu");
@@ -66,25 +66,43 @@ public class RegleJeu extends JFrame implements ActionListener {
 			
 			panneau= new JPanel();
 			panneau.setLayout(null);
-			panneau.setBounds(0,75,500,425);
+			panneau.setBounds(0,75,500,525);
 			panneau.setBackground(new Color(220,220,220));
 			panneau.setVisible(true);
 			
 			this.add(panneau);
 			
 			//regles du jeu
-			
+			/*
 			regleJeu= new JLabel("BIENVENUE");
 			regleJeu.setFont(new Font("Serif", Font.BOLD, 20));
 			regleJeu.setHorizontalAlignment(SwingConstants.CENTER);
 			regleJeu.setForeground(Color.BLACK);
-			regleJeu.setBounds(0, 100, 475, 70);
+			regleJeu.setBounds(0, 10, 500, 20);
 			panneau.add(regleJeu);
+			*/
+			
+			JLabel texteRegle= new JLabel(" ");
+			texteRegle.setText("<html>  L'humanite a decide d envoyer un rover sur une exoplanete : PERSEVERANCE II !  <br>"
+			+"Le meilleur technicien pour le controler est mis sur le coup : Vous! <br>"
+			+"<br>"
+			+"Afin de verifier si la planete est habitable, vous devez: <br>"
+			+" - vous assurez que les elements indispensables a la vie (minerai, baterie et...) sont presents sur la planete <br>" 
+			+" - parcourir au moins 70% de la carte <br>"
+			+"<br>"
+			+"Pour se deplacer, il suffit de cliquer sur les cases a proximite du robot. Attention toutefois a ne pas trop se precipiter: des pieges sont presents ( ravins...) et ils peuvent grandement deteriorer les composantes du robot. Heureusement, des mini-jeux sont la pour vous aider a regagner des points de vie! <br>"
+			+"<br>"
+			+"Dans le menu DETAIL, il sera possible de suivre l'evolution de la partie et l'etat du robot. <br>" 
+			+"Si vous souhaitez commencer une nouvelle partie, selectionnez une carte dans le menu deroulant puis cliquez sur JOUER, sinon cliquez sur EDITER pour creer votre propre carte.");
+			texteRegle.setFont(new Font("Serif", Font.BOLD, 15));
+			texteRegle.setForeground(Color.BLACK);
+			texteRegle.setBounds(10, 10, 450, 450);
+			panneau.add(texteRegle);
 			
 			//bouton quitter 
 			
 			quitter= new JButton("QUITTER");
-			quitter.setBounds(350,350,100,50);
+			quitter.setBounds(350,450,100,50);
 			quitter.setBackground(Color.white);
 			panneau.add(quitter);
 			quitter.addActionListener(this);
