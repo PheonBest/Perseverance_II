@@ -1,4 +1,3 @@
-
 public enum TypeMisAJour {
     // Carte
     Cellules,

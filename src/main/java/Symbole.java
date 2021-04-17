@@ -1,11 +1,5 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.BasicStroke;
-import java.awt.geom.AffineTransform;
 import java.awt.Image;
+import java.awt.Polygon;
 
 public class Symbole extends Polygon {
 	

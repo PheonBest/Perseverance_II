@@ -2,7 +2,6 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.awt.*;
 
 public class Robot extends Avatar {
     

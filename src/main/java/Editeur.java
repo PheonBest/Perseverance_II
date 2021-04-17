@@ -1,19 +1,13 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Editeur extends JPanel {
     private JPanel carte;
     private JPanel menu;
-    private Controleur controleur;
 
     public Editeur(Controleur controleur) {
-        this.controleur = controleur;
 
         carte = new Dessiner(controleur);
         menu = new Menu(controleur);

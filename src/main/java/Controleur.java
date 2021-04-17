@@ -1,34 +1,25 @@
 
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ProcessBuilder.Redirect.Type;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.DecimalFormat;
-import java.awt.Image;
 import java.util.stream.Collectors;
-import java.util.Map;
 
 import javax.sound.sampled.AudioInputStream;
-import javax.swing.CellEditor;
 import javax.swing.SwingWorker;
-import java.awt.MouseInfo;
 
 public class Controleur {
     
@@ -257,7 +248,6 @@ public class Controleur {
                         for (int j=0; j < donnees.obtenirCellules()[i].length; j++)
                             donnees.obtenirCellules()[i][j].translate(dx, dy);
                     }
-                    donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
                 }
                 donnees.notifierObservateur(TypeMisAJour.Peindre);
             }
@@ -273,8 +263,9 @@ public class Controleur {
         Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_IMAGES+"\\b.*\\.(?:jpg|gif|png)");
         try {
             HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_IMAGES+"/");
+            for (String s: images.keySet())
+                System.out.println(s);
             donnees.majArrierePlan(new ArrierePlan(images.get("surface_texture")));
-            donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
             donnees.majImageMenu(TailleImage.resizeImage(images.get("planetes"), donnees.obtenirLargeur(), donnees.obtenirHauteur(), true));
             
             donnees.notifierObservateur(TypeMisAJour.ImageMenu);
@@ -869,9 +860,6 @@ public class Controleur {
             for (int j=0; j < cellules[i].length; j++)
                 cellules[i][j].translate((int)(dx*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()), (int)(dy*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()));
         }
-
-        donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
-        donnees.notifierObservateur(TypeMisAJour.Cellules);
         donnees.notifierObservateur(TypeMisAJour.Peindre);
     }
 

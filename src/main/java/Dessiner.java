@@ -32,6 +32,8 @@ import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
+import java.util.ArrayList;
+
 public class Dessiner extends JPanel {
     private Controleur controleur;
     private ArrierePlan arrierePlan;
@@ -45,9 +47,14 @@ public class Dessiner extends JPanel {
     private JButton panneauPause;
     private double zoom = 1.;
     private boolean enJeu = false;
-    private int[] tailleMinimap = {100,100};
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
+    private HashMap<String, Image> imagesSymboles;
+
+    // Minimap
+    private int[] tailleMinimap = {100,100};
+    private TypeCase[] typeMoyen = {};
+    private TypeSymbole[] symboleMoyen = {};
 
     // Mini-jeu
     private int largeurRectangle;
@@ -95,7 +102,7 @@ public class Dessiner extends JPanel {
             final int LARGEUR = (int) (Options.LARGEUR_CASE*0.7);
             final int HAUTEUR = (int) (Options.LARGEUR_CASE*0.7);
             try {
-                HashMap<String, Image> imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
+                imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
                 for (String i : imagesSymboles.keySet())
                     imagesSymboles.put(i, TailleImage.resizeImage(imagesSymboles.get(i), LARGEUR, HAUTEUR, true));
             
@@ -111,7 +118,6 @@ public class Dessiner extends JPanel {
 
             panneauDeControle = new ControlPanel(10,10);
             add(panneauDeControle);
-			//panneauPause= new BoutonPause(625,60);
             panneauPause = new JButton("PAUSE");
             panneauPause.setBounds(625,60, 100, 50);
             panneauPause.addActionListener(new AbstractAction("Pause") {
@@ -163,7 +169,8 @@ public class Dessiner extends JPanel {
         g2d.setTransform(at);
         
         // Affichage de l'arrière plan
-        arrierePlan.dessiner(g2d, largeurEcran, hauteurEcran, zoom);
+        if (arrierePlan != null)
+            arrierePlan.dessiner(g2d, largeurEcran, hauteurEcran, zoom);
 
         // Affichage de la carte
         // Obtention de la cellule sur laquelle le joueur est
@@ -244,18 +251,31 @@ public class Dessiner extends JPanel {
 
             transformationMinimap.scale(Options.ZOOM_MINIMAP, Options.ZOOM_MINIMAP);
             ((Graphics2D) g2d).setTransform(transformationMinimap);
-            for (int i=0; i < cellules.length; i+=Options.INCREMENT_MINIMAP) {
-                for (int j=0; j < cellules[i].length; j+=Options.INCREMENT_MINIMAP) {
-                    TypeCase typeRepresentatif = obtenirCelluleRepresentative(Voisins.obtenirVoisins(cellules, i, j, 2));
-                    if (cellules[i][j].obtenirType() == typeRepresentatif)
+            if (typeMoyen.length > 0) {
+                int index = 0;
+                TypeCase ancienType;
+                TypeSymbole ancienSymbole;
+                for (int i=0; i < cellules.length; i+=Options.INCREMENT_MINIMAP) {
+                    for (int j=0; j < cellules[i].length; j+=Options.INCREMENT_MINIMAP) {
+                        ancienType = cellules[i][j].obtenirType();
+                        ancienSymbole = cellules[i][j].obtenirSymbole().type;
+
+                        if (ancienType != typeMoyen[index])
+                            cellules[i][j].majType(typeMoyen[index]);
+                        //if (ancienSymbole != symboleMoyen[index])
+                        //    cellules[i][j].obtenirSymbole().majSymbole(symboleMoyen[index], imagesSymboles.get(symboleMoyen[index].name()));
+                        if (ancienSymbole != TypeSymbole.VIDE)
+                            cellules[i][j].obtenirSymbole().majSymbole(TypeSymbole.VIDE, null);
                         cellules[i][j].dessiner(g2d, Options.AGRANDISSEMENT_CELLULE_MINICARTE); // La cellule sera agrandie autour de son centre
-                    else {
-                        TypeCase ancienType = cellules[i][j].obtenirType();
-                        cellules[i][j].majType(typeRepresentatif);
-                        cellules[i][j].dessiner(g2d, Options.AGRANDISSEMENT_CELLULE_MINICARTE);
-                        cellules[i][j].majType(ancienType);
+                        if (ancienType != typeMoyen[index])
+                            cellules[i][j].majType(ancienType);
+                        //if (ancienSymbole != symboleMoyen[index])
+                        //    cellules[i][j].obtenirSymbole().majSymbole(ancienSymbole, imagesSymboles.get(ancienSymbole.name()));
+                        if (ancienSymbole != TypeSymbole.VIDE)
+                            cellules[i][j].obtenirSymbole().majSymbole(ancienSymbole, imagesSymboles.get(ancienSymbole.name()));
+
+                        index++;
                     }
-                    
                 }
             }
 
@@ -394,7 +414,7 @@ public class Dessiner extends JPanel {
 
     public void majCellules(Cellule[][] cellules) {
         this.cellules = cellules;
-        majTailleMinimap();
+        majMinimap();
     }
 
     public void majJoueur(Robot joueur) {
@@ -423,14 +443,30 @@ public class Dessiner extends JPanel {
         this.competences = (LinkedList<BoutonCercle>) competences;
     }
 
-    private void majTailleMinimap() {
+    private void majMinimap() {
+        // On met à jour la taille de la minimap
         if (cellules.length > 1) {
             tailleMinimap[0] = (int)((cellules[0][cellules[0].length-1].xpoints[0] - cellules[0][0].xpoints[0])*Options.ZOOM_MINIMAP);
             tailleMinimap[1] = (int)((cellules[cellules.length-1][0].ypoints[0]    - cellules[0][0].ypoints[0])*Options.ZOOM_MINIMAP);
         }
+        // On met à jour les cellules sélectionnées pour être affichées dans la minimap
+        final int NOMBRE_ECHANTILLONS = (int)(Math.ceil(cellules.length/(double)Options.INCREMENT_MINIMAP) * Math.ceil(cellules[0].length/(double)Options.INCREMENT_MINIMAP));
+        typeMoyen = new TypeCase[NOMBRE_ECHANTILLONS];
+        symboleMoyen = new TypeSymbole[NOMBRE_ECHANTILLONS];
+        int index = 0;
+        Cellule[] voisins;
+        for (int i=0; i < cellules.length; i+=Options.INCREMENT_MINIMAP) {
+            for (int j=0; j < cellules[i].length; j+=Options.INCREMENT_MINIMAP) {
+                voisins = Voisins.obtenirVoisins(cellules, i, j, 2);
+                typeMoyen[index] = obtenirTypeRepresentatif(voisins);
+                symboleMoyen[index] = obtenirSymboleRepresentatif(voisins);
+                
+                index ++;
+            }
+        }
     }
 
-    private TypeCase obtenirCelluleRepresentative(Cellule[] echantillon) {
+    private TypeCase obtenirTypeRepresentatif(Cellule[] echantillon) {
         HashMap<TypeCase, Integer> observations = new HashMap<TypeCase, Integer>(echantillon.length);
         for (Cellule c: echantillon) {
             if (c != null) {
@@ -444,6 +480,26 @@ public class Dessiner extends JPanel {
 
         Entry<TypeCase, Integer> individuMax = null;
         for (Entry<TypeCase, Integer> individu : observations.entrySet()) {
+            if (individuMax == null || individu.getValue().compareTo(individuMax.getValue()) > 0)
+                individuMax = individu;
+        };
+        return individuMax.getKey();
+    }
+
+    private TypeSymbole obtenirSymboleRepresentatif(Cellule[] echantillon) {
+        HashMap<TypeSymbole, Integer> observations = new HashMap<TypeSymbole, Integer>(echantillon.length);
+        for (Cellule c: echantillon) {
+            if (c != null) {
+                if (observations.containsKey(c.obtenirSymbole().type)) {
+                    Integer nombreObservations = observations.get(c.obtenirSymbole().type);
+                    nombreObservations += 1;
+                } else
+                    observations.put(c.obtenirSymbole().type, 1);
+            }
+        }
+
+        Entry<TypeSymbole, Integer> individuMax = null;
+        for (Entry<TypeSymbole, Integer> individu : observations.entrySet()) {
             if (individuMax == null || individu.getValue().compareTo(individuMax.getValue()) > 0)
                 individuMax = individu;
         };

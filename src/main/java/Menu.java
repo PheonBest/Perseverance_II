@@ -1,13 +1,11 @@
-import java.util.ArrayList;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import java.awt.event.ActionEvent;
-import java.awt.Graphics;
 
 public class Menu extends JPanel {
     private BoutonCercle[] boutonsCercle;

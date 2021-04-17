@@ -1,11 +1,9 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.regex.Pattern;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+
+import javax.swing.JPanel;
 
 public class AntiBugPanel extends JPanel{
     
