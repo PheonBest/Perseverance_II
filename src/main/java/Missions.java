@@ -89,13 +89,17 @@ public class Missions extends JFrame {
 		premMission.setBounds(5,5,400,20);
 		mission1.add(premMission);
 		
-		final Image IMG = TailleImage.resizeImage(images.get(TypeSymbole.MINERAI.name()),500,500,true);
-		JLabel monImage = new JLabel(new ImageIcon(IMG));
-		monImage.setBounds(50,20,100,100);
+		final Image IMG = TailleImage.resizeImage(images.get(TypeSymbole.MINERAI.name()),100,100,true);
+		JLabel monImage1 = new JLabel(new ImageIcon(IMG));
+		monImage1.setBounds(60,40,100,100);
+		mission1.add(monImage1);
 		
-		mission1.add(monImage);
+		final Image IMG2 = TailleImage.resizeImage(images.get(TypeSymbole.BACTERIE.name()),100,100,true);
+		JLabel monImage2 = new JLabel(new ImageIcon(IMG2));
+		monImage2.setBounds(270,40,100,100);
+		mission1.add(monImage2);
 		
-	
+		
 		
 		JLabel deuMission= new JLabel("MISSION 2");
 		deuMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
