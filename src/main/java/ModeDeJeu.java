@@ -50,6 +50,8 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	private JLabel presentation;
 	private JButton renommer;
 	private JButton supprimer;
+	
+	
     public ModeDeJeu(Controleur controleur) {
         super();
         this.controleur = controleur;
