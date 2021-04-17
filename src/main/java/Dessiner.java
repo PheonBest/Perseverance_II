@@ -318,9 +318,9 @@ public class Dessiner extends JPanel {
 
                 g2d.setPaint(Color.BLACK);
 
-                dessinerTexteCentre(g2d, "Cliquez pour contrôler\nle bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
+                Formes.dessinerTexteCentre(g2d, "Cliquez pour contrôler\nle bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
                 if (etatMinijeuExtraction.equals(Etat.OUT)) // On affiche le score
-                    dessinerTexteCentre(g2d, new DecimalFormat("0.0").format(-200.*Math.abs(0.5 - positionCurseurExtraction) + 100.)+" % de précision", (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
+                    Formes.dessinerTexteCentre(g2d, new DecimalFormat("0.0").format(-200.*Math.abs(0.5 - positionCurseurExtraction) + 100.)+" % de précision", (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
             }
             // MINI-JEU EXTRACTION -------------
 
@@ -369,8 +369,8 @@ public class Dessiner extends JPanel {
                 }
 
                 g2d.setPaint(Color.BLACK);
-                dessinerTexteCentre(g2d, chronometreMinijeuLaser, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU+DECALAGE_Y_FEUX), Options.police);
-                dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes,\ncliquez le plus vite possible\npour renvoyer les données\ndu scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU+DECALAGE_Y_TEXTE), Options.POLICE_PLAIN);
+                Formes.dessinerTexteCentre(g2d, chronometreMinijeuLaser, (int)(largeurEcran/2), (int)(hauteurEcran/2+3*RAYON_FEU+DECALAGE_Y_FEUX), Options.police);
+                Formes.dessinerTexteCentre(g2d, "Lorsque les lumières deviennent vertes,\ncliquez le plus vite possible\npour renvoyer les données\ndu scan sur Terre.", (int)(largeurEcran/2), (int)(hauteurEcran/2-2*RAYON_FEU+DECALAGE_Y_TEXTE), Options.POLICE_PLAIN);
                 
                 // On dessine les éventuelles erreurs SI il y a au moins une erreur
                 if (nombreErreursLaser > 0) {
@@ -390,25 +390,6 @@ public class Dessiner extends JPanel {
             // MINI-JEU LASER -------------
         }
 
-    }
-
-    // Daniel Kvist, https://stackoverflow.com/questions/27706197/how-can-i-center-graphics-drawstring-in-java
-    private void dessinerTexteCentre(Graphics g, String text, int coordX, int coordY, Font font) {
-        // Get the FontMetrics
-        FontMetrics metrics = g.getFontMetrics(font);
-        final int NOMBRE_LIGNES_TEXTE = text.split("\n").length;
-        int index = 0;
-        g.setFont(font);
-        for (String ligne : text.split("\n")) {
-            // Determine the X coordinate for the text
-            int x = coordX - metrics.stringWidth(ligne) / 2;
-            // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
-            int y = coordY - metrics.getHeight() / 2 + metrics.getAscent() - (int)((NOMBRE_LIGNES_TEXTE/2.-index)*metrics.getHeight());
-            // Set the font
-            // Draw the String
-            g.drawString(ligne, x, y);
-            index++;
-        }
     }
 
     public void majCellules(Cellule[][] cellules) {

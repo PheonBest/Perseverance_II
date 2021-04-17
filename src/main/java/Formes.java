@@ -30,4 +30,23 @@ public class Formes {
             g2d.drawLine(x, y ,  x + (int) largeur , y  - (int) largeur);
     }
 
+    // Daniel Kvist, https://stackoverflow.com/questions/27706197/how-can-i-center-graphics-drawstring-in-java
+    public static void dessinerTexteCentre(Graphics g, String text, int coordX, int coordY, Font font) {
+        // Get the FontMetrics
+        FontMetrics metrics = g.getFontMetrics(font);
+        final int NOMBRE_LIGNES_TEXTE = text.split("\n").length;
+        int index = 0;
+        g.setFont(font);
+        for (String ligne : text.split("\n")) {
+            // Determine the X coordinate for the text
+            int x = coordX - metrics.stringWidth(ligne) / 2;
+            // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+            int y = coordY - metrics.getHeight() / 2 + metrics.getAscent() - (int)((NOMBRE_LIGNES_TEXTE/2.-index)*metrics.getHeight());
+            // Set the font
+            // Draw the String
+            g.drawString(ligne, x, y);
+            index++;
+        }
+    }
+
 }
