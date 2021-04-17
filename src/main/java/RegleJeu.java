@@ -83,17 +83,19 @@ public class RegleJeu extends JFrame implements ActionListener {
 			*/
 			
 			JLabel texteRegle= new JLabel(" ");
-			texteRegle.setText("<html>  L'humanite a decide d envoyer un rover sur une exoplanete : PERSEVERANCE II !  <br>"
+			texteRegle.setText("<html> <center> L'humanite a decide d envoyer un <i>rover</i> sur une exoplanete : <font color='gray'>PERSEVERANCE II</font> <br>"
 			+"Le meilleur technicien pour le controler est mis sur le coup : Vous! <br>"
 			+"<br>"
-			+"Afin de verifier si la planete est habitable, vous devez: <br>"
-			+" - vous assurez que les elements indispensables a la vie (minerai, baterie et...) sont presents sur la planete <br>" 
-			+" - parcourir au moins 70% de la carte <br>"
+			+"<hr>"
+			+"Afin de verifier si la planete est habitable, vous devez: </center> <br>"
+			+" - vous assurez que les <u>elements indispensables a la vie </u> (minerais, bacteries et...) sont presents sur la planete <br>" 
+			+" - parcourir au moins <u>70% de la carte</u> <br>"
 			+"<br>"
-			+"Pour se deplacer, il suffit de cliquer sur les cases a proximite du robot. Attention toutefois a ne pas trop se precipiter: des pieges sont presents ( ravins...) et ils peuvent grandement deteriorer les composantes du robot. Heureusement, des mini-jeux sont la pour vous aider a regagner des points de vie! <br>"
-			+"<br>"
+			+"<center>Pour se deplacer, il suffit de cliquer sur les cases a proximite du robot. Attention toutefois a ne pas trop se precipiter: des pieges sont presents ( ravins...) et ils peuvent grandement deteriorer les composantes du robot. Heureusement, des mini-jeux sont la pour vous aider a regagner des points de vie! <br>"
 			+"Dans le menu DETAIL, il sera possible de suivre l'evolution de la partie et l'etat du robot. <br>" 
-			+"Si vous souhaitez commencer une nouvelle partie, selectionnez une carte dans le menu deroulant puis cliquez sur JOUER, sinon cliquez sur EDITER pour creer votre propre carte.");
+			+"<hr>"
+			+"<br>"
+			+"Si vous souhaitez commencer une nouvelle partie, selectionnez une carte dans le menu deroulant puis cliquez sur JOUER, sinon cliquez sur EDITER pour creer votre propre carte.</center>");
 			texteRegle.setFont(new Font("Serif", Font.BOLD, 15));
 			texteRegle.setForeground(Color.BLACK);
 			texteRegle.setBounds(10, 10, 450, 450);
@@ -102,7 +104,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			//bouton quitter 
 			
 			quitter= new JButton("QUITTER");
-			quitter.setBounds(350,450,100,50);
+			quitter.setBounds(360,460,100,50);
 			quitter.setBackground(Color.white);
 			panneau.add(quitter);
 			quitter.addActionListener(this);
