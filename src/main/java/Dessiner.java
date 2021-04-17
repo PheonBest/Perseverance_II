@@ -48,7 +48,7 @@ public class Dessiner extends JPanel {
     private int[] tailleMinimap = {100,100};
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
-    
+
     // Mini-jeu
     private int largeurRectangle;
     private int hauteurRectangle;
@@ -89,10 +89,28 @@ public class Dessiner extends JPanel {
         this.controleur = controleur;
         this.affichagePanneauDeControle = affichagePanneauDeControle;
         if (affichagePanneauDeControle) {
+
+            // Chargement des symboles
+            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_SYMBOLE+"\\b.*\\.(?:jpg|gif|png)");
+            final int LARGEUR = (int) (Options.LARGEUR_CASE*0.7);
+            final int HAUTEUR = (int) (Options.LARGEUR_CASE*0.7);
+            try {
+                HashMap<String, Image> imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
+                for (String i : imagesSymboles.keySet())
+                    imagesSymboles.put(i, TailleImage.resizeImage(imagesSymboles.get(i), LARGEUR, HAUTEUR, true));
+            
+                // Panneau Missions
+                panneauMission = new BoutonMissions(imagesSymboles, 625,10);
+                //panneauMission = new BoutonMissions(625,10, imagesSymboles);
+                add(panneauMission);
+            
+            
+            } catch (URISyntaxException | IOException e) {
+                e.printStackTrace();
+            }
+
             panneauDeControle = new ControlPanel(10,10);
             add(panneauDeControle);
-            panneauMission = new BoutonMissions (625,10);
-			add(panneauMission);
 			//panneauPause= new BoutonPause(625,60);
             panneauPause = new JButton("PAUSE");
             panneauPause.setBounds(625,60, 100, 50);

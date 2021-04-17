@@ -194,6 +194,7 @@ public class Controleur {
                                 case CHENILLES:
                                     donnees.obtenirJoueur().majSurChenilles(true);
                                 default:
+                                    donnees.obtenirSymbolesDecouverts().put(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type, true);
                                     donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
                                     break;
                             }
@@ -904,14 +905,6 @@ public class Controleur {
             donnees.majStatutSouris(ev, clic);
     }
 
-    public void majStatutSouris(MouseEvent ev) {
-        donnees.majStatutSouris(ev);
-    }
-
-    public void majBorduresFenetre(Point location) {
-        donnees.majBorduresFenetre(location);
-    }
-
     // MUSIQUE
     public void majVolumeEffets(int volumeEffets) {
         donnees.majVolumeEffets( volumeEffets );
@@ -954,9 +947,6 @@ public class Controleur {
         donnees.musiqueSuivante();
         donnees.boucleMusique();
     }
-    public Donnees getDonnees(){
-        return this.donnees;
-    }
 
     public void enregistrer() {
         try {
@@ -984,40 +974,7 @@ public class Controleur {
             e.printStackTrace();
         }
     }
-
-    public void majPositionCurseurExtraction(double positionCurseurExtraction) {
-        donnees.majPositionCurseurExtraction(positionCurseurExtraction);
-    }
     
-    public Image obtenirImageSymbole(TypeSymbole nomSymbole){
-		switch( nomSymbole){
-			case MINERAI:
-				return donnees.getImagesSymboles().get("MINERAI");
-			case BACTERIE:
-				return donnees.getImagesSymboles().get("BACTERIE");
-			case GRAPPIN:
-				return donnees.getImagesSymboles().get("GRAPPIN");
-			case SCANNER:
-				return donnees.getImagesSymboles().get("SCANNER");
-			case RAVIN:
-				return donnees.getImagesSymboles().get("RAVIN");
-			case INCONNUE:
-				return donnees.getImagesSymboles().get("INCONNUE");
-			case BRAS:
-				return donnees.getImagesSymboles().get("BRAS");
-			case JAMBE:
-				return donnees.getImagesSymboles().get("JAMBE");
-			case CAPTEUR:
-				return donnees.getImagesSymboles().get("CAPTEUR");
-            case ENERGIE:
-                return donnees.getImagesSymboles().get("ENERGIE");
-			default:
-				return null;
-		
-		}
-	
-	}
-
     public void majLargeur(int largeur) {
         donnees.majLargeur(largeur);
     }

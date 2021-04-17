@@ -28,7 +28,6 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
     private CardLayout cardLayout = new CardLayout();
     private String scene = "";
 
-    private JPanel extraction = new JPanel();
     private JPanel contenu = new JPanel();
     private JPanel modeDeJeu;
     private JPanel chargement = new Chargement();
@@ -53,7 +52,7 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
         // Lorsque le clic est maintenu.
         // Cet évènement appelle mouseDragged, et non pas mouseMoved
         public void mouseDragged(MouseEvent ev) {
-            controleur.majStatutSouris(ev);
+            controleur.majStatutSouris(ev, true);
         }
 
         @Override
@@ -137,14 +136,6 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
 
         this.setContentPane(contenu); // On définit le contenu de "JFrame" comme un "JPanel"
         this.setVisible(true);
-
-        Point coinEnHautAGauche = getLocation();
-        Insets bordures = getInsets();
-        Insets borduresDessiner = jeu.getInsets();
-
-        //Point coinEnHautAGaucheSansBordures = new Point((int)(coinEnHautAGauche.getX()+bordures.left),(int)(coinEnHautAGauche.getY()+bordures.top));
-        Point pointBordures = new Point((bordures.left+borduresDessiner.left),(bordures.top+borduresDessiner.top));
-        controleur.majBorduresFenetre(pointBordures);
 
         // On définit la largeur et la hauteur du contenu du "JFrame" après l'avoir
         // affiché

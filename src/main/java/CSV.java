@@ -1,6 +1,7 @@
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -27,18 +28,20 @@ public class CSV {
 	
 	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus) throws IOException {
 		List<String[]> data = dataLines (carteCellules);
-		File dir = new File(Options.NOM_DOSSIER_CARTES);
-    	if (!dir.exists()) dir.mkdirs();
-		
 		// Si on est dans le jar, on ne peut pas obtenir le chemin vers un dossier interne
 		URL url = Thread.currentThread().getContextClassLoader().getResource(Options.NOM_DOSSIER_SYMBOLE);
-		String chemin;
-        if (url != null) // Si on n'est pas dans le jar, on obtient la carte en retournant à la racine du projet
+		
+		// Si on est dans le jar, on obtient directement la carte
+		String dossier = Options.NOM_DOSSIER_CARTES;
+		String chemin = Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
+        if (url != null) {// Si on n'est pas dans le jar, on obtient la carte en retournant à la racine du projet
 			chemin = "./././"+Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
-		else // Si on est dans le jar, on obtient directement la carte
-			chemin = Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
-			
-			
+			dossier = "./././"+Options.NOM_DOSSIER_CARTES;
+		}
+
+		File dir = new File(dossier);
+		if (!dir.exists()) dir.mkdirs();
+
 		File csvOutputFile = new File(chemin);
 		if (!csvOutputFile.exists() || ecrireParDessus) {
 			csvOutputFile.createNewFile();
@@ -121,20 +124,25 @@ public class CSV {
 						symbole = s;
 						break;
 					}
-                }
-               if(ds[2].equals("true")){  //lecture boolean estVisible
-				   estVisible = true;
-			   }else{ 
-				   estVisible = false;
-			   }
-			   if(ds[3].equals("true")){  //lecture boolean symboleVisible
-				   symboleVisible = true;
-			   }else{ 
-				   symboleVisible = false;
-			   }
+				}
+				if(ds[2].equals("true")){  //lecture boolean estVisible
+					estVisible = true;
+				}else{ 
+					estVisible = false;
+				}
+				if(ds[3].equals("true")){  //lecture boolean symboleVisible
+					symboleVisible = true;
+				}else{ 
+					symboleVisible = false;
+				}
+				
+				/* Optimisation
+				estVisible = Boolean.parseBoolean(ds[2]);
+				symboleVisible = Boolean.parseBoolean(ds[3]);
+				Image imageSym = imagesSymboles.get(symbole.name());
+				*/
 			   
-			   Image imageSym = obtenirImageSymbole (""+symbole, imagesSymboles);
-			   
+				Image imageSym = obtenirImageSymbole (""+symbole, imagesSymboles);
 				cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, estVisible, new Symbole(symbole, imageSym, symboleVisible));
 			}
 			carte[i]=cellules;

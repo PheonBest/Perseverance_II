@@ -25,6 +25,7 @@ public class Donnees implements Observable {
     private BoutonCercle[] boutonsCercle = {};
     private Cellule[] boutonsType = {};
     private Cellule[] boutonsSymbole = {};
+    private HashMap<TypeSymbole, Boolean> symbolesDecouverts = new HashMap<TypeSymbole, Boolean>();
     private int largeur;
     private int hauteur;
     private Cellule derniereCellule = null;
@@ -77,6 +78,10 @@ public class Donnees implements Observable {
     
     public Donnees() {
 
+        // Initialisation de la hashmap des symboles découverts
+        for (TypeSymbole type: TypeSymbole.values())
+            symbolesDecouverts.put(type, false);
+            
         // Création d'une carte par défaut si elle n'existe pas déjà
 
         cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
@@ -307,21 +312,8 @@ public class Donnees implements Observable {
         statutSouris.majY(e.getY());
     }
 
-    public void majStatutSouris(MouseEvent e) {
-        statutSouris.majX(e.getX());
-        statutSouris.majY(e.getY());
-    }
-
     public StatutSouris obtenirStatutSouris() {
         return this.statutSouris;
-    }
-
-    public void majBorduresFenetre(Point location) {
-        this.borduresFenetres = location;
-    }
-
-    public Point obtenirBorduresFenetre() {
-        return borduresFenetres;
     }
 
     public void majImagesSymboles(HashMap<String, Image> imagesSymboles) {
@@ -431,6 +423,10 @@ public class Donnees implements Observable {
             System.out.println("Nom du CSV : " + i);
         */
         this.cartes = cartes;
+    }
+
+    public HashMap<TypeSymbole, Boolean> obtenirSymbolesDecouverts() {
+        return symbolesDecouverts;
     }
 
     public HashMap<String, InputStream> obtenirCartes() {

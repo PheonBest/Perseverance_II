@@ -29,10 +29,10 @@ public class Missions extends JFrame {
     private int ly = 600;
     private JPanel panneauTitre;
     private JLabel titre;
-    
-    // Constructeur
+    private HashMap<String, Image> images;
+    //------------------------------------------------------------------ Constructeur
 
-    public Missions(int x, int y){
+    public Missions(HashMap<String, Image> images, int x, int y){
         // Fenêtre
         super();
         setLayout(null);
@@ -89,15 +89,11 @@ public class Missions extends JFrame {
 		premMission.setBounds(5,5,400,20);
 		mission1.add(premMission);
 		
-		
-		/*
-		JLabel monImage = new JLabel(new ImageIcon("./res/symboles/MINERAI.png"));
+		final Image IMG = TailleImage.resizeImage(images.get(TypeSymbole.MINERAI.name()),500,500,true);
+		JLabel monImage = new JLabel(new ImageIcon(IMG));
 		monImage.setBounds(50,20,100,100);
-		TailleImage.resizeImage(.....,500,500,true);
+		
 		mission1.add(monImage);
-		*/
-		
-		
 		
 	
 		
