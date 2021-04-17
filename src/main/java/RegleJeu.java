@@ -49,7 +49,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			panneau1= new JPanel();
 			panneau1.setLayout(null);
 			panneau1.setBounds(0,0,500,75);
-			panneau1.setBackground(Color.gray);
+			panneau1.setBackground(new Color(175,175,175));
 			panneau1.setVisible(true); 
 			
 			this.add(panneau1);
@@ -67,25 +67,25 @@ public class RegleJeu extends JFrame implements ActionListener {
 			panneau= new JPanel();
 			panneau.setLayout(null);
 			panneau.setBounds(0,75,500,425);
-			panneau.setBackground(Color.white);
+			panneau.setBackground(new Color(220,220,220));
 			panneau.setVisible(true);
 			
 			this.add(panneau);
 			
 			//regles du jeu
 			
-			regleJeu= new JLabel("ici il faut ecrire les regles que l'on veut");
+			regleJeu= new JLabel("BIENVENUE");
 			regleJeu.setFont(new Font("Serif", Font.BOLD, 20));
+			regleJeu.setHorizontalAlignment(SwingConstants.CENTER);
 			regleJeu.setForeground(Color.BLACK);
-			regleJeu.setBackground(Color.GREEN);
-			regleJeu.setBounds(25, 250, 475, 70);
+			regleJeu.setBounds(0, 100, 475, 70);
 			panneau.add(regleJeu);
 			
 			//bouton quitter 
 			
 			quitter= new JButton("QUITTER");
 			quitter.setBounds(350,350,100,50);
-			quitter.setBackground(Color.red);
+			quitter.setBackground(Color.white);
 			panneau.add(quitter);
 			quitter.addActionListener(this);
 			
