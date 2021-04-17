@@ -33,7 +33,6 @@ public class RegleJeu extends JFrame implements ActionListener {
 		private JPanel panneau;
 		private JLabel regle;
 		private JButton quitter;
-		private JLabel regleJeu;
 		private JLabel monImage;
 		
 		public RegleJeu() {
@@ -72,15 +71,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			
 			this.add(panneau);
 			
-			//regles du jeu
-			/*
-			regleJeu= new JLabel("BIENVENUE");
-			regleJeu.setFont(new Font("Serif", Font.BOLD, 20));
-			regleJeu.setHorizontalAlignment(SwingConstants.CENTER);
-			regleJeu.setForeground(Color.BLACK);
-			regleJeu.setBounds(0, 10, 500, 20);
-			panneau.add(regleJeu);
-			*/
+		
 			
 			JLabel texteRegle= new JLabel(" ");
 			texteRegle.setText("<html> <center> L'humanite a decide d envoyer un <i>rover</i> sur une exoplanete : <font color='gray'>PERSEVERANCE II</font> <br>"
