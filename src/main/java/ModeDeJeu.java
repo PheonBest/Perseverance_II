@@ -119,49 +119,49 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		
 		JLabel titre2 = new JLabel();
 		titre2.setText(" Pour plus d'informations concernant les regles du jeu, n'hesitez pas a cliquer sur le bouton AIDE ");
-		titre2.setFont(new Font("Serif", Font.BOLD, 19));
+		titre2.setFont(new Font("Serif", Font.BOLD+Font.ITALIC, 19));
         titre2.setForeground(Color.WHITE);
 		titre2.setBounds(0, hauteur/5, largeur, 70);
 		titre2.setHorizontalAlignment(SwingConstants.CENTER);
 		presentation.add(titre2);
 		
 		jouer = new JButton("JOUER");
-		jouer.setBounds(largeur/3-200,2*hauteur/3,200,50);
+		jouer.setBounds(2*largeur/5-250,3*hauteur/5,250,70);
 		jouer.setBackground(Color.gray);
 		jouer.setForeground(Color.white);
 		presentation.add(jouer);
 		jouer.addActionListener(this);
 		
 		renommer = new JButton("Renommer");
-		renommer.setBounds(largeur/3-200,2*hauteur/3+60,95,50);
+		renommer.setBounds(2*largeur/5-250,3*hauteur/5+80,120,70);
 		renommer.setBackground(Color.WHITE);
 		renommer.setForeground(Color.gray);
 		presentation.add(renommer);
 		//renommer.addActionListener(this);
 		
 		supprimer = new JButton("Supprimer");
-		supprimer.setBounds(largeur/3-200+105,2*hauteur/3+60,95,50);
+		supprimer.setBounds(2*largeur/5-250+130,3*hauteur/5+80,120,70);
 		supprimer.setBackground(Color.WHITE);
 		supprimer.setForeground(Color.gray);
 		presentation.add(supprimer);
 		
 		
 		creer = new JButton("CREER UNE CARTE");
-		creer.setBounds(2*largeur/3, 2*hauteur/3,200,50);
+		creer.setBounds(3*largeur/5, 3*hauteur/5,250,70);
 		creer.setBackground(Color.GRAY);
 		creer.setForeground(Color.WHITE);
 		presentation.add(creer);
 		//creer.addActionListener(this);
 		
 		editer = new JButton("Editer");
-		editer.setBounds(2*largeur/3, 2*hauteur/3+60,95,50);
+		editer.setBounds(3*largeur/5, 3*hauteur/5+80,120,70);
 		editer.setBackground(Color.WHITE);
 		editer.setForeground(Color.gray);
 		presentation.add(editer);
 		editer.addActionListener(this);
 		
 		cloner = new JButton("Cloner");
-		cloner.setBounds(2*largeur/3+105, 2*hauteur/3+60,95,50);
+		cloner.setBounds(3*largeur/5+130, 3*hauteur/5+80,120,70);
 		cloner.setBackground(Color.WHITE);
 		cloner.setForeground(Color.gray);
 		presentation.add(cloner);
@@ -174,17 +174,18 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		presentation.add(aide);
 		aide.addActionListener(this);
 		
+		JLabel selectionCarte= new JLabel("SELECTION DE LA CARTE");
+		selectionCarte.setBounds(0, hauteur/3, largeur, 50);
+		selectionCarte.setForeground(new Color(220,220,220));
+		selectionCarte.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,12));
+		selectionCarte.setHorizontalAlignment(SwingConstants.CENTER);
+		presentation.add(selectionCarte);
+		
 		j=new JScrollPane(liste);
         final int LARGEUR_LISTE = 100;
-        final int HAUTEUR_LISTE = 100;
+        final int HAUTEUR_LISTE = 75;
         //j.setBounds(150,200,100,100);
 	    j.setBounds((largeur-LARGEUR_LISTE)/2,(hauteur-HAUTEUR_LISTE)/2,LARGEUR_LISTE,HAUTEUR_LISTE);
-		//j.setBounds(0,0,largeur, hauteur);
-		//j.setHorizontalAlignment(SwingConstants.CENTER);
-		//j.setVerticalAlignment(SwingConstants.CENTER);
-		//j.setSize(LARGEUR_LISTE,LARGEUR_LISTE);
-		//j.setAlignmentX(SwingConstants.CENTER);
-		//j.setAlignmentY(SwingConstants.CENTER);
         j.setVisible(true);
         presentation.add(j);
 		
