@@ -263,8 +263,6 @@ public class Controleur {
         Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_IMAGES+"\\b.*\\.(?:jpg|gif|png)");
         try {
             HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_IMAGES+"/");
-            for (String s: images.keySet())
-                System.out.println(s);
             donnees.majArrierePlan(new ArrierePlan(images.get("surface_texture")));
             donnees.majImageMenu(TailleImage.resizeImage(images.get("planetes"), donnees.obtenirLargeur(), donnees.obtenirHauteur(), true));
             
