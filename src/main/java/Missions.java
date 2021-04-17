@@ -26,7 +26,7 @@ import javax.swing.*;
 public class Missions extends JFrame {
     
     private int lx = 650;
-    private int ly = 650;
+    private int ly = 600;
     private JPanel panneauTitre;
     private JLabel titre;
     
@@ -89,12 +89,22 @@ public class Missions extends JFrame {
 		premMission.setBounds(5,5,400,20);
 		mission1.add(premMission);
 		
+		
+		/*
+		JLabel monImage = new JLabel(new ImageIcon("./res/symboles/MINERAI.png"));
+		monImage.setBounds(50,20,100,100);
+		TailleImage.resizeImage(.....,500,500,true);
+		mission1.add(monImage);
+		*/
+		
+		
+		
+	
+		
 		JLabel deuMission= new JLabel("MISSION 2");
 		deuMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
 		deuMission.setBounds(5,5,400,20);
 		mission2.add(deuMission);
-		
-		
 	}
 	
 }
