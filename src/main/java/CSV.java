@@ -79,7 +79,7 @@ public class CSV {
 			//scanner.close(); // On veut pouvoir lire le stream une nouvelle fois, donc on ne ferme pas le scanner (fermer le scanner revient à fermer le stream)
 		} catch(Exception e){e.printStackTrace();}
 		
-		Cellule[][] cellules = dataLines(records);
+		Cellule[][] cellules = dataLines(records, images);
 		for (int i=0; i < cellules.length; i++) {
 			for (Cellule c: cellules[i])
 				c.translate(dx, dy); // Décalage
@@ -98,7 +98,7 @@ public class CSV {
 		return values;
 	}
 
-	public static Cellule[][] dataLines (List<List<String>> liste){ //methode surchargée qui change la liste de listes en un tableau 2D
+	public static Cellule[][] dataLines (List<List<String>> liste, HashMap<String, Image> imagesSymboles){ //methode surchargée qui change la liste de listes en un tableau 2D
 		Cellule[][] carte = new Cellule[liste.size()][];
 		TypeCase type = null;
 		TypeSymbole symbole = null;
@@ -127,39 +127,53 @@ public class CSV {
 			   }else{ 
 				   estVisible = false;
 			   }
-			   /*if(ds[3].equals("true")){  //lecture boolean symboleVisible
+			   if(ds[3].equals("true")){  //lecture boolean symboleVisible
 				   symboleVisible = true;
 			   }else{ 
 				   symboleVisible = false;
-			   }*/
+			   }
 			   
-               
-				if (symbole != null)
-					cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, true, new Symbole(symbole, null, true));
-				else
-					cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, true, null);
+			   Image imageSym = obtenirImageSymbole (""+symbole, imagesSymboles);
+			   
+				cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, estVisible, new Symbole(symbole, imageSym, symboleVisible));
 			}
 			carte[i]=cellules;
 		}
 		return carte;
 	}
 	
-	public Image obtenirImageSymbole(String nomSymbole, HashMap<String, Image> images){  //trouver l'image associee a chaque symbole
+	public static Image obtenirImageSymbole(String nomSymbole, HashMap<String, Image> images){  //trouver l'image associee a chaque symbole
 		switch( nomSymbole){
 			case "BACTERIE":
 				return images.get("BACTERIE");
 			case "MINERAI":
 				return images.get("MINERAI"); // correspondance type de hashmap
-			case "RIVIERE":
-				return images.get("EAU");
-			
-			case "MORT":
-				return images.get("MORT");
-			
-			case "DANGER":
-				return images.get("DANGER");
+			case "RAVIN":
+				return images.get("RAVIN");
+			case "SCANNER":
+				return images.get("SCANNER");
 			case "GRAPPIN":
 				return images.get("GRAPPIN");
+			case "INCONNUE":
+				return images.get("INCONNUE");
+			case "JAMBE":
+				return images.get("JAMBE");
+			case "BRAS":
+				return images.get("BRAS");
+			case "CAPTEUR":
+				return images.get("CAPTEUR");
+			case "BOIS":
+				return images.get("BOIS");
+			case "PONT":
+				return images.get("PONT");
+			case "ENERGIE":
+				return images.get("ENERGIE");
+			case "CHENILLES":
+				return images.get("CHENILLES");
+			case "MONTAGNE":
+				return images.get("MONTAGNE");
+			case "FUSEE":
+				return images.get("FUSEE");
 			default:
 				return null;
 		}

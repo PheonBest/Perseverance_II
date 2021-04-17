@@ -32,7 +32,7 @@ import java.awt.MouseInfo;
 
 public class Controleur {
     
-    private Donnees donnees;
+    public Donnees donnees;
 
     public Controleur(Donnees donnees) {
         this.donnees = donnees;
