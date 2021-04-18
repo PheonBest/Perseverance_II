@@ -73,7 +73,7 @@ public class CSV {
 	
 	
 /////////////////////////////////////////////////////////////////////////////////////////////Méthodes de lecture du fichier CSV
-	public static Cellule[][] lecture(InputStream csv, int dx, int dy, HashMap<String, Image> images){
+	public static Cellule[][] lecture(InputStream csv, int dx, int dy, HashMap<String, Image> images ){
 		List<List<String>> records = new ArrayList<>();
 		try {
 			Scanner scanner = new Scanner(csv);
@@ -126,16 +126,6 @@ public class CSV {
 						break;
 					}
 				}
-				/*if(ds[2].equals("true")){  //lecture boolean estVisible
-					estVisible = true;
-				}else{ 
-					estVisible = false;
-				}
-				if(ds[3].equals("true")){  //lecture boolean symboleVisible
-					symboleVisible = true;
-				}else{ 
-					symboleVisible = false;
-				}*/
 				
 				estVisible = Boolean.parseBoolean(ds[2]);
 				symboleVisible = Boolean.parseBoolean(ds[3]);

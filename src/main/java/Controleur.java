@@ -957,8 +957,22 @@ public class Controleur {
     public Donnees getDonnees(){
         return this.donnees;
     }
+    
+    public void enregistrer(){
+		enregistrer(false);
+	}
 
-    public void enregistrer() {
+    public void enregistrer( boolean reinitialiserExploration) {
+		
+		if(reinitialiserExploration){
+			for (int i=0; i< donnees.obtenirCellules().length; i++) {
+				for (Cellule c: donnees.obtenirCellules()[i]) {
+					if (c.obtenirSymbole() != null)
+						c.obtenirSymbole().estVisible = false;
+						c.majEstDecouverte(false);
+				}
+			}
+		}
 		
         try {
             System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");

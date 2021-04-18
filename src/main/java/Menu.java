@@ -11,12 +11,12 @@ public class Menu extends JPanel {
     private BoutonCercle[] boutonsCercle;
     private Cellule[] boutonsType = new Cellule[TypeCase.values().length];
     private Cellule[] boutonsSymbole = new Cellule[TypeSymbole.values().length];
-    private JButton enregistrer = new JButton("Enregistrer");
+    private JButton enregistrer = new JButton("Enregistrer"); //de l'éditeur de cartes
     private int largeurMenu;
     private Action actionEnregistrer = new AbstractAction("Enregistrer") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            controleur.enregistrer();
+            controleur.enregistrer(true);
         }
     };
     private JButton menu = new JButton("Menu");
