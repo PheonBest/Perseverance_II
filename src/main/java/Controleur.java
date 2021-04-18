@@ -1,25 +1,34 @@
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ProcessBuilder.Redirect.Type;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.awt.Image;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.swing.CellEditor;
 import javax.swing.SwingWorker;
+import java.awt.MouseInfo;
 
 public class Controleur {
     
@@ -185,7 +194,6 @@ public class Controleur {
                                 case CHENILLES:
                                     donnees.obtenirJoueur().majSurChenilles(true);
                                 default:
-                                    donnees.obtenirSymbolesDecouverts().put(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type, true);
                                     donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
                                     break;
                             }
@@ -248,6 +256,7 @@ public class Controleur {
                         for (int j=0; j < donnees.obtenirCellules()[i].length; j++)
                             donnees.obtenirCellules()[i][j].translate(dx, dy);
                     }
+                    donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
                 }
                 donnees.notifierObservateur(TypeMisAJour.Peindre);
             }
@@ -264,6 +273,7 @@ public class Controleur {
         try {
             HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_IMAGES+"/");
             donnees.majArrierePlan(new ArrierePlan(images.get("surface_texture")));
+            donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
             donnees.majImageMenu(TailleImage.resizeImage(images.get("planetes"), donnees.obtenirLargeur(), donnees.obtenirHauteur(), true));
             
             donnees.notifierObservateur(TypeMisAJour.ImageMenu);
@@ -858,6 +868,9 @@ public class Controleur {
             for (int j=0; j < cellules[i].length; j++)
                 cellules[i][j].translate((int)(dx*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()), (int)(dy*Options.INCREMENT_DE_DEPLACEMENT/donnees.obtenirZoom()));
         }
+
+        donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
+        donnees.notifierObservateur(TypeMisAJour.Cellules);
         donnees.notifierObservateur(TypeMisAJour.Peindre);
     }
 
@@ -890,6 +903,14 @@ public class Controleur {
         else
             donnees.majStatutSouris(ev, clic);
     }
+
+    /*public void majStatutSouris(MouseEvent ev) {
+        donnees.majStatutSouris(ev);
+    }
+
+    public void majBorduresFenetre(Point location) {
+        donnees.majBorduresFenetre(location);
+    }*/
 
     // MUSIQUE
     public void majVolumeEffets(int volumeEffets) {
@@ -933,8 +954,12 @@ public class Controleur {
         donnees.musiqueSuivante();
         donnees.boucleMusique();
     }
+    public Donnees getDonnees(){
+        return this.donnees;
+    }
 
     public void enregistrer() {
+		
         try {
             System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");
             CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true);
@@ -960,7 +985,40 @@ public class Controleur {
             e.printStackTrace();
         }
     }
+
+    public void majPositionCurseurExtraction(double positionCurseurExtraction) {
+        donnees.majPositionCurseurExtraction(positionCurseurExtraction);
+    }
     
+    public Image obtenirImageSymbole(TypeSymbole nomSymbole){
+		switch( nomSymbole){
+			case MINERAI:
+				return donnees.getImagesSymboles().get("MINERAI");
+			case BACTERIE:
+				return donnees.getImagesSymboles().get("BACTERIE");
+			case GRAPPIN:
+				return donnees.getImagesSymboles().get("GRAPPIN");
+			case SCANNER:
+				return donnees.getImagesSymboles().get("SCANNER");
+			case RAVIN:
+				return donnees.getImagesSymboles().get("RAVIN");
+			case INCONNUE:
+				return donnees.getImagesSymboles().get("INCONNUE");
+			case BRAS:
+				return donnees.getImagesSymboles().get("BRAS");
+			case JAMBE:
+				return donnees.getImagesSymboles().get("JAMBE");
+			case CAPTEUR:
+				return donnees.getImagesSymboles().get("CAPTEUR");
+            case ENERGIE:
+                return donnees.getImagesSymboles().get("ENERGIE");
+			default:
+				return null;
+		
+		}
+	
+	}
+
     public void majLargeur(int largeur) {
         donnees.majLargeur(largeur);
     }

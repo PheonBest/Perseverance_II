@@ -11,7 +11,7 @@ import java.awt.Image;
 
 public class CSV {
 	
-//////////////////////////////////////////////////////////////////////////////////////////////////////////Méthodes de de rédaction du fichier CSV
+//////////////////////////////////////////////////////////////////////////////////////////////////////////Méthodes de rédaction du fichier CSV
 	
     public static String convertToCSV(String[] data) {
 		return Stream.of(data).map(CSV::escapeSpecialCharacters).collect(Collectors.joining(","));
@@ -66,6 +66,7 @@ public class CSV {
 				s[j]=carte[i][j].toString();
 			}
 			dataLines.add(s);
+			
 		}
 		return dataLines;
 	}
@@ -125,7 +126,7 @@ public class CSV {
 						break;
 					}
 				}
-				if(ds[2].equals("true")){  //lecture boolean estVisible
+				/*if(ds[2].equals("true")){  //lecture boolean estVisible
 					estVisible = true;
 				}else{ 
 					estVisible = false;
@@ -134,15 +135,13 @@ public class CSV {
 					symboleVisible = true;
 				}else{ 
 					symboleVisible = false;
-				}
+				}*/
 				
-				/* Optimisation
 				estVisible = Boolean.parseBoolean(ds[2]);
 				symboleVisible = Boolean.parseBoolean(ds[3]);
 				Image imageSym = imagesSymboles.get(symbole.name());
-				*/
-			   
-				Image imageSym = obtenirImageSymbole (""+symbole, imagesSymboles);
+			
+				//Image imageSym = obtenirImageSymbole (""+symbole, imagesSymboles);
 				cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, estVisible, new Symbole(symbole, imageSym, symboleVisible));
 			}
 			carte[i]=cellules;
