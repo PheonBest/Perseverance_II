@@ -28,16 +28,17 @@ public class CSV {
 	
 	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus) throws IOException {
 		List<String[]> data = dataLines (carteCellules);
-		// Si on est dans le jar, on ne peut pas obtenir le chemin vers un dossier interne
-		URL url = Thread.currentThread().getContextClassLoader().getResource(Options.NOM_DOSSIER_SYMBOLE);
+		URL url = Thread.currentThread().getContextClassLoader().getResource("res/"+Options.NOM_DOSSIER_IMAGES+"/");
 		
-		// Si on est dans le jar, on obtient directement la carte
+		// Si on est dans le jar ou exe ou dmg, on obtient directement la carte
 		String dossier = Options.NOM_DOSSIER_CARTES;
 		String chemin = Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
-        if (url != null) {// Si on n'est pas dans le jar, on obtient la carte en retournant à la racine du projet
+        if (!url.toExternalForm().contains(".jar") && !url.toExternalForm().contains(".exe") && !url.toExternalForm().contains(".dmg")) {// Si on n'est pas dans le jar, on obtient la carte en retournant à la racine du projet
 			chemin = "./././"+Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
 			dossier = "./././"+Options.NOM_DOSSIER_CARTES;
 		}
+		System.out.println(url);
+		System.out.println(chemin);
 
 		File dir = new File(dossier);
 		if (!dir.exists()) dir.mkdirs();

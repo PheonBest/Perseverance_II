@@ -1,34 +1,25 @@
 
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ProcessBuilder.Redirect.Type;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.DecimalFormat;
-import java.awt.Image;
 import java.util.stream.Collectors;
-import java.util.Map;
 
 import javax.sound.sampled.AudioInputStream;
-import javax.swing.CellEditor;
 import javax.swing.SwingWorker;
-import java.awt.MouseInfo;
 
 public class Controleur {
     
@@ -528,10 +519,13 @@ public class Controleur {
                                                             break;
                                                         case "Pont":
                                                             if (donnees.obtenirNombrePont() > 0) {
-                                                                donnees.obtenirCellules()[i][j].obtenirSymbole().majSymbole(TypeSymbole.PONT, donnees.getImagesSymboles().get(TypeSymbole.PONT.name()));
-                                                                donnees.majNombrePonts(donnees.obtenirNombrePont()-1);
-                                                                if (donnees.obtenirNombrePont() == 0)
-                                                                    donnees.obtenirDerniereCompetence().majDisponible(false);
+                                                                // On ne peut placer des ponts que sur une case eau
+                                                                if (donnees.obtenirCellules()[i][j].obtenirType().equals(TypeCase.EAU)) {
+                                                                    donnees.obtenirCellules()[i][j].obtenirSymbole().majSymbole(TypeSymbole.PONT, donnees.getImagesSymboles().get(TypeSymbole.PONT.name()));
+                                                                    donnees.majNombrePonts(donnees.obtenirNombrePont()-1);
+                                                                    if (donnees.obtenirNombrePont() == 0)
+                                                                        donnees.obtenirDerniereCompetence().majDisponible(false);
+                                                                }
                                                                 desactiverCompetence();
                                                             }
                                                             break;
@@ -583,10 +577,16 @@ public class Controleur {
                                                                         // Si le joueur n'a pas de chenilles, on l'empêche d'aller sur une case montagne
                                                                         // Joueur a des chenilles = a
                                                                         // La case est une montagne = b
-                                                                        // On ajoute la casse ssi   !(!a&&b)
+                                                                        // On ajoute la case ssi   !(!a&&b)
                                                                         //                          a||!b
-                                                                        if (donnees.obtenirJoueur().obtenirSurChenilles() || casesVoisines[k].obtenirSymbole().type != TypeSymbole.MONTAGNE)
+                                                                        // Si la case est de l'eau et qu'il n'y a pas un pont dessus, on l'empêche d'aller sur la case
+                                                                        // La case est de l'eau = a
+                                                                        // Il y a un pont sur la case = b
+                                                                        // On ajoute la case ssi !(a&&!b) càd !a||b
+                                                                        if ((donnees.obtenirJoueur().obtenirSurChenilles() || casesVoisines[k].obtenirType() != TypeCase.MONTAGNE)
+                                                                            && (casesVoisines[k].obtenirType() != TypeCase.EAU || casesVoisines[k].obtenirSymbole().type == TypeSymbole.PONT)) {
                                                                             distances.put(casesVoisines[k], Math.pow((double)(COORDS_CELLULE[0]-casesVoisines[k].obtenirCentre()[0]),2)+Math.pow((double)(COORDS_CELLULE[1]-casesVoisines[k].obtenirCentre()[1]),2)); // Distance au carré
+                                                                        }
                                                                     }
                                                                     k++;
                                                                 }
@@ -903,15 +903,7 @@ public class Controleur {
         else
             donnees.majStatutSouris(ev, clic);
     }
-
-    /*public void majStatutSouris(MouseEvent ev) {
-        donnees.majStatutSouris(ev);
-    }
-
-    public void majBorduresFenetre(Point location) {
-        donnees.majBorduresFenetre(location);
-    }*/
-
+    
     // MUSIQUE
     public void majVolumeEffets(int volumeEffets) {
         donnees.majVolumeEffets( volumeEffets );

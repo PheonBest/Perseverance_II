@@ -66,15 +66,6 @@ public class ObtenirRessources{
         URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
         if (url == null)
             url = new File(directoryName).toURI().toURL();
-        
-        /*
-        URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
-        if (url == null) {
-            File dossier = new File("./././"+directoryName);
-            if (dossier.exists())
-                url = dossier.toURI().toURL();
-        }
-        */
 
         if (url != null) {
             if (url.getProtocol().equals("file")) {
