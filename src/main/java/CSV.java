@@ -142,6 +142,7 @@ public class CSV {
 			while (rowScanner.hasNext()) {
 				values.add(rowScanner.next());
 			}
+			rowScanner.close();
 		}
 		return values;
 	}

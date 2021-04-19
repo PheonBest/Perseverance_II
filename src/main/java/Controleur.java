@@ -1094,7 +1094,7 @@ public class Controleur {
         if (file.exists())
             throw new java.io.IOException("Ce nom est déjà utilisé !");
 
-        carte.close(); // On ferme le flux de données, sinon on ne peut pas modifier le fichier
+        carte.close(); // On ferme le flux de données pour pouvoir éditer le fichier
 
         Path source = Paths.get(dossier+"/"+ancienNom+".csv");
         Files.move(source, source.resolveSibling(nouveauNom+".csv"));
@@ -1108,11 +1108,11 @@ public class Controleur {
     }
 
     public void supprimer(String nom, InputStream carte) throws IOException {
-        String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
-        File fichier = new File(chemin);
 
-        carte.close(); // On ferme le flux de données, sinon on ne peut pas modifier le fichier
-        carte = null;
+        carte.close(); // On ferme le flux de données pour pouvoir éditer le fichier
+
+        String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom+".csv", "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        File fichier = new File(chemin);
 
         if (!fichier.delete())
             throw new java.io.IOException("Le fichier n'a pas pu être supprimé !");
