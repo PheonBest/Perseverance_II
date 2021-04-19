@@ -24,8 +24,14 @@ public class App
             @Override
             public void run() {
                 Dimension tailleEcran = Toolkit.getDefaultToolkit().getScreenSize();
-                int largeur = (int) (tailleEcran.getWidth() * 3 / 4);
-                int hauteur = (int) (tailleEcran.getHeight() * 3 / 4);
+
+                // Mode:  Partie de l'écran
+                // int largeur = (int) (tailleEcran.getWidth() * 3 / 4);
+                // int hauteur = (int) (tailleEcran.getHeight() * 3 / 4);
+
+                // Mode: Fullscreen
+                int largeur = (int) tailleEcran.getWidth();
+                int hauteur = (int) tailleEcran.getHeight();
 
                 Donnees donnees = new Donnees();
                 Controleur controleur = new Controleur(donnees);

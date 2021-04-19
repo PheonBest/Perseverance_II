@@ -10,6 +10,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +85,14 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
     public Affichage(int largeur, int hauteur, Controleur controleur) {
         
         this.controleur = controleur;
+
+        // Mode fullscreen
+        setUndecorated(true);
+        setResizable(false);
+        GraphicsEnvironment graphics = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice device = graphics.getDefaultScreenDevice();
+        device.setFullScreenWindow(this);
+
         jeu = new Dessiner(controleur, true);
         modeDeJeu = new ModeDeJeu(controleur);
         editeur = new Editeur(controleur);
