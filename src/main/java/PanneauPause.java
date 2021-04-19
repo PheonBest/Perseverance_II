@@ -14,6 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 public class PanneauPause extends JDialog implements ActionListener {
 	private int lx=600;
 	private int ly=600;
@@ -22,6 +28,10 @@ public class PanneauPause extends JDialog implements ActionListener {
 	private JPanel rouge;
 	private JLabel monImage;
 	private JButton retour;
+	private JButton menu;
+	private JButton pause;
+	private JButton suivant;
+	private JButton precedent;
 	private JSlider volume;
 	private JSlider volume2;
 	private JPanel panneauBas;
@@ -55,11 +65,22 @@ public class PanneauPause extends JDialog implements ActionListener {
 		rouge.add(monImage);
 		//retour
 		retour = new JButton("RETOUR");
-        retour.setLocation(lx-120,ly-60);
-        retour.setSize(100,50);
+        retour.setLocation(lx-140,ly-60);
+        retour.setSize(120,50);
         retour.setBackground(new Color(255,140,0));
+        retour.setFont(new Font("Courier",Font.ITALIC+Font.BOLD,16));
         retour.addActionListener(this);
         this.add(retour);
+        //menu principal
+        menu= new JButton("MENU ");
+        menu.setLocation(lx-140,ly-160);
+        menu.setSize(120,90);
+        menu.setBackground(new Color(255,140,0));
+        menu.setFont(new Font("Courier",Font.ITALIC+Font.BOLD,16));
+        menu.setVisible(true);
+        //menu.addActionListener(this);
+        this.add(menu);
+      
         
 
 		panneauBas= new JPanel();
@@ -71,7 +92,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 		
 		
         
-        son = new JLabel(" --- REGLAGES SON ---");
+        son = new JLabel(" --- VOLUMES SON ---");
         son.setFont(new Font("Serif", Font.BOLD, 13));
         son.setBounds(10,5,150,15);
         son.setBackground(Color.BLACK);
@@ -98,7 +119,65 @@ public class PanneauPause extends JDialog implements ActionListener {
         volume2.setBounds(25,100,100,20);
         volume2.setBackground(new Color(255,140,0));
         panneauBas.add(volume2);
+        
+        JPanel panneauDroite= new JPanel();
+        panneauDroite.setLayout(null);
+		panneauDroite.setBounds(10+150+10,ly-160,280,150);
+		panneauDroite.setBackground(new Color(255,140,0));
+		panneauDroite.setVisible(true);
+		rouge.add(panneauDroite);
+		
+		JLabel son2 = new JLabel(" --- REGLAGES SON ---");
+        son2.setFont(new Font("Serif", Font.BOLD, 13));
+        son2.setBounds(75,5,150,15);
+        son2.setBackground(Color.BLACK);
+        panneauDroite.add(son2);
+        
+        
+                
+  
+        pause= new JButton();
+      
+		try {
+			Image img1 = TailleImage.resizeImage(ImageIO.read(getClass().getResource("./res/symboles/PAUSE.png")),50,50,true);
+			pause.setIcon(new ImageIcon(img1
+			));
+			
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		pause.setBounds(110,45,60,60);
+		panneauDroite.add(pause);
+		pause.addActionListener(this);
+		
+		
+        suivant= new JButton();
+        
+        try {
+			Image img = TailleImage.resizeImage(ImageIO.read(getClass().getResource("./res/symboles/SUIVANT.png")),50,50,true);
+			suivant.setIcon(new ImageIcon(img));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		suivant.setBounds(180,45,60,60);
+		panneauDroite.add(suivant);
+		suivant.addActionListener(this);
+		
+        precedent=new JButton();
+         try {
+			Image img = TailleImage.resizeImage(ImageIO.read(getClass().getResource("./res/symboles/PRECEDENT.png")),50,50,true);
+			precedent.setIcon(new ImageIcon(img));
+			TailleImage.resizeImage(img,50,50,true);
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		precedent.setBounds(40,45,60,60);
+		panneauDroite.add(precedent);
+		
+		 
 	}
+	
+	
 
 	private void setFocusTo(JComponent comp) {
         addComponentListener(new ComponentAdapter() {
@@ -110,7 +189,16 @@ public class PanneauPause extends JDialog implements ActionListener {
     }
 
 	public void actionPerformed(ActionEvent e){
-		this.setVisible(false);
+		if(e.getSource()==retour){
+			this.setVisible(false);
+			/*
+		}else if(e.getSource()==suivant){
+			musiqueSuivante();
+		}else if(e.getSource()==pause){
+		*/
+		}
+		
+		
     }
     
     public void majTaille(int largeur, int hauteur){
@@ -130,19 +218,6 @@ public class PanneauPause extends JDialog implements ActionListener {
 		return composants;
 	}
 	
-/*
-	public void showDialog() {
-
-    JDialog dialog = new JDialog(this, Dialog.ModalityType.APPLICATION_MODAL);
-    //OR, you can do the following...
-    //JDialog dialog = new JDialog();
-    //dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-	dialog.setLayout(null);
-    dialog.setBounds(350, 350, 600, 600);
-    dialog.setVisible(true);
-    setTitle("panneau pause");
-    
-	}*/
 }
 
 
