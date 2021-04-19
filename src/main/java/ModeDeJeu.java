@@ -43,6 +43,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	private JScrollPane j;
 	private JButton aide;
 	private RegleJeu maFenetre2;
+	private Renommer maFenetre3;
 	private JLabel presentation;
 	private JButton renommer;
 	private JButton supprimer;
@@ -53,6 +54,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
         this.controleur = controleur;
         this.setLayout(null);
         this.maFenetre2= new RegleJeu();
+        this.maFenetre3= new Renommer();
     }
 
     public void majCartes(HashMap<String, InputStream> cartesEtNoms) {
@@ -86,6 +88,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	 public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==aide){
 			maFenetre2.setVisible(true);
+		
 			
 		}
 		 if(liste.getSelectedValue()!=null){
@@ -93,6 +96,8 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 				controleur.jouer(cartes.get(liste.getSelectedValue()));
 			else if (e.getSource()== editer)
 				controleur.editer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+			 else if (e.getSource()== renommer)
+				maFenetre3.setVisible(true);
 		}
 	}
 	
@@ -133,7 +138,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		renommer.setBackground(Color.WHITE);
 		renommer.setForeground(Color.gray);
 		presentation.add(renommer);
-		//renommer.addActionListener(this);
+		renommer.addActionListener(this);
 		
 		supprimer = new JButton("Supprimer");
 		supprimer.setBounds(2*largeur/5-250+130,3*hauteur/5+80,120,70);
