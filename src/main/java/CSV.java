@@ -26,9 +26,18 @@ public class CSV {
 		return escapedData;
 	}
 	
-	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus) throws IOException {
-		List<String[]> data = dataLines (carteCellules);
+	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur) throws IOException {
+		List<String[]> data = dataLines (carteCellules);//carte
+		if (joueur!= null){
+			String [] robot = new String []{Integer.toString(joueur.getBatterie()), Integer.toString(joueur.getNbRecharges()), Integer.toString(joueur.obtenirCase()[0]), Integer.toString(joueur.obtenirCase()[1])};
+			data.add(robot);
+		}else{
+			String [] robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0"};
+			data.add(robot);
+		}
+			
 		URL url = Thread.currentThread().getContextClassLoader().getResource("res/"+Options.NOM_DOSSIER_IMAGES+"/");
+		
 		
 		// Si on est dans le jar ou exe ou dmg, on obtient directement la carte
 		String dossier = Options.NOM_DOSSIER_CARTES;
@@ -55,8 +64,8 @@ public class CSV {
 			}
 		}
 	}
-	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename) throws IOException {
-		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false);
+	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, Robot joueur) throws IOException {
+		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur);
 	}
 	
 	public static List<String[]> dataLines (Cellule[][]carte){ // convertit la carte
@@ -74,7 +83,7 @@ public class CSV {
 	
 	
 /////////////////////////////////////////////////////////////////////////////////////////////Méthodes de lecture du fichier CSV
-	public static Cellule[][] lecture(InputStream csv, int dx, int dy, HashMap<String, Image> images ){
+	public static Reception lecture(InputStream csv, int dx, int dy, HashMap<String, Image> images, ArrayList<ArrayList<Image>> imagesJoueur ){
 		List<List<String>> records = new ArrayList<>();
 		try {
 			Scanner scanner = new Scanner(csv);
@@ -84,12 +93,14 @@ public class CSV {
 			//scanner.close(); // On veut pouvoir lire le stream une nouvelle fois, donc on ne ferme pas le scanner (fermer le scanner revient à fermer le stream)
 		} catch(Exception e){e.printStackTrace();}
 		
-		Cellule[][] cellules = dataLines(records, images);
+		Reception jeu = dataLines(records,images,imagesJoueur);
+		Cellule[][] cellules = jeu.getCellule();
 		for (int i=0; i < cellules.length; i++) {
 			for (Cellule c: cellules[i])
 				c.translate(dx, dy); // Décalage
 		}
-		return cellules;
+		jeu.majCarte(cellules);
+		return jeu;
 	}
 	
 	private static List<String> getRecordFromLine(String line) {
@@ -103,13 +114,14 @@ public class CSV {
 		return values;
 	}
 
-	public static Cellule[][] dataLines (List<List<String>> liste, HashMap<String, Image> imagesSymboles){ //methode surchargée qui change la liste de listes en un tableau 2D
-		Cellule[][] carte = new Cellule[liste.size()][];
+	public static Reception dataLines (List<List<String>> liste, HashMap<String, Image> imagesSymboles, ArrayList<ArrayList<Image>> imagesJoueur){ //methode surchargée qui change la liste de listes en un tableau 2D
+		//carte
+		Cellule[][] carte = new Cellule[liste.size()-1][];
 		TypeCase type = null;
 		TypeSymbole symbole = null;
 		boolean estVisible = false;
 		boolean symboleVisible = false;
-		for(int i=0;i<liste.size();i++){
+		for(int i=0;i<liste.size()-1;i++){
 			Cellule[] cellules = new Cellule[liste.get(i).size()];
 			for(int j=0;j<liste.get(i).size();j++){
 				String [] ds = liste.get(i).get(j).split(";");
@@ -136,8 +148,13 @@ public class CSV {
 				cellules[j] = new Cellule(type, i, j, 1, Options.ESPACE_INTER_CASE, estVisible, new Symbole(symbole, imageSym, symboleVisible));
 			}
 			carte[i]=cellules;
+			
 		}
-		return carte;
+		//robot
+		int l = liste.size()-1;
+		int [] joueur = new int[]{Integer.parseInt(liste.get(l).get(0)), Integer.parseInt(liste.get(l).get(1)), Integer.parseInt(liste.get(l).get(2)), Integer.parseInt(liste.get(l).get(3))};
+		Reception jeu = new Reception (carte, joueur, imagesJoueur);
+		return jeu;
 	}
 	
 	public static Image obtenirImageSymbole(String nomSymbole, HashMap<String, Image> images){  //trouver l'image associee a chaque symbole

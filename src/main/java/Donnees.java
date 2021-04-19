@@ -88,7 +88,7 @@ public class Donnees implements Observable {
         }
 
         try {
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "Campagne");
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "Campagne", this.obtenirJoueur());
         } catch (IOException e) {
             e.printStackTrace();
         }

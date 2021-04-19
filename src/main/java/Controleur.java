@@ -111,7 +111,7 @@ public class Controleur {
 	public void jouer(InputStream carte) {
 
 
-        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles));
+        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles, donnees.getImagesJoueur()).getCellule());
 
         donnees.obtenirArrierePlan().majCoords(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2);
         
@@ -794,7 +794,7 @@ public class Controleur {
 
         // On rend toutes les cases visibles
 
-        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles));
+        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles, donnees.getImagesJoueur()).getCellule());
 
         for (int i=0; i< donnees.obtenirCellules().length; i++) {
             for (Cellule c: donnees.obtenirCellules()[i]) {
@@ -956,7 +956,7 @@ public class Controleur {
 
     public void enregistrer( boolean reinitialiserExploration) {
 		
-		if(reinitialiserExploration){
+		if(reinitialiserExploration==true){
 			for (int i=0; i< donnees.obtenirCellules().length; i++) {
 				for (Cellule c: donnees.obtenirCellules()[i]) {
 					if (c.obtenirSymbole() != null)
@@ -968,7 +968,7 @@ public class Controleur {
 		
         try {
             System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true);
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur());
             chargerCartes();
         } catch (IOException e) {
             e.printStackTrace();
