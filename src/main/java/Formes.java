@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
+import java.text.Normalizer;
 
 public class Formes {
     public static final Color[] COULEURS_DIAGONALES = {  
@@ -54,6 +55,13 @@ public class Formes {
             g.drawString(ligne, x, y);
             index++;
         }
+    }
+
+    // Rob and Abdull, https://stackoverflow.com/questions/15190656/easy-way-to-remove-accents-from-a-unicode-string
+    public static String stripAccents(String s) {
+        s = Normalizer.normalize(s, Normalizer.Form.NFD);
+        s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return s;
     }
 
 }

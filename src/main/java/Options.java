@@ -95,4 +95,6 @@ public class Options {
 
     // Mini-jeu Extraction
     public static final double INCREMENT_CURSEUR = 0.05;
+    public static final int NOMBRE_MAX_LIGNES = 1000;
+    public static final int NOMBRE_MAX_COLONNES = 1000;
 }

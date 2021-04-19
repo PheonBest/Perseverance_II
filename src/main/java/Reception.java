@@ -20,6 +20,10 @@ public class Reception{
 	public Cellule[][] getCellule(){
 		return carte;
 	}
+
+	public Robot getJoueur(){
+		return joueur;
+	}
 	
 	//-------------------------------------------------méthodes de MAJ
 	public void majCarte (Cellule[][] map){

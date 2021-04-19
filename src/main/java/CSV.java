@@ -11,6 +11,7 @@ import java.awt.Image;
 
 public class CSV {
 	
+	public static final String[] extensionsFichierCompresse = {".jar",".exe",".dmg"};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////Méthodes de rédaction du fichier CSV
 	
     public static String convertToCSV(String[] data) {
@@ -26,28 +27,26 @@ public class CSV {
 		return escapedData;
 	}
 	
-	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur) throws IOException {
+	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart) throws IOException {
 		List<String[]> data = dataLines (carteCellules);//carte
-		if (joueur!= null){
-			String [] robot = new String []{Integer.toString(joueur.getBatterie()), Integer.toString(joueur.getNbRecharges()), Integer.toString(joueur.obtenirCase()[0]), Integer.toString(joueur.obtenirCase()[1])};
-			data.add(robot);
-		}else{
-			String [] robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0"};
-			data.add(robot);
+		String [] robot;
+		if (joueur!= null) {
+			robot = new String []{Integer.toString(joueur.getBatterie()), Integer.toString(joueur.getNbRecharges()), Integer.toString(joueur.obtenirCase()[0]), Integer.toString(joueur.obtenirCase()[1])};
+		} else {
+			robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0"};
 		}
-			
-		URL url = Thread.currentThread().getContextClassLoader().getResource("res/"+Options.NOM_DOSSIER_IMAGES+"/");
-		
-		
-		// Si on est dans le jar ou exe ou dmg, on obtient directement la carte
-		String dossier = Options.NOM_DOSSIER_CARTES;
-		String chemin = Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
-        if (!url.toExternalForm().contains(".jar") && !url.toExternalForm().contains(".exe") && !url.toExternalForm().contains(".dmg")) {// Si on n'est pas dans le jar, on obtient la carte en retournant à la racine du projet
-			chemin = "./././"+Options.NOM_DOSSIER_CARTES+"/"+filename+".csv";
-			dossier = "./././"+Options.NOM_DOSSIER_CARTES;
+
+		if (celluleDepart != null) {
+			robot[2] = Integer.toString(celluleDepart[0]);
+			robot[3] = Integer.toString(celluleDepart[1]);
 		}
-		System.out.println(url);
-		System.out.println(chemin);
+
+		data.add(robot);
+
+		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+		String chemin = dossier+"/"+filename+".csv";
+
+		System.out.println(dossier);
 
 		File dir = new File(dossier);
 		if (!dir.exists()) dir.mkdirs();
@@ -65,7 +64,40 @@ public class CSV {
 		}
 	}
 	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, Robot joueur) throws IOException {
-		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur);
+		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur, null);
+	}
+
+	// nom: nom du fichier cherché
+	// fichierInterne: n'importe quel fichier étant contenu dans le fichier compressé (.exe, .jar, .dmg)
+	// cheminVersRoot: Préfixe pour retourner dans le root, ex: "./././"
+	public static String fichierExterne(String nom, String fichierInterne, String cheminVersRoot) {
+		String url = Thread.currentThread().getContextClassLoader().getResource(fichierInterne).toExternalForm();
+		for (String extension: extensionsFichierCompresse) {
+			if (url.contains(extension))
+				return nom; // Si on est dans un fichier compressé, on retourne le nom
+		}
+		return cheminVersRoot+nom; // Si on est pas dans un fichier compressé, on retourne au niveau du root
+	}
+	public static void ecrireFichierDepuisFlux(String filename, InputStream carte) {
+		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+		String chemin = dossier+"/"+filename+".csv";
+		File dir = new File(dossier);
+		if (!dir.exists()) dir.mkdirs();
+		File csvOutputFile = new File(chemin);
+        try {
+            csvOutputFile.createNewFile();
+            System.out.println("Ecriture de "+filename+".csv");
+            byte[] buffer = new byte[carte.available()];
+            carte.read(buffer);
+            OutputStream outStream = new FileOutputStream(csvOutputFile);
+            outStream.write(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(!csvOutputFile.exists()){
+            System.out.println("Erreur: Le fichier de destination ne peut pas être créé");
+        }
 	}
 	
 	public static List<String[]> dataLines (Cellule[][]carte){ // convertit la carte
@@ -90,7 +122,7 @@ public class CSV {
 			while (scanner.hasNextLine()) {
 				records.add(getRecordFromLine(scanner.nextLine()));
 			}
-			//scanner.close(); // On veut pouvoir lire le stream une nouvelle fois, donc on ne ferme pas le scanner (fermer le scanner revient à fermer le stream)
+			scanner.close();
 		} catch(Exception e){e.printStackTrace();}
 		
 		Reception jeu = dataLines(records,images,imagesJoueur);

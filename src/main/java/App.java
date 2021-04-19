@@ -1,7 +1,11 @@
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
@@ -49,7 +53,17 @@ public class App
                 competences.add(new BoutonCercle(X_INIT, Y_INIT+2*DISTANCE_INTER_COMPETENCE, 50, "Pont", donnees.getImagesSymboles().get(TypeSymbole.PONT.name()), false)); // False signifie que la compétence est indiponible
                 donnees.majCompetences(competences);
                 donnees.notifierObservateur(TypeMisAJour.Competences);
-                }
+
+                // for (String s: donnees.obtenirCartes().keySet())
+                //     System.out.println(s);
+                // try {
+                //     //controleur.renommer("test2", "Forêt");
+                //     //controleur.cloner("test2", donnees.obtenirCartes().get("test"));
+                //     controleur.supprimer("test2", donnees.obtenirCartes().get("test2"));
+                // } catch (IOException e) {
+                //     e.printStackTrace();
+                // }
+            }
         });
     }
     

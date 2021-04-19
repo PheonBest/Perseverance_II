@@ -74,7 +74,6 @@ public class Donnees implements Observable {
     private int nombreErreursLaser = 0;
     
     public Donnees() {
-
         // Initialisation de la hashmap des symboles découverts
         for (TypeSymbole type: TypeSymbole.values())
             symbolesDecouverts.put(type, false);

@@ -3,9 +3,16 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,17 +117,15 @@ public class Controleur {
     }
 	public void jouer(InputStream carte) {
 
-
-        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles, donnees.getImagesJoueur()).getCellule());
+        Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles, donnees.getImagesJoueur());
+        donnees.majCellules(jeu.getCellule());
+        donnees.majJoueur(jeu.getJoueur());
+        placerJoueur(jeu.getJoueur().obtenirCase()[0], jeu.getJoueur().obtenirCase()[1]);
 
         donnees.obtenirArrierePlan().majCoords(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2);
-        
-        donnees.majJoueur(new Robot(donnees.getImagesJoueur(), 0, 0));
         donnees.majScene("Jeu");
-        LinkedList<int[]> buts = new LinkedList<int[]>();
         
-        
-        placerJoueur(0,0);
+        // Découverte des cellules autour du joueur
         Cellule[] voisins = Voisins.obtenirVoisins(donnees.obtenirCellules(), donnees.obtenirJoueur().obtenirDerniereCase()[0], donnees.obtenirJoueur().obtenirDerniereCase()[1], Options.RAYON_DECOUVERTE);
         for (int i=0; i < voisins.length; i++) {
             if (!voisins[i].estDecouverte()){
@@ -955,7 +960,7 @@ public class Controleur {
 		enregistrer(false);
 	}
 
-    public void enregistrer( boolean reinitialiserExploration) {
+    public void enregistrer(boolean reinitialiserExploration) {
 		
 		if(reinitialiserExploration==true){
 			for (int i=0; i< donnees.obtenirCellules().length; i++) {
@@ -969,7 +974,7 @@ public class Controleur {
 		
         try {
             System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur());
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart());
             chargerCartes();
         } catch (IOException e) {
             e.printStackTrace();
@@ -980,6 +985,7 @@ public class Controleur {
         donnees.majScene("Choix du mode");
         donnees.notifierObservateur(TypeMisAJour.Scene);
         chargerCartes();
+        donnees.majCelluleDepart(null);
     }
 
     private void chargerCartes() {
@@ -1041,5 +1047,75 @@ public class Controleur {
             donnees.majRayonDeSelection(0);
             donnees.notifierObservateur(TypeMisAJour.RayonDeSelection);
         }
+    }
+
+    // Gestion des cartes
+
+    public void cloner(String nouveauNom, InputStream carte) throws IOException {
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        nouveauNom = Formes.stripAccents(nouveauNom);
+        File file = new File(dossier+"/"+nouveauNom+".csv");
+        if (file.exists())
+            throw new java.io.IOException("Ce nom est déjà utilisé !");
+        else {
+                
+            CSV.ecrireFichierDepuisFlux(nouveauNom, carte);
+
+            chargerCartes();
+        }
+    }
+
+    public void creerCarte(String nom, int nombreLignes, int nombreColonnes) throws IOException {
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        nom = Formes.stripAccents(nom);
+        File file = new File(dossier+"/"+nom+".csv");
+        if (file.exists())
+            throw new java.io.IOException("Ce nom est déjà utilisé !");
+        if (nombreLignes < 1 || nombreColonnes < 1 || nombreLignes > Options.NOMBRE_MAX_LIGNES || nombreColonnes > Options.NOMBRE_MAX_COLONNES)
+            throw new IOException("Les dimensions spécifiées sont trop petites !");
+        Cellule[][] cellules = new Cellule[nombreLignes][nombreColonnes];
+        for (int i=0; i < cellules.length; i++) {
+            for (int j=0; j < cellules[i].length; j++)
+                cellules[i][j] = new Cellule(i,j);
+        }
+        try {
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        chargerCartes();
+    }
+    
+    public void renommer(String ancienNom, String nouveauNom, InputStream carte) throws IOException {
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        nouveauNom = Formes.stripAccents(nouveauNom);
+        File file = new File(dossier+"/"+nouveauNom+".csv");
+        if (file.exists())
+            throw new java.io.IOException("Ce nom est déjà utilisé !");
+
+        carte.close(); // On ferme le flux de données, sinon on ne peut pas modifier le fichier
+
+        Path source = Paths.get(dossier+"/"+ancienNom+".csv");
+        Files.move(source, source.resolveSibling(nouveauNom+".csv"));
+        /*
+        boolean success = new File(dossier+"/"+ancienNom+".csv").renameTo(file);
+
+        if (!success)
+            throw new java.io.IOException("Le fichier n'a pas pu être renommé !");
+        */
+        chargerCartes();
+    }
+
+    public void supprimer(String nom, InputStream carte) throws IOException {
+        String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        File fichier = new File(chemin);
+
+        carte.close(); // On ferme le flux de données, sinon on ne peut pas modifier le fichier
+        carte = null;
+
+        if (!fichier.delete())
+            throw new java.io.IOException("Le fichier n'a pas pu être supprimé !");
+        chargerCartes();
     }
 }

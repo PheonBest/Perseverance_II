@@ -89,9 +89,12 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
         // Mode fullscreen
         setUndecorated(true);
         setResizable(false);
+
+        /* Vrai mode fullscreen
         GraphicsEnvironment graphics = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice device = graphics.getDefaultScreenDevice();
         device.setFullScreenWindow(this);
+        */
 
         jeu = new Dessiner(controleur, true);
         modeDeJeu = new ModeDeJeu(controleur);

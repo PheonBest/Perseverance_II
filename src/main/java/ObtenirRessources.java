@@ -62,10 +62,10 @@ public class ObtenirRessources{
         HashMap<String, InputStream> streams = new HashMap<String, InputStream>();
         Pattern filenamePattern = Pattern.compile("[ \\w-]+?(?=\\.(?!exe|jar|dmg))");
         Matcher filenameMatcher;
-
+        
         URL url = Thread.currentThread().getContextClassLoader().getResource(directoryName);
         if (url == null)
-            url = new File(directoryName).toURI().toURL();
+            url = new File(directoryName).toURI().toURL(); // Si le fichier n'est pas trouvé, on cherche à la racine du projet
 
         if (url != null) {
             if (url.getProtocol().equals("file")) {
