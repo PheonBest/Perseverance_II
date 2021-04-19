@@ -15,12 +15,14 @@ public class Missions extends JFrame {
     private int ly = 600;
     private JPanel panneauTitre;
     private JLabel titre;
+    //private Robot joueur;
     private HashMap<String, Image> images;
     //------------------------------------------------------------------ Constructeur
 
     public Missions(HashMap<String, Image> images, int x, int y){
         // Fenêtre
         super();
+        //joueur = r;
         setLayout(null);
         setLocation(x,y);
         setSize(lx+20,ly+40);
@@ -91,6 +93,14 @@ public class Missions extends JFrame {
 		deuMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
 		deuMission.setBounds(5,5,400,20);
 		mission2.add(deuMission);
+		/*
+		JLabel nbKmTot = new JLabel("Distance totale parcourue : "+(joueur.obtenirPExploration()+" km"));
+        nbKmTot.setLayout(null);
+        nbKmTot.setLocation(30,50);
+        nbKmTot.setSize(400,30);
+        nbKmTot.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
+        mission2.add(nbKmTot);
+        */
 	}
 	
 }

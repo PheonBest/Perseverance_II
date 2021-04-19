@@ -10,6 +10,7 @@ public class BoutonMissions extends JPanel implements ActionListener {
 	private int hauteur;
 	private JButton mission;
 	private Missions panneauMission;
+	//private Robot joueur;
 	
 	public BoutonMissions(HashMap<String, Image> images, int x0, int y0){
         setLayout(null);
@@ -41,5 +42,9 @@ public class BoutonMissions extends JPanel implements ActionListener {
 	public JButton obtenirBouton() {
 		return mission;
 	}
+	/*
+	public void majJoueur(Robot joueur) {
+        this.joueur = joueur;
+    }*/
 }
 
