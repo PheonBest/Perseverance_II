@@ -545,7 +545,8 @@ public class Controleur {
                                                     // La case est une montagne = b
                                                     // On va sur la case ssi    !(!a&&b)
                                                     //                          a||!b
-                                                    if (donnees.obtenirJoueur().obtenirSurChenilles() || cellules[i][j].obtenirSymbole().type != TypeSymbole.MONTAGNE) {
+                                                    if ((donnees.obtenirJoueur().obtenirSurChenilles() || cellules[i][j].obtenirType() != TypeCase.MONTAGNE)
+                                                        && (cellules[i][j].obtenirType() != TypeCase.EAU || cellules[i][j].obtenirSymbole().type == TypeSymbole.PONT)) {
 
                                                         // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de sélection autorisé
                                                         Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, indexRobot[0], indexRobot[1], Options.RAYON_JOUEUR);
