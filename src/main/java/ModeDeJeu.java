@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -49,62 +50,16 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	private JButton supprimer;
 	
 	
-    public ModeDeJeu(Controleur controleur) {
+    public ModeDeJeu(Controleur controleur, int largeur, int hauteur) {
         super();
+		this.setSize(largeur,hauteur);
+		this.largeur = largeur;
+		this.hauteur = hauteur;
         this.controleur = controleur;
         this.setLayout(null);
-        this.maFenetre2= new RegleJeu();
-        this.maFenetre3= new Renommer();
-    }
+        this.maFenetre2 = new RegleJeu();
+        this.maFenetre3 = new Renommer(controleur);
 
-    public void majCartes(HashMap<String, InputStream> cartesEtNoms) {
-		//System.out.println(cartesEtNoms.values().size());
-        // On veut trier les cartes par ordre alphabétique
-        List<String> nomCartes = cartesEtNoms.entrySet()
-                    .stream()
-                    .sorted((p1,p2) -> p1.getKey().compareTo(p2.getKey()))
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-        cartes = cartesEtNoms;
-        //JLabel
-        modele.clear();
-        for (String s: nomCartes)
-            modele.addElement(s);
-        
-    }
-
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-    }
-    
-    public void majTaille(int largeur, int hauteur){
-		this.setSize(largeur,hauteur);
-		this.largeur=largeur;
-		this.hauteur=hauteur;
-		
-	}
-	
-	
-	 public void actionPerformed(ActionEvent e) {
-		if(e.getSource()==aide){
-			maFenetre2.setVisible(true);
-		
-			
-		}
-		 if(liste.getSelectedValue()!=null){
-			if (e.getSource()== jouer)
-				controleur.jouer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
-			else if (e.getSource()== editer)
-				controleur.editer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
-			else if (e.getSource()== renommer) {
-				maFenetre3.initialiser(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
-				maFenetre3.setVisible(true);
-			}
-		}
-	}
-	
-	public void initialiser(){
-		
 		// fond d'ecran image
 		presentation = new JLabel();
 		presentation.setLayout(null);
@@ -147,6 +102,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		supprimer.setBackground(Color.WHITE);
 		supprimer.setForeground(Color.gray);
 		presentation.add(supprimer);
+		supprimer.addActionListener(this);
 		
 		
 		creer = new JButton("CREER UNE CARTE");
@@ -168,7 +124,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		cloner.setBackground(Color.WHITE);
 		cloner.setForeground(Color.gray);
 		presentation.add(cloner);
-		//cloner.addActionListener(this);
+		cloner.addActionListener(this);
 		
 		aide= new JButton("AIDE");
 		aide.setBounds(largeur-80,10,70,40);
@@ -195,15 +151,59 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 				
         liste.setModel(modele);
         liste.setVisibleRowCount(5);
-        
-        
+    }
+
+    public void majCartes(HashMap<String, InputStream> cartesEtNoms) {
+		//System.out.println(cartesEtNoms.values().size());
+        // On veut trier les cartes par ordre alphabétique
+        List<String> nomCartes = cartesEtNoms.entrySet()
+                    .stream()
+                    .sorted((p1,p2) -> p1.getKey().compareTo(p2.getKey()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        cartes = cartesEtNoms;
+        //JLabel
+        modele.clear();
+        for (String s: nomCartes)
+            modele.addElement(s);
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+    }
+	
+	 public void actionPerformed(ActionEvent e) {
+		if(e.getSource()==aide){
+			maFenetre2.setVisible(true);
+		
+			
+		}
+		 if(liste.getSelectedValue()!=null){
+			if (e.getSource() == jouer)
+				controleur.jouer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+			else if (e.getSource() == editer)
+				controleur.editer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+			else if (e.getSource() == renommer) {
+				maFenetre3.initialiser(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+				maFenetre3.setVisible(true);
+			} else if (e.getSource() == supprimer) {
+				try {
+					controleur.supprimer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			} else if (e.getSource() == cloner) {
+				try {
+					controleur.cloner("Copie de "+liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 
 	public void majImageMenu(Image imageMenu) {
 		this.imageMenu = imageMenu;
 		presentation.setIcon(new ImageIcon (imageMenu));
 	}
-
- 
-
 }

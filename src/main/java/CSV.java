@@ -27,7 +27,7 @@ public class CSV {
 		return escapedData;
 	}
 	
-	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart) throws IOException {
+	public static InputStream givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart) throws IOException {
 		List<String[]> data = dataLines (carteCellules);//carte
 		String [] robot;
 		if (joueur!= null) {
@@ -46,10 +46,8 @@ public class CSV {
 
 		data.add(robot);
 
-		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
 		String chemin = dossier+"/"+filename+".csv";
-
-		System.out.println(dossier);
 
 		File dir = new File(dossier);
 		if (!dir.exists()) dir.mkdirs();
@@ -57,14 +55,15 @@ public class CSV {
 		File csvOutputFile = new File(chemin);
 		if (!csvOutputFile.exists() || ecrireParDessus) {
 			csvOutputFile.createNewFile();
-			System.out.println("Ecriture de "+filename+".csv");
 			try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
 				data.stream().map(CSV::convertToCSV).forEach(pw::println);
+				pw.close();
 			}
 			if(!csvOutputFile.exists()){
 				System.out.println("Erreur: Le fichier de destination ne peut pas être créé");
 			}
 		}
+		return new FileInputStream(csvOutputFile);
 	}
 	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, Robot joueur) throws IOException {
 		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur, null);
@@ -81,26 +80,28 @@ public class CSV {
 		}
 		return cheminVersRoot+nom; // Si on est pas dans un fichier compressé, on retourne au niveau du root
 	}
-	public static void ecrireFichierDepuisFlux(String filename, InputStream carte) {
-		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+	public static InputStream ecrireFichierDepuisFlux(String filename, InputStream carte) {
+		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
 		String chemin = dossier+"/"+filename+".csv";
 		File dir = new File(dossier);
 		if (!dir.exists()) dir.mkdirs();
 		File csvOutputFile = new File(chemin);
         try {
             csvOutputFile.createNewFile();
-            System.out.println("Ecriture de "+filename+".csv");
+            //System.out.println("Ecriture de "+filename+".csv");
             byte[] buffer = new byte[carte.available()];
             carte.read(buffer);
             OutputStream outStream = new FileOutputStream(csvOutputFile);
             outStream.write(buffer);
+			outStream.close(); // On ferme le stream pour pouvoir éditer le fichier postérieurement
+			return new FileInputStream(csvOutputFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if(!csvOutputFile.exists()){
+        if(!csvOutputFile.exists())
             System.out.println("Erreur: Le fichier de destination ne peut pas être créé");
-        }
+		return null;
 	}
 	
 	public static List<String[]> dataLines (Cellule[][]carte){ // convertit la carte

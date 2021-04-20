@@ -28,16 +28,13 @@ public class Menu extends JPanel {
     };
     private Controleur controleur;
 
-    public Menu(Controleur controleur) {
+    public Menu(Controleur controleur, int largeurMenu) {
         super();
         this.controleur = controleur;
-    }
-
-    public void initialiser(int largeurMenu) {
         this.largeurMenu = largeurMenu;
         //JLabel
         for (int i=0; i<Options.infoLabels.length; i++) {
-            final JLabel label = new JLabel(Options.infoLabels[i]);
+            JLabel label = new JLabel(Options.infoLabels[i]);
             label.setHorizontalAlignment(JLabel.CENTER);
             label.setFont(Options.police);
             label.setBounds(0, Options.yLabels[i], largeurMenu, 50);
