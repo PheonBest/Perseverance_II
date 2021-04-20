@@ -30,5 +30,6 @@ public enum TypeMisAJour {
 
     // Menus
     Options,
-    ImageMenu
+    ImageMenu,
+    Resultat
 }
