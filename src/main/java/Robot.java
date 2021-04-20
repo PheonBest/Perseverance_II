@@ -23,6 +23,7 @@ public class Robot extends Avatar {
     private int[] derniereCase = null;
     //Compétences
     private boolean surChenilles = false;
+    private int nombrePonts = 0;
     
     // Trajectoire
     /* Pour aller d'un point à un autre sur la carte, on utilise une liste de cases ciblées, appelées but (à atteindre).
@@ -163,6 +164,16 @@ public class Robot extends Avatar {
         int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
         return ((int)((((double)this.nbCasesExplorees)/((double)nbCasesTotales))*100));
     }
+    
+    public int obtenirNombrePont() {
+        return nombrePonts;
+    }
+
+    public void majNombrePonts(int nombrePonts) {
+        this.nombrePonts = nombrePonts;
+    }
+    
+
     
     
     //---------------------------------------------------------------------------------------------------- Méthodes de fonctionnalités du robot
@@ -406,10 +417,12 @@ public class Robot extends Avatar {
             }
         }
     }
-    public boolean obtenirSurChenilles() {
-        return surChenilles;
-    }
+  
     public void majSurChenilles(boolean surChenilles) {
         this.surChenilles = surChenilles;
     }
+    
+    public boolean obtenirSurChenilles(){
+		return this.surChenilles;
+	}
 }

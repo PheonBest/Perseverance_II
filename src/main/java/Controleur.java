@@ -396,7 +396,7 @@ public class Controleur {
                                     if (b.obtenirEffet().equals("Pont"))
                                         b.majDisponible(true);
                                 }
-                                donnees.majNombrePonts(donnees.obtenirNombrePont()+1);
+                                donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()+1);
                             case CHENILLES:
                                 donnees.obtenirJoueur().majSurChenilles(true);
                             default:
@@ -452,7 +452,7 @@ public class Controleur {
                         if (b.contains(x, y)) {
                             clicSurCompetence = true;
                             // Si on a cliqué sur la compétence mais qu'on n'a pas de ponts en résèrve, on ne poursuit pas la requête
-                            if (!(b.obtenirEffet().equals("Pont") && donnees.obtenirNombrePont() < 1)) {
+                            if (!(b.obtenirEffet().equals("Pont") && donnees.obtenirJoueur().obtenirNombrePont() < 1)) {
                                 // Si on a déjà sélectionné la compétene, on la désélectionne
                                 if (donnees.obtenirDerniereCompetence() == b) // On compare les pointeurs (références) des 2 objets
                                     desactiverCompetence();
@@ -531,12 +531,12 @@ public class Controleur {
                                                             scan(i, j);
                                                             break;
                                                         case "Pont":
-                                                            if (donnees.obtenirNombrePont() > 0) {
+                                                            if (donnees.obtenirJoueur().obtenirNombrePont() > 0) {
                                                                 // On ne peut placer des ponts que sur une case eau
                                                                 if (donnees.obtenirCellules()[i][j].obtenirType().equals(TypeCase.EAU)) {
                                                                     donnees.obtenirCellules()[i][j].obtenirSymbole().majSymbole(TypeSymbole.PONT, donnees.getImagesSymboles().get(TypeSymbole.PONT.name()));
-                                                                    donnees.majNombrePonts(donnees.obtenirNombrePont()-1);
-                                                                    if (donnees.obtenirNombrePont() == 0)
+                                                                    donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()-1);
+                                                                    if (donnees.obtenirJoueur().obtenirNombrePont() == 0)
                                                                         donnees.obtenirDerniereCompetence().majDisponible(false);
                                                                 }
                                                                 desactiverCompetence();

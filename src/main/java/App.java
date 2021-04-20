@@ -31,6 +31,7 @@ public class App
                 // int hauteur = (int) (tailleEcran.getHeight() * 3 / 4);
 
                 // Mode: Fullscreen
+             
                 int largeur = (int) tailleEcran.getWidth();
                 int hauteur = (int) tailleEcran.getHeight();
 

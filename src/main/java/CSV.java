@@ -34,9 +34,9 @@ public class CSV {
 			robot = new String []{Integer.toString(joueur.getBatterie()), Integer.toString(joueur.getNbRecharges()), Integer.toString(joueur.obtenirCase()[0]), Integer.toString(joueur.obtenirCase()[1]), 
 				Integer.toString(joueur.getJambes()[0].voyant.getEtat()), Integer.toString(joueur.getJambes()[1].voyant.getEtat()), Integer.toString(joueur.getBras()[0].voyant.getEtat()), Integer.toString(joueur.getBras()[1].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[0].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[1].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[2].voyant.getEtat()),
 					Integer.toString(joueur.getJambes()[0].getUsure()), Integer.toString(joueur.getJambes()[1].getUsure()), Integer.toString(joueur.getBras()[0].getUsure()), Integer.toString(joueur.getBras()[1].getUsure()), Integer.toString(joueur.getCapteurs()[0].getUsure()), Integer.toString(joueur.getCapteurs()[1].getUsure()), Integer.toString(joueur.getCapteurs()[2].getUsure()),
-						Integer.toString((int)(joueur.getKmParcourus())), Integer.toString((int)(joueur.getCompteurKm()))};
+						Integer.toString((int)(joueur.getKmParcourus())), Integer.toString((int)(joueur.getCompteurKm())), Integer.toString(joueur.obtenirNombrePont()), Integer.toString((joueur.obtenirSurChenilles())? 1 : 0)};
 		} else {
-			robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+			robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
 		}
 
 		if (celluleDepart != null) {
@@ -191,7 +191,7 @@ public class CSV {
 		int [] joueur = new int[]{Integer.parseInt(liste.get(l).get(0)), Integer.parseInt(liste.get(l).get(1)), Integer.parseInt(liste.get(l).get(2)), Integer.parseInt(liste.get(l).get(3)),
 			Integer.parseInt(liste.get(l).get(4)), Integer.parseInt(liste.get(l).get(5)), Integer.parseInt(liste.get(l).get(6)), Integer.parseInt(liste.get(l).get(7)), Integer.parseInt(liste.get(l).get(8)), Integer.parseInt(liste.get(l).get(9)), Integer.parseInt(liste.get(l).get(10)),
 				Integer.parseInt(liste.get(l).get(11)), Integer.parseInt(liste.get(l).get(12)), Integer.parseInt(liste.get(l).get(13)), Integer.parseInt(liste.get(l).get(14)), Integer.parseInt(liste.get(l).get(15)), Integer.parseInt(liste.get(l).get(16)), Integer.parseInt(liste.get(l).get(17)),
-					Integer.parseInt(liste.get(l).get(18)), Integer.parseInt(liste.get(l).get(19))};
+					Integer.parseInt(liste.get(l).get(18)), Integer.parseInt(liste.get(l).get(19)), Integer.parseInt(liste.get(l).get(20)), Integer.parseInt(liste.get(l).get(21))};
 		Reception jeu = new Reception (carte, joueur, imagesJoueur);
 		return jeu;
 	}

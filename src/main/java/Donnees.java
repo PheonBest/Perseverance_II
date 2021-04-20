@@ -35,7 +35,6 @@ public class Donnees implements Observable {
     private int rayonDeSelection = 0;
     private boolean etatOptions = false;
     private Cellule derniereCelluleMinijeu = null;
-    private int nombrePonts = 0;
     
     // CSV des cartes && éditeur
     private HashMap<String, InputStream> cartes;
@@ -555,14 +554,6 @@ public class Donnees implements Observable {
     }
     public Cellule obtenirDerniereCelluleMinijeu() {
         return derniereCelluleMinijeu;
-    }
-
-    public int obtenirNombrePont() {
-        return nombrePonts;
-    }
-
-    public void majNombrePonts(int nombrePonts) {
-        this.nombrePonts = nombrePonts;
     }
 
     public void majLargeur(int largeur) {
