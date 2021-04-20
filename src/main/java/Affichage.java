@@ -168,6 +168,7 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
         ((Dessiner)jeu).majHauteur(this.hauteur);
         ((Dessiner)jeu).initialiser();
         ((ModeDeJeu)modeDeJeu).majTaille(this.largeur,this.hauteur);
+        //((Renommer)renommer).majTaille(this.largeur,this.hauteur);
 		((ModeDeJeu)modeDeJeu).initialiser();
         ((Dessiner)jeu).majEnJeu(true);
         ((Editeur)editeur).initialiser(this.largeur, this.hauteur);
@@ -320,6 +321,9 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                 break;
             case SensVariationExtraction:
                 ((Dessiner)jeu).majSensVariationExtraction((boolean) nouveau);
+                break;
+            case Resultat:
+                ((Dessiner)jeu).majResultat((String) nouveau);
                 break;
             
             // Mini jeu laser

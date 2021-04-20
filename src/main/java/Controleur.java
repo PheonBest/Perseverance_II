@@ -179,23 +179,6 @@ public class Controleur {
                         if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) { // Si on doit fermer la fenêtre du minijeu
                             donnees.majEtatMinijeuExtraction(Etat.OFF);
                             donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
-                            System.out.println("Précision du bras robotique: "+new DecimalFormat("0.00").format(-200.*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100)+" %");
-                            
-                            switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
-                                case BOIS:
-                                    // On a extrait 1 de bois, donc on peut construire 1 pont
-                                    for (BoutonCercle b: donnees.obtenirCompetences()) {
-                                        if (b.obtenirEffet().equals("Pont"))
-                                            b.majDisponible(true);
-                                    }
-                                    donnees.majNombrePonts(donnees.obtenirNombrePont()+1);
-                                case CHENILLES:
-                                    donnees.obtenirJoueur().majSurChenilles(true);
-                                default:
-                                    donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
-                                    break;
-                            }
-                            desactiverCompetence();
                         }
                         break;
                     case OFF:
@@ -400,7 +383,29 @@ public class Controleur {
                     donnees.majEtatMinijeuExtraction(Etat.OUT);
 
                     // Pourcentage de précision final
-                    System.out.println(new DecimalFormat("0.0").format(-200*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100)+" % de précision");
+                    double score = -200*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100;
+                    String resultat = new DecimalFormat("0.0").format(score)+" % de précision";
+                    if (score < 75)
+                        resultat = "Echec ! "+resultat;
+                    else {
+                        resultat = "Réussite ! "+resultat;
+                        switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
+                            case BOIS:
+                                // On a extrait 1 de bois, donc on peut construire 1 pont
+                                for (BoutonCercle b: donnees.obtenirCompetences()) {
+                                    if (b.obtenirEffet().equals("Pont"))
+                                        b.majDisponible(true);
+                                }
+                                donnees.majNombrePonts(donnees.obtenirNombrePont()+1);
+                            case CHENILLES:
+                                donnees.obtenirJoueur().majSurChenilles(true);
+                            default:
+                                donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
+                                break;
+                        }
+                    }
+                    donnees.majResultat(resultat);
+                    donnees.notifierObservateur(TypeMisAJour.Resultat);
                     donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
                 }
                 // Si le mini-jeu laser est en cours
@@ -428,6 +433,7 @@ public class Controleur {
                             donnees.notifierObservateur(TypeMisAJour.NombreErreursLaser);
                             if (donnees.obtenirNombreErreursLaser() == Options.NOMBRE_ERREURS_LASER) { // Si on atteint le maximum de croix
                                 // MALUS
+                                donnees.obtenirJoueur().malusBatterie(TypeCase.NEIGE);
                             }
                         }
                     }

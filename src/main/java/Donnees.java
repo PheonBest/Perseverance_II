@@ -65,6 +65,7 @@ public class Donnees implements Observable {
     private Etat etatMinijeuExtraction = Etat.OFF;
     private boolean sensVariationExtraction = true;
     private double positionCurseurExtraction = 0;
+    private String resultat = ""; // Score final affiché
 
     // Minijeu Laser
     private Etat etatMinijeuLaser = Etat.OFF;
@@ -197,6 +198,9 @@ public class Donnees implements Observable {
                     break;
                 case SensVariationExtraction:
                     obs.mettreAJour(TypeMisAJour.SensVariationExtraction, sensVariationExtraction);
+                    break;
+                case Resultat:
+                    obs.mettreAJour(TypeMisAJour.Resultat, resultat);
                     break;
 
                 // Mini jeu laser
@@ -479,6 +483,9 @@ public class Donnees implements Observable {
     }
     public double obtenirPositionCurseurExtraction() {
         return positionCurseurExtraction;
+    }
+    public void majResultat(String resultat) {
+        this.resultat = resultat;
     }
     
     // Mini jeu extraction ----------
