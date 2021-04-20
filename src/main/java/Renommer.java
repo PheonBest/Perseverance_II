@@ -53,6 +53,7 @@ public class Renommer extends JFrame implements ActionListener{
 		valider= new JButton("VALIDER");
 		valider.setBounds(155,110,135,50);
 		valider.setBackground(new Color(175,175,175));
+		valider.addActionListener(this);
 		fond.add(valider);
 		
 				
@@ -64,8 +65,9 @@ public class Renommer extends JFrame implements ActionListener{
 				nom.setText("");
 				
 			}else if(e.getSource()==valider){
-				try{				
-					controleur.renommer(nomCarte, nom.getText() ,carte);
+				try{
+					System.out.println(nomCarte+" "+nom.getText());
+					controleur.renommer(nomCarte, nom.getText(), carte);
 				}catch(IOException ex){
 					ex.printStackTrace();
 				}
@@ -74,11 +76,10 @@ public class Renommer extends JFrame implements ActionListener{
 			}
 	}
 	
-	public void initialiser(String a, InputStream b){
-		this.nomCarte=a;
-		this.carte=b;
-	
-	
+	public void initialiser(String nomCarte, InputStream carte){
+		System.out.println(nomCarte);
+		this.nomCarte = nomCarte;
+		this.carte = carte;
 	}
 	/*
 	public void majTaille(int largeur, int hauteur){

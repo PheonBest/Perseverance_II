@@ -322,6 +322,9 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
             case SensVariationExtraction:
                 ((Dessiner)jeu).majSensVariationExtraction((boolean) nouveau);
                 break;
+            case Resultat:
+                ((Dessiner)jeu).majResultat((String) nouveau);
+                break;
             
             // Mini jeu laser
             case MinijeuLaser:

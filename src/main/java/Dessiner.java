@@ -65,6 +65,7 @@ public class Dessiner extends JPanel {
     private final double MINIJEU_LASER_HAUTEUR_ECRAN = 2.1;
     
     // Mini-jeu "Extraction"
+    private String resultat = "";
     private Etat etatMinijeuExtraction = Etat.OFF;
     private String scoreExtraction = "";
     private double positionCurseurExtraction = 0;
@@ -340,7 +341,7 @@ public class Dessiner extends JPanel {
 
                 Formes.dessinerTexteCentre(g2d, "Cliquez pour contrôler\nle bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
                 if (etatMinijeuExtraction.equals(Etat.OUT)) // On affiche le score
-                    Formes.dessinerTexteCentre(g2d, new DecimalFormat("0.0").format(-200.*Math.abs(0.5 - positionCurseurExtraction) + 100.)+" % de précision", (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
+                    Formes.dessinerTexteCentre(g2d, resultat, (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
             }
             // MINI-JEU EXTRACTION -------------
 
@@ -520,6 +521,9 @@ public class Dessiner extends JPanel {
 	public void majSensVariationExtraction(boolean sensVariationExtraction) {
         this.sensVariationExtraction = sensVariationExtraction;
 	}
+    public void majResultat(String resultat) {
+        this.resultat = resultat;
+    }
 
     // Minijeu laser
     public void majEtatMinijeuLaser(Etat etatMinijeuLaser) {

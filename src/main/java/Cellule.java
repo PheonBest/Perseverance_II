@@ -124,20 +124,27 @@ public class Cellule extends Polygon implements Dessin {
             translate((int)(COIN_EN_HAUT_A_GAUCHE[0]), (int)(COIN_EN_HAUT_A_GAUCHE[1]));
             g2d.setTransform(ANCIENNE_TRANSFORMATION);
 
-            if (symbole != null && symbole.obtenirImage() != null) {
-                Image imageAgrandie = TailleImage.resizeImage(symbole.obtenirImage(), (int)(symbole.obtenirImage().getWidth(null)*taille*facteurDeTaille), (int)(symbole.obtenirImage().getHeight(null)*taille*facteurDeTaille), true);
+            if (symbole != null && symbole.obtenirImage() != null && estDecouverte) {
+                Image img = symbole.obtenirImage();
+                if (estDecouverte)
+                    img = null;
+                Image imageAgrandie;
+                if (symbole.estVisible)
+                    imageAgrandie = TailleImage.resizeImage(img, (int)(img.getWidth(null)*taille*facteurDeTaille), (int)(img.getHeight(null)*taille*facteurDeTaille), true);
+                else
+                    imageAgrandie = TailleImage.resizeImage(img, (int)(img.getWidth(null)*taille*facteurDeTaille), (int)(img.getHeight(null)*taille*facteurDeTaille), true);
                 g2d.drawImage(imageAgrandie, (int)(CENTRE_CASE[0] - imageAgrandie.getWidth(null)/2), (int)(CENTRE_CASE[1] - imageAgrandie.getHeight(null)/2), null);
                 /*
-                g2d.drawImage(  symbole.obtenirImage(),
-                                (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)*agrandissement*taille/2),
-                                (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)*agrandissement*taille/2),
-                                (int)(CENTRE_CASE[0] + symbole.obtenirImage().getWidth(null)*agrandissement*taille/2),
-                                (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)*agrandissement*taille/2),
+                g2d.drawImage(  img,
+                                (int)(CENTRE_CASE[0] - img.getWidth(null)*agrandissement*taille/2),
+                                (int)(CENTRE_CASE[1] - img.getHeight(null)*agrandissement*taille/2),
+                                (int)(CENTRE_CASE[0] + img.getWidth(null)*agrandissement*taille/2),
+                                (int)(CENTRE_CASE[1] + img.getHeight(null)*agrandissement*taille/2),
 
-                                (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2),
-                                (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2)•,
-                                (int)(CENTRE_CASE[0] + symbole.obtenirImage().getWidth(null)/2),
-                                (int)(CENTRE_CASE[1] + symbole.obtenirImage().getHeight(null)/2),
+                                (int)(CENTRE_CASE[0] - img.getWidth(null)/2),
+                                (int)(CENTRE_CASE[1] - img.getHeight(null)/2)•,
+                                (int)(CENTRE_CASE[0] + img.getWidth(null)/2),
+                                (int)(CENTRE_CASE[1] + img.getHeight(null)/2),
                                 null);
                 */
             }
@@ -147,7 +154,10 @@ public class Cellule extends Polygon implements Dessin {
             g2d.setPaint(Color.BLUE);
             if (selectionne)
                 g2d.drawPolygon(this);
-            if (symbole != null && symbole.obtenirImage() != null) {
+            if (symbole != null && symbole.obtenirImage() != null && estDecouverte) {
+                Image img = symbole.obtenirImage();
+                if (estDecouverte)
+                    img = null;
                 if (taille == 1)
                     g2d.drawImage(symbole.obtenirImage(), (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2), (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2), null);
                 else {
