@@ -4,21 +4,28 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import java.io.InputStream;
+import java.io.IOException;
 
 public class Renommer extends JFrame implements ActionListener{
 	int x=100;
 	int y=100;
 	int lx=300;
 	int ly=220;
+	//int largeur;
+	//int hauteur;
 	private JButton valider;
 	private JButton effacer;
 	private JTextField nom;
+	private Controleur controleur;
+	private String nomCarte ;
+	private InputStream carte; 
 	
 	public Renommer(){
 		
 		super();
         setLayout(null);
-        setLocation(x,y);
+        setLocation(400,400);
         setSize(lx+20,ly);
         setTitle("RENOMMER");
         
@@ -55,8 +62,31 @@ public class Renommer extends JFrame implements ActionListener{
 	 public void actionPerformed(ActionEvent e) {
 			if(e.getSource()== effacer){
 				nom.setText("");
+				
+			}else if(e.getSource()==valider){
+				try{				
+					controleur.renommer(nomCarte, nom.getText() ,carte);
+				}catch(IOException ex){
+					ex.printStackTrace();
+				}
+				
+
 			}
-		}
+	}
 	
+	public void initialiser(String a, InputStream b){
+		this.nomCarte=a;
+		this.carte=b;
+	
+	
+	}
+	/*
+	public void majTaille(int largeur, int hauteur){
+		this.setSize(largeur,hauteur);
+		this.largeur=largeur;
+		this.hauteur=hauteur;
+		
+	}
+	*/
 }
 

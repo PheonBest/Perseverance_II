@@ -168,6 +168,7 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
         ((Dessiner)jeu).majHauteur(this.hauteur);
         ((Dessiner)jeu).initialiser();
         ((ModeDeJeu)modeDeJeu).majTaille(this.largeur,this.hauteur);
+        //((Renommer)renommer).majTaille(this.largeur,this.hauteur);
 		((ModeDeJeu)modeDeJeu).initialiser();
         ((Dessiner)jeu).majEnJeu(true);
         ((Editeur)editeur).initialiser(this.largeur, this.hauteur);

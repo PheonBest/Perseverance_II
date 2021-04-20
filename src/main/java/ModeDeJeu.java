@@ -97,6 +97,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 			else if (e.getSource()== editer)
 				controleur.editer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 			 else if (e.getSource()== renommer)
+				maFenetre3.initialiser(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 				maFenetre3.setVisible(true);
 		}
 	}
