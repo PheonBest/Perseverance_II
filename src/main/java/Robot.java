@@ -112,6 +112,9 @@ public class Robot extends Avatar {
             this.comptKm = nb;
         }else this.comptKm=0;
     }
+    public double getCompteurKm(){
+		return this.comptKm;
+	}
     public void resetCompteurkm(){
         this.comptKm=0;
     }
