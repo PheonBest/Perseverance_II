@@ -43,11 +43,11 @@ public class Robot extends Avatar {
     //--------------------------------------------------------------------------------------------------- Constructeurs
     
     // Constructeur complet 
-    public Robot(int nivBatterie, int nbR, int listeEtats[], int listeUsures[],int nbKmParcourus, int compteurKm , int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image, int[] coords, int x, int y, double r, int dx, int dy, double dr) {
+    public Robot(int nivBatterie, int nbR, int listeEtats[], int listeUsures[],int nbKmParcourus, int compteurKm , int animationIndex, int dureeImage, ArrayList<ArrayList<Image>> image) {
         // Le robot est un avatar, il hérite donc de son constructeur et de ses conditions d'avatar
-        super(animationIndex, dureeImage, image, coords, x, y, r, dx, dy, dr);
-        xFictif = x;
-        yFictif = y;
+        super(animationIndex, dureeImage, image, new int[]{0,0}, 0, 0, 0, 0, 0, 0);
+        xFictif = 0;
+        yFictif = 0;
         this.batterie = nivBatterie;
         this.nbRecharges = nbR;
         this.kmTot = nbKmParcourus;
@@ -70,7 +70,7 @@ public class Robot extends Avatar {
     
     // Constructeur "Robot neuf"
     public Robot(ArrayList<ArrayList<Image>> image, int x, int y) {
-        this(Options.BATTERIE_MAX,0, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image, new int[] {0,0}, x, y, .0, 0, 0, .0);
+        this(Options.BATTERIE_MAX,0, new int[] {Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN,Options.ALERTE_MIN}, new int[] {Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN,Options.USURE_MIN},0,0,0, Options.JOUEUR_DUREE_ANIMATION, image);
     }
     
     //---------------------------------------------------------------------------------------------------- Setters et getters
