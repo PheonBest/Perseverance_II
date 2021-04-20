@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.*;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -120,10 +121,18 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
         
         contenu.addKeyListener(this);
         panneauPause.addKeyListener(this);
+        panneauPause.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				controleur.interactionClavier(KeyEvent.VK_ESCAPE);
+			}
+		});
         contenu.setLayout(cardLayout);
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
+                if (scene.equals("Jeu"))
+                    controleur.enregistrer();
                 System.exit(0);
             }
         });
@@ -172,13 +181,21 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
             j.addKeyListener(this);
 
         // Lorsqu'on appuie sur le bouton "Retour" du panneauPause, on simule l'appui sur le clavier de la touche Echap
-        ((JButton)(panneauPause.obtenirComposants().get(0))).addActionListener(new AbstractAction("Pause") {
+        ((JButton)(panneauPause.obtenirComposants().get(PanneauPause.RETOUR))).addActionListener(new AbstractAction("Pause") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 controleur.interactionClavier(KeyEvent.VK_ESCAPE);
             }
         });
         
+        ((JButton)(panneauPause.obtenirComposants().get(PanneauPause.MENU))).addActionListener(new AbstractAction("Menu") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controleur.interactionClavier(KeyEvent.VK_ESCAPE);
+                controleur.enregistrer();
+                controleur.retourMenu();
+            }
+        });
     }
 
     public void initialiser() {

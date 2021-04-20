@@ -21,6 +21,15 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class PanneauPause extends JDialog implements ActionListener {
+
+	public static final int RETOUR = 0;
+	public static final int VOLUME = 1;
+	public static final int VOLUME2 = 2;
+	public static final int MENU = 3;
+	public static final int PAUSE = 4;
+	public static final int SUIVANT = 5;
+	public static final int PRECEDENT = 6;
+
 	private int lx=600;
 	private int ly=600;
 	private int x0=250;
@@ -43,6 +52,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 	
 	public PanneauPause() {
 		super();
+		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setLayout(null);
         setSize(lx,ly+40);
         setLocation(x0,y0);
@@ -215,6 +225,10 @@ public class PanneauPause extends JDialog implements ActionListener {
 		composants.add(retour);
 		composants.add(volume);
 		composants.add(volume2);
+		composants.add(menu);
+		composants.add(pause);
+		composants.add(suivant);
+		composants.add(precedent);
 		return composants;
 	}
 	

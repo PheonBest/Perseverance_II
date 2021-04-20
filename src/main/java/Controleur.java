@@ -115,11 +115,13 @@ public class Controleur {
         donnees.obtenirArrierePlan().translate(DELTA_X, DELTA_Y);
         donnees.obtenirJoueur().majCase(ligne, colonne);
     }
-	public void jouer(InputStream carte) {
+	public void jouer(String nomCarte, InputStream carte) {
+        donnees.majNomCarte(nomCarte);
 
         Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles, donnees.getImagesJoueur());
         donnees.majCellules(jeu.getCellule());
         donnees.majJoueur(jeu.getJoueur());
+        System.out.println(jeu.getJoueur().obtenirCase()[0]+" "+jeu.getJoueur().obtenirCase()[1]);
         placerJoueur(jeu.getJoueur().obtenirCase()[0], jeu.getJoueur().obtenirCase()[1]);
 
         donnees.obtenirArrierePlan().majCoords(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2);
@@ -824,8 +826,10 @@ public class Controleur {
         donnees.notifierObservateur(TypeMisAJour.BoutonsSymbole); // On transmet une unique fois la référence à la liste
         donnees.notifierObservateur(TypeMisAJour.Peindre);
     }
-
     public void interactionClavier(int code) {
+        interactionClavier(code, false);
+    }
+    public void interactionClavier(int code, boolean dejaCache) {
         if (donnees.getScene() != null) {
             if (donnees.getScene().equals("Editeur de carte")) {
                 switch (code) {
@@ -845,7 +849,8 @@ public class Controleur {
             } else if (donnees.getScene().equals("Jeu")) {
                 switch (code) {
                     case KeyEvent.VK_ESCAPE :
-                        donnees.majEtatOptions(!donnees.obtenirEtatOptions());
+                        if (!dejaCache)
+                            donnees.majEtatOptions(!donnees.obtenirEtatOptions());
 
                         // Si on sort des options et qu'on joue au mini-jeu laser (le jeu allait se lancer)
                         if (!donnees.obtenirEtatOptions() && donnees.obtenirEtatMiniJeuLaser().equals(Etat.ON)) {

@@ -90,7 +90,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		}
 		 if(liste.getSelectedValue()!=null){
 			if (e.getSource()== jouer)
-				controleur.jouer(cartes.get(liste.getSelectedValue()));
+				controleur.jouer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 			else if (e.getSource()== editer)
 				controleur.editer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 		}

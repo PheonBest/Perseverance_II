@@ -40,7 +40,7 @@ public class Donnees implements Observable {
     // CSV des cartes && éditeur
     private HashMap<String, InputStream> cartes;
     private String nomCarte;
-    private int[] celluleDepart = new int[2];
+    private int[] celluleDepart = null;
 
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
