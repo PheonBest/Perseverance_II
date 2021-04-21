@@ -12,8 +12,8 @@ public class Renommer extends JFrame implements ActionListener{
 	int y=100;
 	int lx=300;
 	int ly=220;
-	//int largeur;
-	//int hauteur;
+	int largeur;
+	int hauteur;
 	private JButton valider;
 	private JButton effacer;
 	private JTextField nom;
@@ -21,11 +21,11 @@ public class Renommer extends JFrame implements ActionListener{
 	private String nomCarte ;
 	private InputStream carte; 
 	
-	public Renommer(Controleur controleur){
+	public Renommer(Controleur controleur, int largeur, int hauteur){
 		super();
 		this.controleur = controleur;
         setLayout(null);
-        setLocation(400,400);
+        setLocation(largeur, hauteur);
         setSize(lx+20,ly);
         setTitle("RENOMMER");
 		

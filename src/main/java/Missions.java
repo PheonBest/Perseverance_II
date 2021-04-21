@@ -71,7 +71,7 @@ public class Missions extends JFrame {
         mission2.setLayout(null);
         panneauFond.add(mission2);
        
-		JLabel premMission= new JLabel("MISSION 1");
+		JLabel premMission= new JLabel("MISSION 1: decouvrir les deux symboles suivants (minerais et bacteries");
 		premMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
 		premMission.setBounds(5,5,400,20);
 		mission1.add(premMission);
@@ -88,7 +88,7 @@ public class Missions extends JFrame {
 		
 		
 		
-		JLabel deuMission= new JLabel("MISSION 2");
+		JLabel deuMission= new JLabel("MISSION 2: parcourir au moins 70% de la carte ");
 		deuMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
 		deuMission.setBounds(5,5,400,20);
 		mission2.add(deuMission);

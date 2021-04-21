@@ -45,6 +45,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	private JButton aide;
 	private RegleJeu maFenetre2;
 	private Renommer maFenetre3;
+	private Renommer maFenetre4;
 	private JLabel presentation;
 	private JButton renommer;
 	private JButton supprimer;
@@ -57,8 +58,10 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		this.hauteur = hauteur;
         this.controleur = controleur;
         this.setLayout(null);
+        // creation des nouvelles fenetres qui vont apparaitre quand on clique sur les boutons
         this.maFenetre2 = new RegleJeu();
-        this.maFenetre3 = new Renommer(controleur);
+        this.maFenetre3 = new Renommer(controleur, 2*largeur/5-270,3*hauteur/5);
+        this.maFenetre4 = new Renommer(controleur, 3*largeur/5-20, 3*hauteur/5);
 
 		// fond d'ecran image
 		presentation = new JLabel();
@@ -127,7 +130,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		cloner.addActionListener(this);
 		
 		aide= new JButton("AIDE");
-		aide.setBounds(largeur-80,10,70,40);
+		aide.setBounds(largeur-130,10,120,70);
 		
 		aide.setBackground(Color.WHITE);
 		presentation.add(aide);
@@ -141,7 +144,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		presentation.add(selectionCarte);
 		
 		j=new JScrollPane(liste);
-        final int LARGEUR_LISTE = 100;
+        final int LARGEUR_LISTE = 150;
         final int HAUTEUR_LISTE = 75;
         //j.setBounds(150,200,100,100);
 	    j.setBounds((largeur-LARGEUR_LISTE)/2,(hauteur-HAUTEUR_LISTE)/2,LARGEUR_LISTE,HAUTEUR_LISTE);
@@ -193,6 +196,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 					e1.printStackTrace();
 				}
 			} else if (e.getSource() == cloner) {
+				maFenetre4.setVisible(true);
 				try {
 					controleur.cloner("Copie de "+liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 				} catch (IOException e1) {
