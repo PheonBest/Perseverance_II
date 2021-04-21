@@ -47,13 +47,13 @@ public class PanneauPause extends JDialog implements ActionListener {
 	
 	public PanneauPause(int largeur, int hauteur) {
 		super();
-		this.setSize(largeur,hauteur);
+		//this.setSize(largeur,hauteur);
 		this.largeur=largeur;
 		this.hauteur=hauteur;
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setLayout(null);
         setSize(lx,ly+40);
-        setLocation(x0,y0);
+        setLocation((largeur-lx)/2,(hauteur-ly-40)/2);
         setLayout(null);
         
         setTitle("panneau pause");
