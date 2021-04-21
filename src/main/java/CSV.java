@@ -208,8 +208,6 @@ public class CSV {
 				return images.get("SCANNER");
 			case "GRAPPIN":
 				return images.get("GRAPPIN");
-			case "INCONNUE":
-				return images.get("INCONNUE");
 			case "JAMBE":
 				return images.get("JAMBE");
 			case "BRAS":
