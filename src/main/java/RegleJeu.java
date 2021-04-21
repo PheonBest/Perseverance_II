@@ -78,7 +78,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			+"<hr>"
             +"<i><u>SYMBOLE</u></i> <br>"
             +"<br>"
-            +"Les sources de vies bactériennes, minerais, objets et caisses de <br>ravitaillement sont présents sous forme de symboles “?”. Pour découvrir de quel <br>symbole il s’agit, vous allez devoir les scanner à l’aide de l’outil scanner <br>puis utiliser le grappin pour les extraire. Ces deux outils sont disponibles sur la <br>gauche de l’écran de jeu et vous demanderont une concentration accrue <br>lorsque vous les utiliserez. </center> <br>");
+            +"Les sources de vies bactériennes, minerais, objets et caisses de <br>ravitaillement sont présents sous forme de symboles ?. Pour découvrir de quel <br>symbole il s’agit, vous allez devoir les scanner à l’aide de l’outil scanner <br>puis utiliser le grappin pour les extraire. Ces deux outils sont disponibles sur la <br>gauche de l’écran de jeu et vous demanderont une concentration accrue <br>lorsque vous les utiliserez. </center> <br>");
             
 			texteRegle.setFont(new Font("Serif", Font.BOLD, 15));
             texteRegle.setBounds(0,0,100,900);

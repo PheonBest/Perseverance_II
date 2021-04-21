@@ -78,7 +78,7 @@ public class PanneauPause extends JDialog implements ActionListener {
         retour.setBackground(new Color(255,140,0));
         retour.setFont(new Font("Courier",Font.ITALIC+Font.BOLD,16));
         retour.addActionListener(this);
-        this.add(retour);
+        rouge.add(retour);
         //menu principal
         menu= new JButton("MENU ");
         menu.setLocation(lx-140,ly-160);
@@ -87,7 +87,7 @@ public class PanneauPause extends JDialog implements ActionListener {
         menu.setFont(new Font("Courier",Font.ITALIC+Font.BOLD,16));
         menu.setVisible(true);
         //menu.addActionListener(this);
-        this.add(menu);
+        rouge.add(menu);
       
         
 
