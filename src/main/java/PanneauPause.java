@@ -27,10 +27,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 
 	private int lx=600;
 	private int ly=600;
-	private int x0=250;
-	private int y0=50;
-	private JPanel rouge;
-	private JLabel monImage;
+	
 	private JButton retour;
 	private JButton menu;
 	private JButton pause;
@@ -38,16 +35,12 @@ public class PanneauPause extends JDialog implements ActionListener {
 	private JButton precedent;
 	private JSlider volume;
 	private JSlider volume2;
-	private JPanel panneauBas;
-	private JLabel son;
-	private JLabel titreSon;
-	private JLabel titreEffet;
+	
 	private int largeur;
 	private int hauteur;
 	
 	public PanneauPause(int largeur, int hauteur) {
 		super();
-		//this.setSize(largeur,hauteur);
 		this.largeur=largeur;
 		this.hauteur=hauteur;
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -60,14 +53,14 @@ public class PanneauPause extends JDialog implements ActionListener {
         // fenetre modale 
         this.setModal(true);
         //fond rouge
-        rouge= new JPanel();
+        JPanel rouge= new JPanel();
         rouge.setLayout(null);
 		rouge.setBounds(0,0,lx,ly);
 		rouge.setBackground(Color.red);
 		rouge.setVisible(true);
 		this.add(rouge);
         //image pause
-        monImage = new JLabel(new ImageIcon(Donnees.imagesMenu.get("pause")));
+        JLabel monImage = new JLabel(new ImageIcon(Donnees.imagesMenu.get("pause")));
         monImage.setVisible(true);
 		monImage.setBounds(lx/2-500/2,150,500,250);
 		rouge.add(monImage);
@@ -91,7 +84,7 @@ public class PanneauPause extends JDialog implements ActionListener {
       
         
 
-		panneauBas= new JPanel();
+		JPanel panneauBas= new JPanel();
         panneauBas.setLayout(null);
 		panneauBas.setBounds(10,ly-160,150,150);
 		panneauBas.setBackground(new Color(255,140,0));
@@ -100,13 +93,13 @@ public class PanneauPause extends JDialog implements ActionListener {
 		
 		
         
-        son = new JLabel(" --- VOLUMES SON ---");
+        JLabel son = new JLabel(" --- VOLUMES SON ---");
         son.setFont(new Font("Serif", Font.BOLD, 13));
         son.setBounds(10,5,150,15);
         son.setBackground(Color.BLACK);
         panneauBas.add(son);
         
-        titreSon= new JLabel("volume musique");
+        JLabel titreSon= new JLabel("volume musique");
         titreSon.setFont(new Font("Courier", Font.BOLD, 12));
 		titreSon.setBounds(26,40,150,15);
 		titreSon.setBackground(Color.BLACK);
@@ -117,7 +110,7 @@ public class PanneauPause extends JDialog implements ActionListener {
         volume.setBackground(new Color(255,140,0));
         panneauBas.add(volume);
         
-		titreEffet= new JLabel("volume effets");
+		JLabel titreEffet= new JLabel("volume effets");
         titreEffet.setFont(new Font("Courier", Font.BOLD, 12));
 		titreEffet.setBounds(26,80,150,15);
 		titreEffet.setBackground(Color.BLACK);

@@ -13,8 +13,7 @@ public class Missions extends JFrame {
     
     private int lx = 650;
     private int ly = 600;
-    private JPanel panneauTitre;
-    private JLabel titre;
+  
     //private Robot joueur;
     //------------------------------------------------------------------ Constructeur
 
@@ -33,13 +32,13 @@ public class Missions extends JFrame {
 		panneauFond.setLayout(null);
 		this.add(panneauFond);
 		
-		panneauTitre= new JPanel();
+		JPanel panneauTitre= new JPanel();
 		panneauTitre.setBounds(10,10,lx-20,50);
 		panneauTitre.setBackground(new Color(220,220,220));
         panneauTitre.setLayout(null);
         panneauFond.add(panneauTitre);
         
-        titre = new JLabel("------------------ MISSIONS ------------------");
+        JLabel titre = new JLabel("------------------ MISSIONS ------------------");
         titre.setBounds(0,0,lx-20,40);
         titre.setFont(new Font("Courier",Font.BOLD,18));
         titre.setHorizontalAlignment(SwingConstants.CENTER);

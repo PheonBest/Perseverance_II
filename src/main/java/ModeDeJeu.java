@@ -32,15 +32,12 @@ public class ModeDeJeu extends JPanel implements ActionListener {
     private String carteActive = null;
     
 
-    private JPanel panneauAffichage;
-    private JPanel panneauBas;
     private JButton jouer;
     private JButton creer;
     private JButton editer;
     private JButton cloner;
     private int largeur;
     private int hauteur;
-	private JLabel selection;
 	private JScrollPane j;
 	private JButton aide;
 	private RegleJeu maFenetre2;
@@ -64,7 +61,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
         this.maFenetre4 = new Renommer(controleur, 3*largeur/5-20, 3*hauteur/5);
 
 		// fond d'ecran image
-		presentation = new JLabel();
+		JLabel presentation = new JLabel();
 		presentation.setLayout(null);
 		presentation.setBounds(0,0,largeur,hauteur);
 		presentation.setVisible(true);
