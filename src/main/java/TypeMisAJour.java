@@ -10,6 +10,7 @@ public enum TypeMisAJour {
     Zoom,
     Cartes,
     ArrierePlan,
+    InformerJoueur,
 
     // Joueur
     Joueur,

@@ -41,6 +41,8 @@ public class Donnees implements Observable {
     private int rayonDeSelection = 0;
     private boolean etatOptions = false;
     private Cellule derniereCelluleMinijeu = null;
+    private String informerJoueur = "";
+    private long chronometreNotification = 0;
     
     // CSV des cartes && éditeur
     private HashMap<String, InputStream> cartes;
@@ -170,6 +172,9 @@ public class Donnees implements Observable {
                     break;
                 case ArrierePlan:
                     obs.mettreAJour(TypeMisAJour.ArrierePlan, arrierePlan);
+                    break;
+                case InformerJoueur:
+                    obs.mettreAJour(TypeMisAJour.InformerJoueur, informerJoueur);
                     break;
 
                 // Joueur
@@ -327,6 +332,20 @@ public class Donnees implements Observable {
 
     public HashMap<String, Image> getImagesSymboles() {
         return imagesSymboles;
+    }
+
+    // Notification du joueur
+    public void majInformerJoueur(String informerJoueur) {
+        this.informerJoueur = informerJoueur;
+    }
+    public String obtenirInformerJoueur() {
+        return informerJoueur;
+    }
+    public void majChronometreNotification(long chronometreNotification) {
+        this.chronometreNotification = chronometreNotification;
+    }
+    public long obteniChronometreNotification() {
+        return chronometreNotification;
     }
 
     // MUSIQUE

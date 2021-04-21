@@ -272,7 +272,11 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                 else if (scene.equals("Editeur de carte"))
                     ((Editeur)editeur).majArrierePlan((ArrierePlan) nouveau);
                 break;
-            
+            case InformerJoueur:
+                if (scene.equals("Jeu"))
+                    ((Dessiner)jeu).majInformerJoueur((String) nouveau);
+                break;
+                
             // Joueur
             case Joueur:
                 ((Dessiner)jeu).majJoueur((Robot) nouveau);

@@ -10,9 +10,10 @@ public class Options {
 	public static final int LARGEUR_CASE = 80;
 	public static final int HAUTEUR_CASE = (int)(LARGEUR_CASE*RATIO_LARGEUR_HAUTEUR);
     public static final int ESPACE_INTER_CASE = 5;
-	public static final int DELAI_ANIMATION = 15; // Le jeu se met à jour toutes les 16 milisecondes
+	public static final int DELAI_ANIMATION = 15; // Le jeu se met à jour toutes les 15 milisecondes
     public static final double VITESSE_DEPLACEMENT_ROBOT = 7; // vitesse (pixel/durée d'itération de la boucle du jeu, c.à.d pixel/DELAI_ANIMATION)
-    
+    public static final long DUREE_NOTIFICATION = 3000; // Durée des messages d'information
+
     // Paramètres du robot
     public static final int BATTERIE_MIN = 0;
     public static final int BATTERIE_MAX = 100;
@@ -99,4 +100,5 @@ public class Options {
     public static final int NOMBRE_MAX_COLONNES = 1000;
     public static final int TEMPS_DE_REACTION_MIN = 360;
     public static final int PRECISION_MIN = 85;
+    public static final double PROBABILITE_CELLULE_VISIBLE = 0.4; // Probabilité qu'un symbole soit visible
 }

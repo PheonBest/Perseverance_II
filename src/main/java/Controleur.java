@@ -54,8 +54,10 @@ public class Controleur {
             donnees.notifierObservateur(TypeMisAJour.PositionCurseurExtraction);
             donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
             donnees.obtenirJoueur().usureBras();
-        } else
+        } else {
+            notifierJoueur("On ne peut que extraire les\nsymboles de bois et de ponts !");
             desactiverCompetence();
+        }
     }
 
     // Effet quand on utilise le scanner sur une case qui contient un symbole (une les capteurs)
@@ -73,8 +75,16 @@ public class Controleur {
             donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
             donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
             donnees.obtenirJoueur().usureCapteurs();
-        } else
+        } else {
+            notifierJoueur("On ne peut que scanner les cases avec\nun symbole de point d'interrogation !");
             desactiverCompetence();
+        }
+    }
+
+    private void notifierJoueur(String notification) {
+        donnees.majInformerJoueur(notification);
+        donnees.majChronometreNotification(System.currentTimeMillis());
+        donnees.notifierObservateur(TypeMisAJour.InformerJoueur);
     }
 
     // Effet quand on marche sur une case
@@ -173,6 +183,22 @@ public class Controleur {
                     click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY(), false);
             }
             if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
+
+                /* Recharge au fur et à mesure
+                Cellule caseJoueur = donnees.obtenirCellules()[donnees.obtenirJoueur().obtenirDerniereCase()[0]][donnees.obtenirJoueur().obtenirDerniereCase()[1]];
+                if (caseJoueur.obtenirSymbole().type == TypeSymbole.ENERGIE && caseJoueur.obtenirSymbole().obtenirEstVisible()) {
+                    donnees.obtenirJoueur().maintenance(caseJoueur.obtenirSymbole().type);
+                    donnees.obtenirJoueur().actualiseVP();
+                }
+                */
+
+                // Si on est en train d'afficher une notification au joueur
+                // Et qu'il est temps de supprimer la notification:
+                if (!donnees.obtenirInformerJoueur().equals("")
+                    && System.currentTimeMillis() - donnees.obteniChronometreNotification() > Options.DUREE_NOTIFICATION) {
+                    donnees.majInformerJoueur("");
+                    donnees.notifierObservateur(TypeMisAJour.InformerJoueur);
+                }
                 
                 switch (donnees.obtenirEtatMiniJeuExtraction()) {
                     case ON:
@@ -422,14 +448,15 @@ public class Controleur {
                     else {
                         resultat = "Réussite ! "+resultat;
                         switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
-                            case PONT:
-                                // Si on extrait 1 pont, c'est comme si on extrayait du bois
+                            case PONT: // Si on extrait 1 pont, c'est comme si on extrayait du bois
                             case BOIS:
                                 // On a extrait 1 de bois, donc on peut construire 1 pont
-                                for (BoutonCercle b: donnees.obtenirCompetences()) {
-                                    if (b.obtenirEffet().equals("Pont"))
-                                        b.majDisponible(true);
+                                int i = 0;
+                                while (i < donnees.obtenirCompetences().size() && !donnees.obtenirCompetences().get(i).obtenirEffet().equals("Pont")) {
+                                    i++;
                                 }
+                                if (i < donnees.obtenirCompetences().size())
+                                    donnees.obtenirCompetences().get(i).majDisponible(true);
                                 donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()+1);
                                 donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
                                 break;
@@ -498,7 +525,7 @@ public class Controleur {
                             clicSurCompetence = true;
                             // Si on a cliqué sur la compétence mais qu'on n'a pas de ponts en résèrve, on ne poursuit pas la requête
                             if (!(b.obtenirEffet().equals("Pont") && donnees.obtenirJoueur().obtenirNombrePont() < 1)) {
-                                // Si on a déjà sélectionné la compétene, on la désélectionne
+                                // Si on a déjà sélectionné la compétence, on la désélectionne
                                 if (donnees.obtenirDerniereCompetence() == b) // On compare les pointeurs (références) des 2 objets
                                     desactiverCompetence();
                                 else { // On sélectionne la compétence
@@ -529,7 +556,9 @@ public class Controleur {
                                             break;
                                     }
                                 }
-                            }
+                            } else
+                                notifierJoueur("Vous devez collecter des ponts pour en poser !");
+
                             estModifie = true;
                             donnees.notifierObservateur(TypeMisAJour.Competences);
                             break;
@@ -583,7 +612,8 @@ public class Controleur {
                                                                     donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()-1);
                                                                     if (donnees.obtenirJoueur().obtenirNombrePont() == 0)
                                                                         donnees.obtenirDerniereCompetence().majDisponible(false);
-                                                                }
+                                                                } else
+                                                                    notifierJoueur("Un pont ne peut être posé que sur de l'eau !");
                                                                 desactiverCompetence();
                                                             }
                                                             break;
@@ -599,13 +629,12 @@ public class Controleur {
                                                 } else {
                                                     
                                                     // Si le joueur n'a pas de chenilles, on l'empêche d'aller sur une case montagne
-                                                    // Joueur a des chenilles = a
-                                                    // La case est une montagne = b
-                                                    // On va sur la case ssi    !(!a&&b)
-                                                    //                          a||!b
-                                                    if ((donnees.obtenirJoueur().obtenirSurChenilles() || cellules[i][j].obtenirType() != TypeCase.MONTAGNE)
-                                                        && (cellules[i][j].obtenirType() != TypeCase.EAU || cellules[i][j].obtenirSymbole().type == TypeSymbole.PONT)) {
-
+                                                    // Si il n'y a pas de pont sur une case eau, on empêche le jour d'y aller
+                                                    if (cellules[i][j].obtenirType() == TypeCase.MONTAGNE && !donnees.obtenirJoueur().obtenirSurChenilles())
+                                                        notifierJoueur("Impossible d'escalader\nIl faudrait des chenilles !");
+                                                    else if (cellules[i][j].obtenirType() == TypeCase.EAU && cellules[i][j].obtenirSymbole().type != TypeSymbole.PONT)
+                                                        notifierJoueur("Impossible de nager\nIl faudrait poser un pont !");
+                                                    else {
                                                         // On vérifie que la cellule cliquée fait bien partie des voisins dans le rayon de sélection autorisé
                                                         Cellule[] casesVoisines = Voisins.obtenirVoisins(cellules, indexRobot[0], indexRobot[1], Options.RAYON_JOUEUR);
                                                         int index = 0;
@@ -1039,10 +1068,25 @@ public class Controleur {
 		if(reinitialiserExploration==true){
 			for (int i=0; i< donnees.obtenirCellules().length; i++) {
 				for (Cellule c: donnees.obtenirCellules()[i]) {
-					if (c.obtenirSymbole() != null)
-						c.obtenirSymbole().estVisible = false;
+					if (c.obtenirSymbole() != null) {
+
+                        if (c.obtenirSymbole().type == TypeSymbole.BACTERIE ||
+                            c.obtenirSymbole().type == TypeSymbole.MINERAI) {
+                            c.obtenirSymbole().estVisible = true; 
+                        } else if (
+                            c.obtenirSymbole().type == TypeSymbole.JAMBE ||
+                            c.obtenirSymbole().type == TypeSymbole.BRAS ||
+                            c.obtenirSymbole().type == TypeSymbole.CAPTEUR ||
+                            c.obtenirSymbole().type == TypeSymbole.ENERGIE ||
+                            c.obtenirSymbole().type == TypeSymbole.CHENILLES
+                        ) {
+                            c.obtenirSymbole().estVisible = Math.random() > Options.PROBABILITE_CELLULE_VISIBLE; // ex: 40% de rendre le symbole visible
+                        } else {
+                            c.obtenirSymbole().estVisible = true; 
+                        }
 						c.majEstDecouverte(false);
-				}
+                    }
+                }
 			}
 		}
 		

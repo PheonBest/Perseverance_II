@@ -49,7 +49,7 @@ public class Formes {
             // Determine the X coordinate for the text
             int x = coordX - metrics.stringWidth(ligne) / 2;
             // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
-            int y = coordY - metrics.getHeight() / 2 + metrics.getAscent() - (int)((NOMBRE_LIGNES_TEXTE/2.-index)*metrics.getHeight());
+            int y = coordY - metrics.getHeight() / 2 + metrics.getAscent() - (int)(((NOMBRE_LIGNES_TEXTE - 1)/2.-index)*metrics.getHeight());
             // Set the font
             // Draw the String
             g.drawString(ligne, x, y);

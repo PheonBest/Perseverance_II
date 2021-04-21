@@ -48,11 +48,14 @@ public class Dessiner extends JPanel {
     private double zoom = 1.;
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
+    private String informerJoueur = "";
 
     // Minimap
     private int[] tailleMinimap = {100,100};
     private TypeCase[] typeMoyen = {};
     private TypeSymbole[] symboleMoyen = {};
+    private final double DELTA_LARGEUR = 9./4.*Options.DIMENSIONS_CASES[0];
+    private final double DELTA_HAUTEUR = 9./4.*Options.DIMENSIONS_CASES[1];
 
     // Mini-jeu
     private int largeurRectangle;
@@ -88,6 +91,22 @@ public class Dessiner extends JPanel {
     private Etat etatMinijeuLaser = Etat.OFF;
     private int nombreErreursLaser = 0;
     private String chronometreMinijeuLaser = "";
+
+    private final int DECALAGE_Y_TEXTE = 20;
+    private final int DECALAGE_Y_FEUX = 30;
+    private final int NOMBRE_FEUX = 3;
+    private final int RAYON_FEU = 30;
+    private final int ESPACE_INTRER_FEU = 30;
+    private final int LARGEUR_CROIX = 30;
+    private final int ESPACE_INTER_CROIX = 30;
+    private final int NOMBRE_CROIX = 3;
+    private final int LONGUEUR_TOTALE = NOMBRE_CROIX*LARGEUR_CROIX+(NOMBRE_CROIX-1)*ESPACE_INTER_CROIX;
+    private int coinX; // Coordonnée x du coin où on dessine les croix
+    private int coinY; // Coordonnée y du coin où on dessine les croix
+
+    // Informer le joueur
+    final int LARGEUR_RECTANGLE_NOTIFICATION = 350;
+    final int HAUTEUR_RECTANGLE_NOTIFICATION = 100;
    
 
     public Dessiner(Controleur controleur, boolean affichagePanneauDeControle, int largeur, int hauteur){
@@ -122,6 +141,11 @@ public class Dessiner extends JPanel {
         hauteurRectangleLaser = (int) (hauteurEcran/MINIJEU_LASER_HAUTEUR_ECRAN);
         coinMinijeuX = (int)(largeurEcran/2.-largeurRectangle/2.); // Coordonnée X du coin en haut à gauche du rectangle
         coinMinijeuY = (int)(hauteurEcran/2.-hauteurRectangle/2.); // Coordonnée Y du coin en haut à gauche du rectangle
+        coinX = (int) ((largeurEcran-LONGUEUR_TOTALE)/2); // Coordonnée x du coin où on dessine les croix
+        coinY = (int) ((hauteurEcran-LARGEUR_CROIX)/2+RAYON_FEU*4); // Coordonnée y du coin où on dessine les croix
+        
+
+        
     }
 
     public void paintComponent(Graphics g) {
@@ -198,8 +222,6 @@ public class Dessiner extends JPanel {
             // On dessine la minimap sur un rectangle
             g2d.setColor(Color.gray);
 
-            final double DELTA_LARGEUR = 9./4.*Options.DIMENSIONS_CASES[0];
-            final double DELTA_HAUTEUR = 9./4.*Options.DIMENSIONS_CASES[1];
             Formes.dessinerRectangle(g2d,
                 (int)(Options.POSITION_X_MINIMAP*largeurEcran - DELTA_LARGEUR/2),
                 (int)(Options.POSITION_Y_MINIMAP*hauteurEcran - DELTA_HAUTEUR/2),
@@ -259,10 +281,10 @@ public class Dessiner extends JPanel {
                 }
             }
 
+            ((Graphics2D) g2d).setTransform(transformationInitiale);
+            
             // MINI-JEU EXTRACTION -------------
             if (!etatMinijeuExtraction.equals(Etat.OFF)) {
-                
-                ((Graphics2D) g2d).setTransform(transformationInitiale);
                 Formes.dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangle, RAYON, RAYON);
 
                 int largeur = LARGEUR_TOTALE_CLAVETTE;
@@ -325,19 +347,7 @@ public class Dessiner extends JPanel {
             // MINI-JEU EXTRACTION -------------
 
             // MINI-JEU LASER -------------
-            final int DECALAGE_Y_TEXTE = 20;
-            final int DECALAGE_Y_FEUX = 30;
-            final int NOMBRE_FEUX = 3;
-            final int RAYON_FEU = 30;
-            final int ESPACE_INTRER_FEU = 30;
-            final int LARGEUR_CROIX = 30;
-            final int ESPACE_INTER_CROIX = 30;
-            final int NOMBRE_CROIX = 3;
-            final int LONGUEUR_TOTALE = NOMBRE_CROIX*LARGEUR_CROIX+(NOMBRE_CROIX-1)*ESPACE_INTER_CROIX;
-            final int coinX = (int) ((largeurEcran-LONGUEUR_TOTALE)/2); // Coordonnée x du coin où on dessine les croix
-            final int coinY = (int) ((hauteurEcran-LARGEUR_CROIX)/2+RAYON_FEU*4); // Coordonnée y du coin où on dessine les croix
             if (!etatMinijeuLaser.equals(Etat.OFF)) {
-                ((Graphics2D) g2d).setTransform(transformationInitiale);
                 Formes.dessinerRectangle(g2d, coinMinijeuX, coinMinijeuY, largeurRectangle, hauteurRectangleLaser, RAYON, RAYON);
                 g2d.setStroke(new BasicStroke(10));
                 
@@ -388,6 +398,13 @@ public class Dessiner extends JPanel {
                 }
             }
             // MINI-JEU LASER -------------
+
+            // On affiche un message pour informer le joueur SI il n'est pas vide
+            if (!informerJoueur.equals("")) {
+                Formes.dessinerRectangle(g2d, (int)((largeurEcran-LARGEUR_RECTANGLE_NOTIFICATION)/2.), (int)(hauteurEcran*4./5. - HAUTEUR_RECTANGLE_NOTIFICATION/2), LARGEUR_RECTANGLE_NOTIFICATION, HAUTEUR_RECTANGLE_NOTIFICATION, RAYON, RAYON);
+                g2d.setColor(new Color(231, 76, 60)); // rouge clair
+                Formes.dessinerTexteCentre(g2d, informerJoueur, (int)(largeurEcran/2), (int)(hauteurEcran*4./5.), Options.POLICE_PLAIN);
+            }
         }
 
     }
@@ -521,5 +538,9 @@ public class Dessiner extends JPanel {
         composants.add(panneauMission.obtenirBouton());
         composants.add(panneauDeControle.obtenirBouton());
         return composants;
+    }
+
+    public void majInformerJoueur(String informerJoueur) {
+        this.informerJoueur = informerJoueur;
     }
 }
