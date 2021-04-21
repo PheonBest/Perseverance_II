@@ -42,7 +42,8 @@ public class RegleJeu extends JFrame implements ActionListener {
 			regle= new JLabel("REGLES DU JEU");
 			regle.setFont(new Font("Serif", Font.BOLD, 30));
 			regle.setForeground(Color.BLACK);
-			regle.setBounds(100, 5, 300, 70);
+			regle.setBounds(0, 5, 700, 70);
+			regle.setHorizontalAlignment(SwingConstants.CENTER);
 			panneau1.add(regle);
 			
 			//panneau bas
