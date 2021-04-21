@@ -97,4 +97,6 @@ public class Options {
     public static final double INCREMENT_CURSEUR = 0.05;
     public static final int NOMBRE_MAX_LIGNES = 1000;
     public static final int NOMBRE_MAX_COLONNES = 1000;
+    public static final int TEMPS_DE_REACTION_MIN = 360;
+    public static final int PRECISION_MIN = 85;
 }

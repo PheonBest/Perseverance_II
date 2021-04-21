@@ -16,10 +16,9 @@ public class Missions extends JFrame {
     private JPanel panneauTitre;
     private JLabel titre;
     //private Robot joueur;
-    private HashMap<String, Image> images;
     //------------------------------------------------------------------ Constructeur
 
-    public Missions(HashMap<String, Image> images, int x, int y){
+    public Missions(int x, int y){
         // Fenêtre
         super();
         //joueur = r;
@@ -72,24 +71,24 @@ public class Missions extends JFrame {
         mission2.setLayout(null);
         panneauFond.add(mission2);
        
-		JLabel premMission= new JLabel("MISSION 1");
+		JLabel premMission= new JLabel("MISSION 1: decouvrir les deux symboles suivants (minerais et bacteries");
 		premMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
 		premMission.setBounds(5,5,400,20);
 		mission1.add(premMission);
 		
-		final Image IMG = TailleImage.resizeImage(images.get(TypeSymbole.MINERAI.name()),100,100,true);
+		final Image IMG = TailleImage.resizeImage(Donnees.imagesSymboles.get(TypeSymbole.MINERAI.name()),100,100,true);
 		JLabel monImage1 = new JLabel(new ImageIcon(IMG));
 		monImage1.setBounds(60,40,100,100);
 		mission1.add(monImage1);
 		
-		final Image IMG2 = TailleImage.resizeImage(images.get(TypeSymbole.BACTERIE.name()),100,100,true);
+		final Image IMG2 = TailleImage.resizeImage(Donnees.imagesSymboles.get(TypeSymbole.BACTERIE.name()),100,100,true);
 		JLabel monImage2 = new JLabel(new ImageIcon(IMG2));
 		monImage2.setBounds(270,40,100,100);
 		mission1.add(monImage2);
 		
 		
 		
-		JLabel deuMission= new JLabel("MISSION 2");
+		JLabel deuMission= new JLabel("MISSION 2: parcourir au moins 70% de la carte ");
 		deuMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
 		deuMission.setBounds(5,5,400,20);
 		mission2.add(deuMission);

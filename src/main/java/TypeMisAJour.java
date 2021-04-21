@@ -1,4 +1,7 @@
 public enum TypeMisAJour {
+    // Affichage
+    Initialisation,
+
     // Carte
     Cellules,
     Peindre,

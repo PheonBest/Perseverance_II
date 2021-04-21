@@ -45,12 +45,15 @@ public class PanneauPause extends JDialog implements ActionListener {
 	private int largeur;
 	private int hauteur;
 	
-	public PanneauPause() {
+	public PanneauPause(int largeur, int hauteur) {
 		super();
+		//this.setSize(largeur,hauteur);
+		this.largeur=largeur;
+		this.hauteur=hauteur;
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setLayout(null);
         setSize(lx,ly+40);
-        setLocation(x0,y0);
+        setLocation((largeur-lx)/2,(hauteur-ly-40)/2);
         setLayout(null);
         
         setTitle("panneau pause");
@@ -64,7 +67,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 		rouge.setVisible(true);
 		this.add(rouge);
         //image pause
-        monImage = new JLabel(new ImageIcon("./res/images/pause.png"));
+        monImage = new JLabel(new ImageIcon(Donnees.imagesMenu.get("pause")));
         monImage.setVisible(true);
 		monImage.setBounds(lx/2-500/2,150,500,250);
 		rouge.add(monImage);
@@ -149,7 +152,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 			));
 			
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		pause.setBounds(110,45,60,60);
 		panneauDroite.add(pause);
@@ -162,7 +165,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 			Image img = TailleImage.resizeImage(ImageIO.read(getClass().getResource("./res/symboles/SUIVANT.png")),50,50,true);
 			suivant.setIcon(new ImageIcon(img));
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		suivant.setBounds(180,45,60,60);
 		panneauDroite.add(suivant);
@@ -174,7 +177,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 			precedent.setIcon(new ImageIcon(img));
 			TailleImage.resizeImage(img,50,50,true);
 		} catch (Exception ex) {
-			System.out.println(ex);
+			ex.printStackTrace();
 		}
 		precedent.setBounds(40,45,60,60);
 		panneauDroite.add(precedent);
@@ -182,8 +185,6 @@ public class PanneauPause extends JDialog implements ActionListener {
 		 
 	}
 	
-	
-
 	private void setFocusTo(JComponent comp) {
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -205,13 +206,6 @@ public class PanneauPause extends JDialog implements ActionListener {
 		
 		
     }
-    
-    public void majTaille(int largeur, int hauteur){
-			this.setSize(largeur,hauteur);
-			this.largeur=largeur;
-			this.hauteur=hauteur;
-		
-	}
 
 	public LinkedList<JComponent> obtenirComposants() {
 		// Retourne la liste des composants
