@@ -12,8 +12,8 @@ public class Renommer extends JFrame implements ActionListener{
 	int y=100;
 	int lx=300;
 	int ly=220;
-	int largeur;
-	int hauteur;
+	//int largeur;
+	//int hauteur;
 	private JButton valider;
 	private JButton effacer;
 	private JTextField nom;
@@ -21,16 +21,13 @@ public class Renommer extends JFrame implements ActionListener{
 	private String nomCarte ;
 	private InputStream carte; 
 	
-	public Renommer(Controleur controleur, int largeur, int hauteur){
+	public Renommer(){
+		
 		super();
-		this.controleur = controleur;
         setLayout(null);
-        setLocation(largeur, hauteur);
+        setLocation(400,400);
         setSize(lx+20,ly);
         setTitle("RENOMMER");
-		
-		// Quand on ferme la fenêtre, on la cache pour ne pas avoir à l'initialiser à nouveau
-		setDefaultCloseOperation(HIDE_ON_CLOSE);
         
         JLabel texteChoix= new JLabel("Veuillez saisir un nom");
         texteChoix.setBounds(0,20,lx,15);
@@ -58,22 +55,29 @@ public class Renommer extends JFrame implements ActionListener{
 		valider.setBackground(new Color(175,175,175));
 		valider.addActionListener(this);
 		fond.add(valider);
+		
+				
+	
 	}
 	
 	 public void actionPerformed(ActionEvent e) {
-			if (e.getSource()== effacer){
+			if(e.getSource()== effacer){
 				nom.setText("");
-			} else if (e.getSource() == valider) {
-				try {
+				
+			}else if(e.getSource()==valider){
+				try{
+					System.out.println(nomCarte+" "+nom.getText());
 					controleur.renommer(nomCarte, nom.getText(), carte);
-					setVisible(false);
-				} catch(IOException ex){
+				}catch(IOException ex){
 					ex.printStackTrace();
 				}
+				
+
 			}
 	}
 	
 	public void initialiser(String nomCarte, InputStream carte){
+		System.out.println(nomCarte);
 		this.nomCarte = nomCarte;
 		this.carte = carte;
 	}

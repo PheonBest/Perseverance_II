@@ -46,8 +46,10 @@ public class Dessiner extends JPanel {
     private BoutonMissions panneauMission;
     private JButton panneauPause;
     private double zoom = 1.;
+    private boolean enJeu = false;
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
+    private HashMap<String, Image> imagesSymboles;
 
     // Minimap
     private int[] tailleMinimap = {100,100};
@@ -65,6 +67,7 @@ public class Dessiner extends JPanel {
     // Mini-jeu "Extraction"
     private String resultat = "";
     private Etat etatMinijeuExtraction = Etat.OFF;
+    private String scoreExtraction = "";
     private double positionCurseurExtraction = 0;
     private boolean sensVariationExtraction = false;
 
@@ -90,22 +93,32 @@ public class Dessiner extends JPanel {
     private String chronometreMinijeuLaser = "";
    
 
-    public Dessiner(Controleur controleur, boolean affichagePanneauDeControle, int largeur, int hauteur){
-        setLayout(null);
-        largeurEcran = largeur;
-        hauteurEcran = hauteur;
+    public Dessiner(Controleur controleur, boolean affichagePanneauDeControle){
         this.controleur = controleur;
         this.affichagePanneauDeControle = affichagePanneauDeControle;
         if (affichagePanneauDeControle) {
 
+            // Chargement des symboles
+            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_SYMBOLE+"\\b.*\\.(?:jpg|gif|png)");
+            final int LARGEUR = (int) (Options.LARGEUR_CASE*0.7);
+            final int HAUTEUR = (int) (Options.LARGEUR_CASE*0.7);
+            try {
+                imagesSymboles = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_SYMBOLE+"/");
+                for (String i : imagesSymboles.keySet())
+                    imagesSymboles.put(i, TailleImage.resizeImage(imagesSymboles.get(i), LARGEUR, HAUTEUR, true));
+            
+                // Panneau Missions
+                panneauMission = new BoutonMissions(imagesSymboles, 625,10);
+                //panneauMission = new BoutonMissions(625,10, imagesSymboles);
+                add(panneauMission);
+            
+            
+            } catch (URISyntaxException | IOException e) {
+                e.printStackTrace();
+            }
+
             panneauDeControle = new ControlPanel(10,10);
             add(panneauDeControle);
-
-            // Panneau Missions
-            panneauMission = new BoutonMissions(625,10);
-            //panneauMission = new BoutonMissions(625,10);
-            add(panneauMission);
-
             panneauPause = new JButton("PAUSE");
             panneauPause.setBounds(625,60, 100, 50);
             panneauPause.addActionListener(new AbstractAction("Pause") {
@@ -116,12 +129,20 @@ public class Dessiner extends JPanel {
             });
 			add(panneauPause);
         }
+        
+       
+    }
+    public Dessiner(Controleur controleur){
+        this(controleur, false);
+    }
 
+    public void initialiser() {
         largeurRectangle = (int) (largeurEcran/MINIJEU_EXTRACTION_LARGEUR_ECRAN);
         hauteurRectangle = (int) (hauteurEcran/MINIJEU_EXTRACTION_HAUTEUR_ECRAN);
         hauteurRectangleLaser = (int) (hauteurEcran/MINIJEU_LASER_HAUTEUR_ECRAN);
         coinMinijeuX = (int)(largeurEcran/2.-largeurRectangle/2.); // Coordonnée X du coin en haut à gauche du rectangle
         coinMinijeuY = (int)(hauteurEcran/2.-hauteurRectangle/2.); // Coordonnée Y du coin en haut à gauche du rectangle
+  
     }
 
     public void paintComponent(Graphics g) {
@@ -184,7 +205,7 @@ public class Dessiner extends JPanel {
         //System.out.println(nombreCellulesVisibles);
 
         
-        if (affichagePanneauDeControle && joueur != null) {
+        if (enJeu && joueur != null) {
             // Affichage du joueur
             joueur.dessiner(g2d);
 
@@ -243,16 +264,16 @@ public class Dessiner extends JPanel {
                         if (ancienType != typeMoyen[index])
                             cellules[i][j].majType(typeMoyen[index]);
                         //if (ancienSymbole != symboleMoyen[index])
-                        //    cellules[i][j].obtenirSymbole().majSymbole(symboleMoyen[index], Donnees.imagesSymboles.get(symboleMoyen[index].name()));
+                        //    cellules[i][j].obtenirSymbole().majSymbole(symboleMoyen[index], imagesSymboles.get(symboleMoyen[index].name()));
                         if (ancienSymbole != TypeSymbole.VIDE)
                             cellules[i][j].obtenirSymbole().majSymbole(TypeSymbole.VIDE, null);
                         cellules[i][j].dessiner(g2d, Options.AGRANDISSEMENT_CELLULE_MINICARTE); // La cellule sera agrandie autour de son centre
                         if (ancienType != typeMoyen[index])
                             cellules[i][j].majType(ancienType);
                         //if (ancienSymbole != symboleMoyen[index])
-                        //    cellules[i][j].obtenirSymbole().majSymbole(ancienSymbole, Donnees.imagesSymboles.get(ancienSymbole.name()));
+                        //    cellules[i][j].obtenirSymbole().majSymbole(ancienSymbole, imagesSymboles.get(ancienSymbole.name()));
                         if (ancienSymbole != TypeSymbole.VIDE)
-                            cellules[i][j].obtenirSymbole().majSymbole(ancienSymbole, Donnees.imagesSymboles.get(ancienSymbole.name()));
+                            cellules[i][j].obtenirSymbole().majSymbole(ancienSymbole, imagesSymboles.get(ancienSymbole.name()));
 
                         index++;
                     }
@@ -399,13 +420,24 @@ public class Dessiner extends JPanel {
 
     public void majJoueur(Robot joueur) {
         this.joueur = joueur;
-        System.out.println(joueur);
         if (affichagePanneauDeControle)
             panneauDeControle.majJoueur(joueur);
     }
 
+    public void majLargeur(double largeurEcran) {
+        this.largeurEcran = largeurEcran;
+    }
+
+    public void majHauteur(double hauteurEcran) {
+        this.hauteurEcran = hauteurEcran;
+    }
+
     public void majZoom(double zoom) {
         this.zoom = zoom;
+    }
+
+    public void majEnJeu(boolean enJeu) {
+        this.enJeu = enJeu;
     }
 
     public void majCompetences(List<BoutonCercle> competences) {

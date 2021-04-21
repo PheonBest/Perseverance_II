@@ -12,7 +12,7 @@ public class BoutonMissions extends JPanel implements ActionListener {
 	private Missions panneauMission;
 	//private Robot joueur;
 	
-	public BoutonMissions(int x0, int y0){
+	public BoutonMissions(HashMap<String, Image> images, int x0, int y0){
         setLayout(null);
         setSize(lx,ly);
         setLocation(x0,y0);
@@ -24,7 +24,7 @@ public class BoutonMissions extends JPanel implements ActionListener {
         mission.addActionListener(this);
         this.add(mission);
         
-        this.panneauMission = new Missions(250,0);
+        this.panneauMission = new Missions(images, 250,0);
     }
         
     public void actionPerformed(ActionEvent e){

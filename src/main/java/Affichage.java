@@ -31,11 +31,11 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
 
     private JPanel contenu = new JPanel();
     private JPanel modeDeJeu;
-    private JPanel chargement;
+    private JPanel chargement = new Chargement();
     private JPanel editeur;
     private JPanel jeu;
    // private JPanel options = new JPanel();
-	private PanneauPause panneauPause;
+	private PanneauPause panneauPause = new PanneauPause();
 	
     private int largeur;
     private int hauteur;
@@ -97,52 +97,16 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
         device.setFullScreenWindow(this);
         */
 
+        jeu = new Dessiner(controleur, true);
+        modeDeJeu = new ModeDeJeu(controleur);
+        editeur = new Editeur(controleur);
+        jeu.setLayout(null);
+
+        
         // Gestion des évènements
         super.setFocusable(true);
         this.addKeyListener(this);
 
-        contenu.setLayout(cardLayout);
-
-        this.setTitle("Perseverance II");
-        this.setSize(largeur, hauteur);
-        this.setLocationRelativeTo(null);
-
-       // options.setBounds(100,100,300,300);
-       // options.setBackground(Color.RED);
-        
-        contenu.setLayout(cardLayout);
-
-        this.setContentPane(contenu); // On définit le contenu de "JFrame" comme un "JPanel"
-        this.setVisible(true);
-
-        // On définit la largeur et la hauteur du contenu du "JFrame" après l'avoir
-        // affiché
-        // Si on obtient sa taille avant son affichage, la dimension retournée est (0,0)
-        this.largeur = (int) this.getContentPane().getSize().getWidth();
-        this.hauteur = (int) this.getContentPane().getSize().getHeight();
-        controleur.majLargeur(this.largeur);
-        controleur.majHauteur(this.hauteur);
-
-
-        // Chargement du jeu
-        chargement = new Chargement();
-
-        ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), 50);
-        contenu.add(chargement, "Chargement");
-        cardLayout.show(contenu, "Chargement");
-    }
-
-    public void initialiser() {
-
-        modeDeJeu = new ModeDeJeu(controleur, this.largeur, this.hauteur);
-        panneauPause = new PanneauPause(this.largeur, this.hauteur);
-        editeur = new Editeur(controleur, this.largeur, this.hauteur);
-        jeu = new Dessiner(controleur, true, this.largeur, this.hauteur);
-        
-        contenu.add(modeDeJeu, "Choix du mode");
-        contenu.add(jeu, "Jeu");
-        contenu.add(editeur, "Editeur de carte");
-        
         jeu.addMouseWheelListener(clicJeuSansMaintien);
         jeu.addMouseListener(clicJeuSansMaintien);
         jeu.addMouseMotionListener(clicJeuSansMaintien);
@@ -163,7 +127,8 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
 				controleur.interactionClavier(KeyEvent.VK_ESCAPE);
 			}
 		});
-        
+        contenu.setLayout(cardLayout);
+
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
                 if (scene.equals("Jeu"))
@@ -171,7 +136,45 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                 System.exit(0);
             }
         });
+
+        this.setTitle("Perseverance II");
+        this.setSize(largeur, hauteur);
+        this.setLocationRelativeTo(null);
+
+       // options.setBounds(100,100,300,300);
+       // options.setBackground(Color.RED);
         
+        contenu.setLayout(cardLayout);
+        contenu.add(modeDeJeu, "Choix du mode");
+        contenu.add(jeu, "Jeu");
+        contenu.add(chargement, "Chargement");
+        contenu.add(editeur, "Editeur de carte");
+        //contenu.add(options, "Options");
+        jeu.setBackground(Color.DARK_GRAY);
+
+        
+
+        this.setContentPane(contenu); // On définit le contenu de "JFrame" comme un "JPanel"
+        this.setVisible(true);
+
+        // On définit la largeur et la hauteur du contenu du "JFrame" après l'avoir
+        // affiché
+        // Si on obtient sa taille avant son affichage, la dimension retournée est (0,0)
+        this.largeur = (int) this.getContentPane().getSize().getWidth();
+        this.hauteur = (int) this.getContentPane().getSize().getHeight();
+        controleur.majLargeur(this.largeur);
+        controleur.majHauteur(this.hauteur);
+        ((Dessiner)jeu).majLargeur(this.largeur);
+        ((Dessiner)jeu).majHauteur(this.hauteur);
+        ((Dessiner)jeu).initialiser();
+        ((ModeDeJeu)modeDeJeu).majTaille(this.largeur,this.hauteur);
+        //((Renommer)renommer).majTaille(this.largeur,this.hauteur);
+		((ModeDeJeu)modeDeJeu).initialiser();
+        ((Dessiner)jeu).majEnJeu(true);
+        ((Editeur)editeur).initialiser(this.largeur, this.hauteur);
+        
+        ((Chargement)chargement).majTailleBar((int)(this.largeur/2.), (int)(this.hauteur/2.), (int)(this.largeur*2./5.), 50);
+
         // Ajout du keyListener aux widgets
         for (JComponent j: panneauPause.obtenirComposants())
             j.addKeyListener(this);
@@ -194,6 +197,24 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                 controleur.retourMenu();
             }
         });
+    }
+
+    public void initialiser() {
+        //System.out.println("Initialisation");
+
+        
+        // Chargement et exécution du jeu
+        cardLayout.show(contenu, "Chargement");
+        controleur.charger();
+        
+        /*
+        // Exécuter l'éditeur
+        cardLayout.show(contenu, "Editeur");
+        controleur.editer();
+        timer = new Timer(Options.DELAI_ANIMATION, this);
+        timer.start();
+        */
+        
     }
 
     @Override
@@ -221,10 +242,6 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
     @Override
     public void mettreAJour(TypeMisAJour type, Object nouveau) {
         switch (type) {
-            //Affichage
-            case Initialisation:
-                initialiser();
-                break;
             //Carte
             case Cellules:
                 if (scene.equals("Jeu"))

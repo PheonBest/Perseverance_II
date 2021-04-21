@@ -13,14 +13,8 @@ import javax.sound.sampled.LineUnavailableException;
 
 public class Donnees implements Observable {
 
-    // Variables statiques
-    //Images des symboles
-    public static HashMap<String, Image> imagesSymboles;
-    public static HashMap<String, Image> imagesMenu;
-
-    // --------
-    
     private ArrierePlan arrierePlan;
+    private Image imageMenu;
     private Robot joueur;
     private String scene;
     private ArrayList<Observateur> listObserver = new ArrayList<Observateur>();
@@ -50,8 +44,11 @@ public class Donnees implements Observable {
     // Images du joueur
     // On les stocke car elles mettent un certain temps à charger
     private ArrayList<ArrayList<Image>> images;
+    //Images des symboles
+    public HashMap<String, Image> imagesSymboles;
 
     private int avancementChargement;
+    private Point borduresFenetres;
 
     // Lecteurs de sons
     private Son lecteurMusique;
@@ -112,6 +109,7 @@ public class Donnees implements Observable {
     }
     
     public void majImagesJoueur(ArrayList<ArrayList<Image>> images) {
+        //(images.size());
         this.images = images;
     }
 
@@ -143,11 +141,7 @@ public class Donnees implements Observable {
     public void notifierObservateur(TypeMisAJour type) {
         for (Observateur obs: listObserver) {
             switch (type) {
-                // Affichage
-                case Initialisation:
-                    obs.mettreAJour(TypeMisAJour.Initialisation, null);
-                    break;
-                
+
                 // Carte
                 case Cellules:
                     obs.mettreAJour(TypeMisAJour.Cellules, cellules);
@@ -224,7 +218,7 @@ public class Donnees implements Observable {
                     obs.mettreAJour(TypeMisAJour.Options, etatOptions);
                     break;
                 case ImageMenu:
-                    obs.mettreAJour(TypeMisAJour.ImageMenu, imagesMenu.get("planetes"));
+                    obs.mettreAJour(TypeMisAJour.ImageMenu, imageMenu);
                     break;
             }
         }
@@ -322,7 +316,7 @@ public class Donnees implements Observable {
     }
 
     public void majImagesSymboles(HashMap<String, Image> imagesSymboles) {
-        Donnees.imagesSymboles = imagesSymboles;
+        this.imagesSymboles = imagesSymboles;
     }
 
     public HashMap<String, Image> getImagesSymboles() {
@@ -543,8 +537,8 @@ public class Donnees implements Observable {
         this.etatOptions = etatOptions;
     }
 
-    public void majImages(HashMap<String, Image> imagesMenu) {
-        Donnees.imagesMenu = imagesMenu;
+    public void majImageMenu(Image imageMenu) {
+        this.imageMenu = imageMenu;
     }
 
     public Cellule obtenirDerniereCaseSymbole() {
