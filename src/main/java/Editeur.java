@@ -7,14 +7,10 @@ public class Editeur extends JPanel {
     private JPanel carte;
     private JPanel menu;
 
-    public Editeur(Controleur controleur, int largeur, int hauteur) {
+    public Editeur(Controleur controleur) {
 
-        carte = new Dessiner(controleur, false, largeur, hauteur);
-        final int LARGEUR_MENU = (int)(largeur/Options.RATIO_LARGEUR_MENU);
-        final int LARGEUR_CARTE = (int)(LARGEUR_MENU*(Options.RATIO_LARGEUR_MENU-1));
-        menu = new Menu(controleur, LARGEUR_MENU);
-        carte.setBounds(0, 0, LARGEUR_CARTE, hauteur);
-        menu.setBounds(LARGEUR_CARTE, 0, LARGEUR_MENU, hauteur);
+        carte = new Dessiner(controleur);
+        menu = new Menu(controleur);
         
         setLayout(null);
         menu.setLayout(null);
@@ -22,12 +18,24 @@ public class Editeur extends JPanel {
         carte.setBackground(Color.DARK_GRAY);
         menu.setBackground(Color.LIGHT_GRAY);
         
+        //((Dessiner)carte).majEnJeu(true); // Affichage de la minimap
+
         add(carte);
         add(menu);
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+    }
+
+    public void initialiser(int largeur, int hauteur) {
+        final int LARGEUR_MENU = (int)(largeur/Options.RATIO_LARGEUR_MENU);
+        final int LARGEUR_CARTE = (int)(LARGEUR_MENU*(Options.RATIO_LARGEUR_MENU-1));
+        ((Dessiner)carte).majLargeur(largeur);
+        ((Dessiner)carte).majHauteur(hauteur);
+        carte.setBounds(0, 0, LARGEUR_CARTE, hauteur);
+        menu.setBounds(LARGEUR_CARTE, 0, LARGEUR_MENU, hauteur);
+        ((Menu) menu).initialiser(LARGEUR_MENU);
     }
 
     public void majCellules(Cellule[][] cellules) {

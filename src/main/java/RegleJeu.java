@@ -40,8 +40,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			regle= new JLabel("REGLES DU JEU");
 			regle.setFont(new Font("Serif", Font.BOLD, 30));
 			regle.setForeground(Color.BLACK);
-			regle.setBounds(100, 5, 400, 70);
-			regle.setHorizontalAlignment(SwingConstants.CENTER);
+			regle.setBounds(100, 5, 300, 70);
 			panneau1.add(regle);
 			
 			//panneau bas
@@ -78,7 +77,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			+"<hr>"
             +"<i><u>SYMBOLE</u></i> <br>"
             +"<br>"
-            +"Les sources de vies bactériennes, minerais, objets et caisses de <br>ravitaillement sont présents sous forme de symboles ? . Pour découvrir de quel <br>symbole il s’agit, vous allez devoir les scanner à l’aide de l’outil <br>scanner puis utiliser le grappin pour les extraire. Ces deux outils sont disponibles sur la <br>gauche de l’écran de jeu et vous demanderont une concentration accrue <br>lorsque vous les utiliserez.</center>");
+            +"Les sources de vies bactériennes, minerais, objets et caisses de ravitaillement sont présents sous forme de symboles “?”. Pour découvrir de quel symbole il s’agit, vous allez devoir les scanner à l’aide de l’outil scanner puis utiliser le grappin pour les extraire. Ces deux outils sont disponibles sur la gauche de l’écran de jeu et vous demanderont une concentration accrue lorsque vous les utiliserez. </center>");
             
 			texteRegle.setFont(new Font("Serif", Font.BOLD, 15));
             texteRegle.setBounds(0,0,100,900);

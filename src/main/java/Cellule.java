@@ -126,10 +126,14 @@ public class Cellule extends Polygon implements Dessin {
 
             if (symbole != null && symbole.obtenirImage() != null && estDecouverte) {
                 Image img = symbole.obtenirImage();
-                if (!symbole.estVisible)
-                    img = Donnees.imagesSymboles.get(TypeSymbole.INCONNUE.name());
-                img = TailleImage.resizeImage(img, (int)(img.getWidth(null)*taille*facteurDeTaille), (int)(img.getHeight(null)*taille*facteurDeTaille), true);
-                g2d.drawImage(img, (int)(CENTRE_CASE[0] - img.getWidth(null)/2), (int)(CENTRE_CASE[1] - img.getHeight(null)/2), null);
+                if (estDecouverte)
+                    img = null;
+                Image imageAgrandie;
+                if (symbole.estVisible)
+                    imageAgrandie = TailleImage.resizeImage(img, (int)(img.getWidth(null)*taille*facteurDeTaille), (int)(img.getHeight(null)*taille*facteurDeTaille), true);
+                else
+                    imageAgrandie = TailleImage.resizeImage(img, (int)(img.getWidth(null)*taille*facteurDeTaille), (int)(img.getHeight(null)*taille*facteurDeTaille), true);
+                g2d.drawImage(imageAgrandie, (int)(CENTRE_CASE[0] - imageAgrandie.getWidth(null)/2), (int)(CENTRE_CASE[1] - imageAgrandie.getHeight(null)/2), null);
                 /*
                 g2d.drawImage(  img,
                                 (int)(CENTRE_CASE[0] - img.getWidth(null)*agrandissement*taille/2),
@@ -152,12 +156,12 @@ public class Cellule extends Polygon implements Dessin {
                 g2d.drawPolygon(this);
             if (symbole != null && symbole.obtenirImage() != null && estDecouverte) {
                 Image img = symbole.obtenirImage();
-                if (!symbole.estVisible)
-                    img = Donnees.imagesSymboles.get(TypeSymbole.INCONNUE.name());
+                if (estDecouverte)
+                    img = null;
                 if (taille == 1)
-                    g2d.drawImage(img, (int)(CENTRE_CASE[0] - img.getWidth(null)/2), (int)(CENTRE_CASE[1] - img.getHeight(null)/2), null);
+                    g2d.drawImage(symbole.obtenirImage(), (int)(CENTRE_CASE[0] - symbole.obtenirImage().getWidth(null)/2), (int)(CENTRE_CASE[1] - symbole.obtenirImage().getHeight(null)/2), null);
                 else {
-                    Image imageAgrandie = TailleImage.resizeImage(img, (int)(img.getWidth(null)*taille), (int)(img.getHeight(null)*taille), true);
+                    Image imageAgrandie = TailleImage.resizeImage(symbole.obtenirImage(), (int)(symbole.obtenirImage().getWidth(null)*taille), (int)(symbole.obtenirImage().getHeight(null)*taille), true);
                     g2d.drawImage(imageAgrandie, (int)(CENTRE_CASE[0] - imageAgrandie.getWidth(null)/2), (int)(CENTRE_CASE[1] - imageAgrandie.getHeight(null)/2), null);
                     /*
                     g2d.drawImage(  symbole.obtenirImage(),

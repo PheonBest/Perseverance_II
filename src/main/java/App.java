@@ -39,7 +39,18 @@ public class App
                 Controleur controleur = new Controleur(donnees);
                 Affichage affichage = new Affichage(largeur, hauteur, controleur);
                 donnees.ajouterObservateur(affichage);
-                controleur.charger();
+                affichage.initialiser();
+                
+                //Compétences
+                final int X_INIT = 100;
+                final int Y_INIT = 200;
+                final int DISTANCE_INTER_COMPETENCE = 120;
+                List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
+                competences.add(new BoutonCercle(X_INIT, Y_INIT, 50, "Grappin", donnees.getImagesSymboles().get(TypeSymbole.GRAPPIN.name()), true));
+                competences.add(new BoutonCercle(X_INIT, Y_INIT+DISTANCE_INTER_COMPETENCE, 50, "Scanner", donnees.getImagesSymboles().get(TypeSymbole.SCANNER.name()), true));
+                competences.add(new BoutonCercle(X_INIT, Y_INIT+2*DISTANCE_INTER_COMPETENCE, 50, "Pont", donnees.getImagesSymboles().get(TypeSymbole.PONT.name()), false)); // False signifie que la compétence est indiponible
+                donnees.majCompetences(competences);
+                donnees.notifierObservateur(TypeMisAJour.Competences);
             }
         });
     }

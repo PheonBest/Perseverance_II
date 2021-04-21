@@ -24,7 +24,7 @@ public class BoutonPause extends JPanel implements ActionListener {
         pause.addActionListener(this);
         this.add(pause);
         
-        panneauPause = new PanneauPause(100,100);
+        panneauPause = new PanneauPause();
     }
     
     public void actionPerformed(ActionEvent e){
