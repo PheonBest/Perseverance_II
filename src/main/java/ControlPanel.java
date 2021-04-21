@@ -31,14 +31,8 @@ public class ControlPanel extends JPanel implements ActionListener{
         add(details);
 
         // Images
-        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_DETAILS+"\\b.*\\.(?:jpg|gif|png)");
-        try {
-            HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_DETAILS+"/");
-            imageP = images.get("Mars9");
-            imageR = images.get("PerseveranceII");
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
+        imageP = Donnees.imagesMenu.get("Mars9");
+        imageR = Donnees.imagesMenu.get("PerseveranceII");
     }
     
     public void paintComponent(Graphics g){

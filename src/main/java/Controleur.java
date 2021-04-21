@@ -4,10 +4,12 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.ByteArrayInputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -41,29 +43,38 @@ public class Controleur {
     }
     // Effet quand on utilise le bras robot sur une case qui contient un symbole (use les bras)
     private void extraire(int ligne, int colonne) {
-        donnees.majDerniereCelluleMinijeu(donnees.obtenirCellules()[ligne][colonne]);
-        donnees.majSensVariationExtraction(true);
-        donnees.majPositionCurseurExtraction(0);
-        donnees.majEtatMinijeuExtraction(Etat.IN);
-        donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
-        donnees.notifierObservateur(TypeMisAJour.PositionCurseurExtraction);
-        donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
-        donnees.obtenirJoueur().usureBras();
+        Cellule c = donnees.obtenirCellules()[ligne][colonne]; // Cellule sélectionnée
+        // On ne peut extraire que du bois et des ponts si la case et le sybmole sont visibles
+        if (c.estDecouverte() && c.obtenirSymbole().obtenirEstVisible() && (c.obtenirSymbole().type == TypeSymbole.BOIS || c.obtenirSymbole().type == TypeSymbole.PONT)) {
+            donnees.majDerniereCelluleMinijeu(c);
+            donnees.majSensVariationExtraction(true);
+            donnees.majPositionCurseurExtraction(0);
+            donnees.majEtatMinijeuExtraction(Etat.IN);
+            donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
+            donnees.notifierObservateur(TypeMisAJour.PositionCurseurExtraction);
+            donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
+            donnees.obtenirJoueur().usureBras();
+        } else
+            desactiverCompetence();
     }
 
     // Effet quand on utilise le scanner sur une case qui contient un symbole (une les capteurs)
     private void scan(int ligne, int colonne) {
-        donnees.majDerniereCelluleMinijeu(donnees.obtenirCellules()[ligne][colonne]);
-
-        donnees.majRepereMinijeuLaser(System.currentTimeMillis());
-        donnees.majTempsAvantChrono((int)(Math.random()*((7000-3000)+1)+3000));
-        donnees.majChronometreMinijeuLaser("0.0000 secondes"); // On met à jour l'affichage du temps
-        donnees.majNombreErreursLaser(0);
-        donnees.majEtatMinijeuLaser(Etat.ON);
-        donnees.notifierObservateur(TypeMisAJour.NombreErreursLaser);
-        donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
-        donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
-        donnees.obtenirJoueur().usureCapteurs();
+        Cellule c = donnees.obtenirCellules()[ligne][colonne]; // Cellule sélectionnée
+        // On ne peut scanner que les cases qui ont un symbole non visible sur une case visibele
+        if (c.estDecouverte() && !c.obtenirSymbole().obtenirEstVisible() && c.obtenirSymbole().type != null && c.obtenirSymbole().type != TypeSymbole.VIDE) {
+            donnees.majDerniereCelluleMinijeu(c);
+            donnees.majRepereMinijeuLaser(System.currentTimeMillis());
+            donnees.majTempsAvantChrono((int)(Math.random()*((7000-3000)+1)+3000));
+            donnees.majChronometreMinijeuLaser("0.0000 secondes"); // On met à jour l'affichage du temps
+            donnees.majNombreErreursLaser(0);
+            donnees.majEtatMinijeuLaser(Etat.ON);
+            donnees.notifierObservateur(TypeMisAJour.NombreErreursLaser);
+            donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+            donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+            donnees.obtenirJoueur().usureCapteurs();
+        } else
+            desactiverCompetence();
     }
 
     // Effet quand on marche sur une case
@@ -82,7 +93,7 @@ public class Controleur {
                     break;
                 case DESERT:
                     break;
-                case SABLE_MOUVANTS :
+                case SABLE_MOUVANTS:
                     if(aChangeDeCase)donnees.obtenirJoueur().malusBatterie(TypeCase.SABLE_MOUVANTS);
                     break;
                 case NEIGE:
@@ -117,12 +128,21 @@ public class Controleur {
     }
 	public void jouer(String nomCarte, InputStream carte) {
         donnees.majNomCarte(nomCarte);
-
-        Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles, donnees.getImagesJoueur());
+        Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, Donnees.imagesSymboles, donnees.getImagesJoueur());
         donnees.majCellules(jeu.getCellule());
         donnees.majJoueur(jeu.getJoueur());
-        System.out.println(jeu.getJoueur().obtenirCase()[0]+" "+jeu.getJoueur().obtenirCase()[1]);
         placerJoueur(jeu.getJoueur().obtenirCase()[0], jeu.getJoueur().obtenirCase()[1]);
+
+        //Compétences
+        final int X_INIT = 100;
+        final int Y_INIT = 200;
+        final int DISTANCE_INTER_COMPETENCE = 120;
+        List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
+        competences.add(new BoutonCercle(X_INIT, Y_INIT, 50, "Grappin", Donnees.imagesSymboles.get(TypeSymbole.GRAPPIN.name()), true));
+        competences.add(new BoutonCercle(X_INIT, Y_INIT+DISTANCE_INTER_COMPETENCE, 50, "Scanner", Donnees.imagesSymboles.get(TypeSymbole.SCANNER.name()), true));
+        // La compétence "Pont" est disponible si le joueur au moins un pont
+        competences.add(new BoutonCercle(X_INIT, Y_INIT+2*DISTANCE_INTER_COMPETENCE, 50, "Pont", Donnees.imagesSymboles.get(TypeSymbole.PONT.name()), jeu.getJoueur().obtenirNombrePont() > 0));
+        donnees.majCompetences(competences);
 
         donnees.obtenirArrierePlan().majCoords(-donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2);
         donnees.majScene("Jeu");
@@ -139,6 +159,7 @@ public class Controleur {
         donnees.notifierObservateur(TypeMisAJour.Scene);
         donnees.notifierObservateur(TypeMisAJour.Joueur);   // On transmet une unique fois la référence à l'objet Joueur (la valeur de l'objet joueur est un pointeur)
         donnees.notifierObservateur(TypeMisAJour.Cellules); // On transmet une unique fois la référence du tableau de cellules
+        donnees.notifierObservateur(TypeMisAJour.Competences); // On transmet une unique fois la référence du tableau de cellules
         donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
 	}
 
@@ -179,6 +200,7 @@ public class Controleur {
                         if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) { // Si on doit fermer la fenêtre du minijeu
                             donnees.majEtatMinijeuExtraction(Etat.OFF);
                             donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
+                            desactiverCompetence();
                         }
                         break;
                     case OFF:
@@ -207,7 +229,6 @@ public class Controleur {
                         if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
                             donnees.majEtatMinijeuLaser(Etat.OFF);
                             donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
-                            donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().estVisible = true;
                             desactiverCompetence();
                         }
                         break;
@@ -247,17 +268,21 @@ public class Controleur {
     public void charger() {
 
         // Chargement des cartes
-        chargerCartes();
+        try {
+            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
+            donnees.majCartes(ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES));
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
 
-        // Chargement de l'arrière plan
+        // Chargement des images et de l'arrière plan
         Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_IMAGES+"\\b.*\\.(?:jpg|gif|png)");
         try {
             HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_IMAGES+"/");
             donnees.majArrierePlan(new ArrierePlan(images.get("surface_texture")));
             donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
-            donnees.majImageMenu(TailleImage.resizeImage(images.get("planetes"), donnees.obtenirLargeur(), donnees.obtenirHauteur(), true));
-            
-            donnees.notifierObservateur(TypeMisAJour.ImageMenu);
+            images.put("planetes", TailleImage.resizeImage(images.get("planetes"), donnees.obtenirLargeur(), donnees.obtenirHauteur(), true));
+            donnees.majImages(images);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
@@ -280,8 +305,6 @@ public class Controleur {
             e.printStackTrace();
         }
 
-        
-
         // Chargement des symboles
         pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_SYMBOLE+"\\b.*\\.(?:jpg|gif|png)");
         final int LARGEUR = (int) (Options.LARGEUR_CASE*0.7);
@@ -294,11 +317,8 @@ public class Controleur {
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
-        
-        
 
-        // Chargement des images du joueur
-        ArrayList<ArrayList<Image>> images = new ArrayList<ArrayList<Image>>(4);
+        // Chargement des images du joueur=
         Charger threadWorkerChargement = new Charger();
         threadWorkerChargement.execute();
     }
@@ -359,7 +379,19 @@ public class Controleur {
                 majMusique(0);
                 boucleMusique();
                 donnees.majScene("Choix du mode");
+
+                // Les variables statiques ont été envoyées
+                // Elles sont constantes, et n'impliquent donc pas un couplage fort
+                // entre l'affichage et les données
+
+                // On peut alors initialiser l'Affichage
+                donnees.notifierObservateur(TypeMisAJour.Initialisation);
+
+                // On envoie aux objets crées lors de l'initialisation les données chargées
+                donnees.notifierObservateur(TypeMisAJour.ImageMenu);
+                donnees.notifierObservateur(TypeMisAJour.Cartes);
                 donnees.notifierObservateur(TypeMisAJour.Scene);
+
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -385,11 +417,13 @@ public class Controleur {
                     // Pourcentage de précision final
                     double score = -200*Math.abs(0.5 - donnees.obtenirPositionCurseurExtraction()) + 100;
                     String resultat = new DecimalFormat("0.0").format(score)+" % de précision";
-                    if (score < 75)
+                    if (score < Options.PRECISION_MIN)
                         resultat = "Echec ! "+resultat;
                     else {
                         resultat = "Réussite ! "+resultat;
                         switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
+                            case PONT:
+                                // Si on extrait 1 pont, c'est comme si on extrayait du bois
                             case BOIS:
                                 // On a extrait 1 de bois, donc on peut construire 1 pont
                                 for (BoutonCercle b: donnees.obtenirCompetences()) {
@@ -397,10 +431,14 @@ public class Controleur {
                                         b.majDisponible(true);
                                 }
                                 donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()+1);
+                                donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
+                                break;
                             case CHENILLES:
                                 donnees.obtenirJoueur().majSurChenilles(true);
-                            default:
                                 donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
+                                break;
+                            default:
+                                //donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
                                 break;
                         }
                     }
@@ -415,8 +453,15 @@ public class Controleur {
 
                     // Mise à jour du temps de réaction final en MILLISECONDES
                     // on arrondie le temps au millième
-                    donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0").format(System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser())+" millisecondes"); 
-                    System.out.println("Temps de réaction: "+donnees.obtenirChronometreMinijeuLaser()+" ms"); // Temps de réaction final
+                    double score = System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser();
+                    String resultat = new DecimalFormat("0.0").format(score)+" millisecondes";
+                    if (score > Options.TEMPS_DE_REACTION_MIN)
+                        resultat = "Echec ! "+resultat;
+                    else {
+                        resultat = "Réussite ! "+resultat;
+                        donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majEstVisible(true);
+                    }
+                    donnees.majChronometreMinijeuLaser(resultat);
                     donnees.majEtatMinijeuLaser(Etat.OUT);
                     donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
                     donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
@@ -534,7 +579,7 @@ public class Controleur {
                                                             if (donnees.obtenirJoueur().obtenirNombrePont() > 0) {
                                                                 // On ne peut placer des ponts que sur une case eau
                                                                 if (donnees.obtenirCellules()[i][j].obtenirType().equals(TypeCase.EAU)) {
-                                                                    donnees.obtenirCellules()[i][j].obtenirSymbole().majSymbole(TypeSymbole.PONT, donnees.getImagesSymboles().get(TypeSymbole.PONT.name()));
+                                                                    donnees.obtenirCellules()[i][j].obtenirSymbole().majSymbole(TypeSymbole.PONT, Donnees.imagesSymboles.get(TypeSymbole.PONT.name()));
                                                                     donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()-1);
                                                                     if (donnees.obtenirJoueur().obtenirNombrePont() == 0)
                                                                         donnees.obtenirDerniereCompetence().majDisponible(false);
@@ -796,8 +841,8 @@ public class Controleur {
         for (int i=0; i<NOMBRE_COLONNES_SYMBOLE; i++) {
             for (int j=0; j<Options.NOMBRE_BOUTONS_TYPE_PAR_LIGNE; j++) {
                 if (index < SYMBOLES.length) {
-                    //System.out.println("Image: "+SYMBOLES[index].name()+" "+donnees.getImagesSymboles().get(SYMBOLES[index].name()));
-                    boutonsSymbole[index] = new Cellule(TypeCase.VIDE, i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON, true, new Symbole(SYMBOLES[index], donnees.getImagesSymboles().get(SYMBOLES[index].name()), true));
+                    //System.out.println("Image: "+SYMBOLES[index].name()+" "+Donnees.imagesSymboles.get(SYMBOLES[index].name()));
+                    boutonsSymbole[index] = new Cellule(TypeCase.VIDE, i, j, TAILLE, Options.ESPACE_INTER_CASE_BOUTON, true, new Symbole(SYMBOLES[index], Donnees.imagesSymboles.get(SYMBOLES[index].name()), true));
                     boutonsSymbole[index].translate((LARGEUR_MENU-LONGUEUR_TOTALE_CASES)/2, Options.yLabels[2]+60);
                 }
                 index++;
@@ -807,16 +852,25 @@ public class Controleur {
 
 
         // On rend toutes les cases visibles
+        Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, Donnees.imagesSymboles, donnees.getImagesJoueur());
 
-        donnees.majCellules(CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, donnees.imagesSymboles, donnees.getImagesJoueur()).getCellule());
+        donnees.majCellules(jeu.getCellule());
 
         for (int i=0; i< donnees.obtenirCellules().length; i++) {
             for (Cellule c: donnees.obtenirCellules()[i]) {
-                if (c.obtenirSymbole() != null)
+                if (c.obtenirSymbole() != null) {
+                    if (c.obtenirSymbole().type == TypeSymbole.FUSEE) // On réinitialise le point d'apparition
+                        c.obtenirSymbole().majSymbole(TypeSymbole.VIDE, null);
                     c.obtenirSymbole().estVisible = true;
+                }
                 c.majEstDecouverte(true);
             }
         }
+        // On fixe le point d'apparition à celui spécifié dans le CSV
+        Cellule pointApparition = donnees.obtenirCellules()[jeu.getJoueur().obtenirCase()[0]][jeu.getJoueur().obtenirCase()[1]];
+        pointApparition.obtenirSymbole().majSymbole(TypeSymbole.FUSEE, Donnees.imagesSymboles.get(TypeSymbole.FUSEE.name()));
+        donnees.majCelluleDepart(jeu.getJoueur().obtenirCase());
+
         donnees.majBoutonsCercle(boutonsCercle);
         donnees.majBoutonsType(boutonsType);
         donnees.majBoutonsSymbole(boutonsSymbole);
@@ -832,6 +886,15 @@ public class Controleur {
         donnees.notifierObservateur(TypeMisAJour.BoutonsSymbole); // On transmet une unique fois la référence à la liste
         donnees.notifierObservateur(TypeMisAJour.Peindre);
     }
+    
+    public void majLargeur(int largeur) {
+        donnees.majLargeur(largeur);
+    }
+
+    public void majHauteur(int hauteur) {
+        donnees.majHauteur(hauteur);
+    }
+
     public void interactionClavier(int code) {
         interactionClavier(code, false);
     }
@@ -972,7 +1035,7 @@ public class Controleur {
 	}
 
     public void enregistrer(boolean reinitialiserExploration) {
-		
+
 		if(reinitialiserExploration==true){
 			for (int i=0; i< donnees.obtenirCellules().length; i++) {
 				for (Cellule c: donnees.obtenirCellules()[i]) {
@@ -984,9 +1047,10 @@ public class Controleur {
 		}
 		
         try {
-            System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart());
-            chargerCartes();
+            //System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");
+            InputStream inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart());
+            // On charge la carte enregistrée
+            donnees.obtenirCartes().put(donnees.obtenirNomCarte(), inputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -995,60 +1059,11 @@ public class Controleur {
     public void retourMenu() {
         donnees.majScene("Choix du mode");
         donnees.notifierObservateur(TypeMisAJour.Scene);
-        chargerCartes();
         donnees.majCelluleDepart(null);
-    }
-
-    private void chargerCartes() {
-        // Chargement des cartes
-        try {
-            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
-            donnees.majCartes(ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES));
-            donnees.notifierObservateur(TypeMisAJour.Cartes);
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void majPositionCurseurExtraction(double positionCurseurExtraction) {
         donnees.majPositionCurseurExtraction(positionCurseurExtraction);
-    }
-    
-    public Image obtenirImageSymbole(TypeSymbole nomSymbole){
-		switch( nomSymbole){
-			case MINERAI:
-				return donnees.getImagesSymboles().get("MINERAI");
-			case BACTERIE:
-				return donnees.getImagesSymboles().get("BACTERIE");
-			case GRAPPIN:
-				return donnees.getImagesSymboles().get("GRAPPIN");
-			case SCANNER:
-				return donnees.getImagesSymboles().get("SCANNER");
-			case RAVIN:
-				return donnees.getImagesSymboles().get("RAVIN");
-			case INCONNUE:
-				return donnees.getImagesSymboles().get("INCONNUE");
-			case BRAS:
-				return donnees.getImagesSymboles().get("BRAS");
-			case JAMBE:
-				return donnees.getImagesSymboles().get("JAMBE");
-			case CAPTEUR:
-				return donnees.getImagesSymboles().get("CAPTEUR");
-            case ENERGIE:
-                return donnees.getImagesSymboles().get("ENERGIE");
-			default:
-				return null;
-		
-		}
-	
-	}
-
-    public void majLargeur(int largeur) {
-        donnees.majLargeur(largeur);
-    }
-
-    public void majHauteur(int hauteur) {
-        donnees.majHauteur(hauteur);
     }
 
     private void desactiverCompetence() {
@@ -1063,21 +1078,20 @@ public class Controleur {
     // Gestion des cartes
 
     public void cloner(String nouveauNom, InputStream carte) throws IOException {
-        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
         nouveauNom = Formes.stripAccents(nouveauNom);
         File file = new File(dossier+"/"+nouveauNom+".csv");
         if (file.exists())
             throw new java.io.IOException("Ce nom est déjà utilisé !");
         else {
-                
-            CSV.ecrireFichierDepuisFlux(nouveauNom, carte);
-
-            chargerCartes();
+            InputStream inputStream = CSV.ecrireFichierDepuisFlux(nouveauNom, carte);
+            donnees.obtenirCartes().put(nouveauNom, inputStream);
+            donnees.notifierObservateur(TypeMisAJour.Cartes);
         }
     }
 
     public void creerCarte(String nom, int nombreLignes, int nombreColonnes) throws IOException {
-        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
         nom = Formes.stripAccents(nom);
         File file = new File(dossier+"/"+nom+".csv");
         if (file.exists())
@@ -1088,18 +1102,23 @@ public class Controleur {
         for (int i=0; i < cellules.length; i++) {
             for (int j=0; j < cellules[i].length; j++)
                 cellules[i][j] = new Cellule(i,j);
-        }
-        try {
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null);
+        } try {
+            /* On ne recharge pas les cartes avec en obtenant les ressources avec ObtenirRessources.java
+            * Car cette méthode utilise getResourceAsStream()
+            * qui permet de chercher des ressources présentes dans le classpath (ressource statique)
+            * Or ici on a des fichiers générés dynamiquement
+            * On modifie donc directement la liste de cartes
+            */
+            InputStream inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null);
+            donnees.obtenirCartes().put(nom, inputStream);
+            donnees.notifierObservateur(TypeMisAJour.Cartes);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        chargerCartes();
     }
     
     public void renommer(String ancienNom, String nouveauNom, InputStream carte) throws IOException {
-        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
         nouveauNom = Formes.stripAccents(nouveauNom);
         File file = new File(dossier+"/"+nouveauNom+".csv");
         if (file.exists())
@@ -1109,24 +1128,25 @@ public class Controleur {
 
         Path source = Paths.get(dossier+"/"+ancienNom+".csv");
         Files.move(source, source.resolveSibling(nouveauNom+".csv"));
-        /*
-        boolean success = new File(dossier+"/"+ancienNom+".csv").renameTo(file);
 
-        if (!success)
-            throw new java.io.IOException("Le fichier n'a pas pu être renommé !");
-        */
-        chargerCartes();
+        InputStream inputStream = new FileInputStream(file);
+        donnees.obtenirCartes().put(nouveauNom, inputStream);
+        donnees.obtenirCartes().remove(ancienNom);
+        donnees.notifierObservateur(TypeMisAJour.Cartes);
     }
 
     public void supprimer(String nom, InputStream carte) throws IOException {
 
         carte.close(); // On ferme le flux de données pour pouvoir éditer le fichier
 
-        String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom+".csv", "res/"+Options.NOM_DOSSIER_IMAGES+"/", "./././");
+        String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom+".csv", "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
         File fichier = new File(chemin);
 
         if (!fichier.delete())
             throw new java.io.IOException("Le fichier n'a pas pu être supprimé !");
-        chargerCartes();
+        else {
+            donnees.obtenirCartes().remove(nom);
+            donnees.notifierObservateur(TypeMisAJour.Cartes);
+        }
     }
 }
