@@ -50,6 +50,8 @@ public class Dessiner extends JPanel {
     private boolean affichagePanneauDeControle;
     private String informerJoueur = "";
     private JButton quitter;
+    private boolean victoire = false;
+    private boolean defaite = false;
 
     // Minimap
     private int[] tailleMinimap = {100,100};
@@ -134,13 +136,13 @@ public class Dessiner extends JPanel {
                 }
             });
 			add(panneauPause);
+
+            // bouton pour quitter le jeu
+            quitter= new JButton("QUITTER");
+            quitter.setBounds(735,60, 100, 50);
+            add(quitter);
+            //quitter.addActionListener(this);
         }
-        
-        // bouton pour quitter le jeu
-        quitter= new JButton("QUITTER");
-        quitter.setBounds(735,60, 100, 50);
-        add(quitter);
-        //quitter.addActionListener(this);
 
         largeurRectangle = (int) (largeurEcran/MINIJEU_EXTRACTION_LARGEUR_ECRAN);
         hauteurRectangle = (int) (hauteurEcran/MINIJEU_EXTRACTION_HAUTEUR_ECRAN);
@@ -211,10 +213,14 @@ public class Dessiner extends JPanel {
                 }
             }
         }
-        //System.out.println(nombreCellulesVisibles);
 
-        
-        if (affichagePanneauDeControle && joueur != null) {
+        if (victoire) {
+            // Affichage du panneau de victoire (appelé une unique fois)
+        }
+        else if (defaite) {
+            // Affichage du panneau de défaite (appelé une unique fois)
+        }
+        else if (affichagePanneauDeControle && joueur != null) {
             // Affichage du joueur
             joueur.dessiner(g2d);
 
@@ -548,5 +554,11 @@ public class Dessiner extends JPanel {
 
     public void majInformerJoueur(String informerJoueur) {
         this.informerJoueur = informerJoueur;
+    }
+    public void majVictoire(boolean victoire) {
+        this.victoire = victoire;
+    }
+    public void majDefaite(boolean defaite) {
+        this.defaite = defaite;
     }
 }

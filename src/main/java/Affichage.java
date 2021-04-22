@@ -264,7 +264,7 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                     ((Editeur) editeur).majZoom((Double) nouveau);
                 break;
             case Cartes:
-                ((ModeDeJeu) modeDeJeu).majCartes((HashMap<String, InputStream>) nouveau);
+                ((ModeDeJeu) modeDeJeu).majCartes((HashMap<String, List<String[]>>) nouveau);
                 break;
             case ArrierePlan:
                 if (scene.equals("Jeu"))
@@ -286,6 +286,12 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                 break;
             case RayonDeSelection:
                 ((Dessiner)jeu).majRayon((Integer) nouveau);
+                break;
+                case Victoire:
+                ((Dessiner)jeu).majVictoire((boolean) nouveau);
+                break;
+            case Defaite:
+                ((Dessiner)jeu).majDefaite((boolean) nouveau);
                 break;
             
             // Editeur de carte

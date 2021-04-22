@@ -23,7 +23,7 @@ import javax.swing.SwingConstants;
 public class ModeDeJeu extends JPanel implements ActionListener {
 	
     private Controleur controleur;
-    private HashMap<String, InputStream> cartes;
+    private HashMap<String, List<String[]>> cartes;
     private JList<String> liste = new JList<>();
     DefaultListModel<String> modele = new DefaultListModel<>();
 	private Image imageMenu;
@@ -156,7 +156,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
         liste.setVisibleRowCount(5);
     }
 
-    public void majCartes(HashMap<String, InputStream> cartesEtNoms) {
+    public void majCartes(HashMap<String, List<String[]>> cartesEtNoms) {
 		//System.out.println(cartesEtNoms.values().size());
         // On veut trier les cartes par ordre alphabétique
         List<String> nomCartes = cartesEtNoms.entrySet()

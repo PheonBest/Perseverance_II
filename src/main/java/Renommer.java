@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class Renommer extends JFrame implements ActionListener{
 	int x=100;
@@ -19,7 +20,7 @@ public class Renommer extends JFrame implements ActionListener{
 	private JTextField nom;
 	private Controleur controleur;
 	private String nomCarte ;
-	private InputStream carte; 
+	private List<String[]> carte; 
 	
 	public Renommer(Controleur controleur, int largeur, int hauteur){
 		super();
@@ -73,7 +74,7 @@ public class Renommer extends JFrame implements ActionListener{
 			}
 	}
 	
-	public void initialiser(String nomCarte, InputStream carte){
+	public void initialiser(String nomCarte, List<String[]> carte){
 		this.nomCarte = nomCarte;
 		this.carte = carte;
 	}

@@ -43,9 +43,11 @@ public class Donnees implements Observable {
     private Cellule derniereCelluleMinijeu = null;
     private String informerJoueur = "";
     private long chronometreNotification = 0;
+    private boolean victoire = false;
+    private boolean defaite = false;
     
     // CSV des cartes && éditeur
-    private HashMap<String, InputStream> cartes;
+    private HashMap<String, List<String[]>> cartes;
     private String nomCarte;
     private int[] celluleDepart = null;
 
@@ -186,6 +188,12 @@ public class Donnees implements Observable {
                     break;
                 case RayonDeSelection:
                     obs.mettreAJour(TypeMisAJour.RayonDeSelection, rayonDeSelection);
+                    break;
+                case Victoire:
+                    obs.mettreAJour(TypeMisAJour.Victoire, victoire);
+                    break;
+                case Defaite:
+                    obs.mettreAJour(TypeMisAJour.Defaite, defaite);
                     break;
 
                 // Editeur de carte
@@ -441,7 +449,7 @@ public class Donnees implements Observable {
         }
     }
 
-    public void majCartes(HashMap<String, InputStream> cartes) {
+    public void majCartes(HashMap<String, List<String[]>> cartes) {
         /*
         for (String i : cartes.keySet())
             System.out.println("Nom du CSV : " + i);
@@ -453,7 +461,7 @@ public class Donnees implements Observable {
         return symbolesDecouverts;
     }
 
-    public HashMap<String, InputStream> obtenirCartes() {
+    public HashMap<String, List<String[]>> obtenirCartes() {
         return cartes;
     }
 
@@ -592,5 +600,18 @@ public class Donnees implements Observable {
     }
     public int[] obtenirCelluleDepart() {
         return celluleDepart;
+    }
+
+    public void majVictoire(boolean victoire) {
+        this.victoire = victoire;
+    }
+    public void majDefaite(boolean defaite) {
+        this.defaite = defaite;
+    }
+    public boolean obtenirVictoire() {
+        return victoire;
+    }
+    public boolean obtenirDefaite() {
+        return defaite;
     }
 }

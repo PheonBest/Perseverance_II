@@ -136,7 +136,7 @@ public class Controleur {
         donnees.obtenirArrierePlan().translate(DELTA_X, DELTA_Y);
         donnees.obtenirJoueur().majCase(ligne, colonne);
     }
-	public void jouer(String nomCarte, InputStream carte) {
+	public void jouer(String nomCarte, List<String[]> carte) {
         donnees.majNomCarte(nomCarte);
         Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, Donnees.imagesSymboles, donnees.getImagesJoueur());
         donnees.majCellules(jeu.getCellule());
@@ -174,119 +174,137 @@ public class Controleur {
 	}
 
 	public void rafraichir() {
-        if (!donnees.obtenirEtatOptions()) {
-
-            // Si on est dans le jeu ou dans la carte de l'éditeur de carte (pas dans le menu)
-            // On maintient le clic
-            if (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && donnees.obtenirStatutSouris().obtenirX() < donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU)) {
-                if (donnees.obtenirStatutSouris().obtenirClicGauche())
-                    click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY(), false);
-            }
-            if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
-
-                /* Recharge au fur et à mesure
-                Cellule caseJoueur = donnees.obtenirCellules()[donnees.obtenirJoueur().obtenirDerniereCase()[0]][donnees.obtenirJoueur().obtenirDerniereCase()[1]];
-                if (caseJoueur.obtenirSymbole().type == TypeSymbole.ENERGIE && caseJoueur.obtenirSymbole().obtenirEstVisible()) {
-                    donnees.obtenirJoueur().maintenance(caseJoueur.obtenirSymbole().type);
-                    donnees.obtenirJoueur().actualiseVP();
-                }
-                */
-
-                // Si on est en train d'afficher une notification au joueur
-                // Et qu'il est temps de supprimer la notification:
-                if (!donnees.obtenirInformerJoueur().equals("")
-                    && System.currentTimeMillis() - donnees.obteniChronometreNotification() > Options.DUREE_NOTIFICATION) {
-                    donnees.majInformerJoueur("");
-                    donnees.notifierObservateur(TypeMisAJour.InformerJoueur);
-                }
-                
-                switch (donnees.obtenirEtatMiniJeuExtraction()) {
-                    case ON:
-                        break;
-                    case IN: // On fait varier la position du curseur entre 0 et 1
-                        
-                        if (donnees.obtenirSensVariationExtraction()) { //On déplace le curseur vers la droite
-                            donnees.majPositionCurseurExtraction(donnees.obtenirPositionCurseurExtraction() + Options.INCREMENT_CURSEUR);
-                            if (donnees.obtenirPositionCurseurExtraction() > 1) {
-                                donnees.majPositionCurseurExtraction(1);
-                                donnees.majSensVariationExtraction(false);
-                                donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
-                            }
-                        } else { // On déplace le curseur vers la gauche
-                            donnees.majPositionCurseurExtraction(donnees.obtenirPositionCurseurExtraction() - Options.INCREMENT_CURSEUR);
-                            if (donnees.obtenirPositionCurseurExtraction() < 0) {
-                                donnees.majPositionCurseurExtraction(0);
-                                donnees.majSensVariationExtraction(true);
-                                donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
-                            }
-                        }
-                        donnees.notifierObservateur(TypeMisAJour.PositionCurseurExtraction);
-                        break;
-                    case OUT: // Si on est en train d'afficher le score
-                        if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) { // Si on doit fermer la fenêtre du minijeu
-                            donnees.majEtatMinijeuExtraction(Etat.OFF);
-                            donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
-                            desactiverCompetence();
-                        }
-                        break;
-                    case OFF:
-                        break;
-                }
-
-                switch (donnees.obtenirEtatMiniJeuLaser()) {
-                    case ON:
-                        
-                        // Si il est temps de démarrer le mini-jeu
-                        if (System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser() > donnees.obtenirTempsAvantChrono()) {
-                            donnees.majEtatMinijeuLaser(Etat.IN);
-                            donnees.majRepereMinijeuLaser(System.currentTimeMillis()); // On met à jour le repère de temps
-                            donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
-                        }
-                        // On met à jour l'affichage du temps
-                        donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0000").format((System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser()) / 1000.) + " secondes");
-                        donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
-                        break;
-                    case IN:
-                        // On arrondie le temps (en seconde) au millième
-                        donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0000").format((System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser()) / 1000.) + " secondes");
-                        donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
-                        break;
-                    case OUT:
-                        if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
-                            donnees.majEtatMinijeuLaser(Etat.OFF);
-                            donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
-                            desactiverCompetence();
-                        }
-                        break;
-                    case OFF:
-                        break;
-                }
-                donnees.obtenirJoueur().move();
-
-                // Si on a changé de case
-                if (donnees.obtenirJoueur().obtenirCasePrecedente()[0] != donnees.obtenirJoueur().obtenirCase()[0] || donnees.obtenirJoueur().obtenirCasePrecedente()[1] != donnees.obtenirJoueur().obtenirCase()[1]) {
-                    effetCase(donnees.obtenirJoueur().obtenirDerniereCase());
-                    Cellule[] voisins = Voisins.obtenirVoisins(donnees.obtenirCellules(), donnees.obtenirJoueur().obtenirDerniereCase()[0], donnees.obtenirJoueur().obtenirDerniereCase()[1], Options.RAYON_DECOUVERTE);
-                    for (int i=0; i < voisins.length; i++) {
-                        if (!voisins[i].estDecouverte())
-                            voisins[i].majEstDecouverte(true);
-                            donnees.obtenirJoueur().majCasesExplorees();
-                    }
-                }
-                    
-
-                donnees.obtenirJoueur().rafraichirImage();
-                int dx = -donnees.obtenirJoueur().getDx();
-                int dy = -donnees.obtenirJoueur().getDy();
-                if (dx != 0 || dy != 0) {
-                    donnees.obtenirArrierePlan().translate(dx, dy);
-                    for (int i=0; i < donnees.obtenirCellules().length; i++) {
-                        for (int j=0; j < donnees.obtenirCellules()[i].length; j++)
-                            donnees.obtenirCellules()[i][j].translate(dx, dy);
-                    }
-                    donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
-                }
+        // Si le joueur n'a pas gagné ou perdu, on rafraichit l'affichage
+        if (!donnees.obtenirVictoire() && !donnees.obtenirDefaite()) {
+            // Si le joueur vient de perdre, on affiche le panneau de défaite
+            if (donnees.obtenirJoueur().isDead()) {
+                donnees.majDefaite(true);
+                donnees.notifierObservateur(TypeMisAJour.Defaite);
                 donnees.notifierObservateur(TypeMisAJour.Peindre);
+            }
+            // Si le joueur vient de gagner, on affiche le panneau de victoire
+            else if (donnees.obtenirSymbolesDecouverts().get(TypeSymbole.BACTERIE) &&
+                donnees.obtenirSymbolesDecouverts().get(TypeSymbole.MINERAI) &&
+                donnees.obtenirJoueur().obtenirPExploration() >= 70) {
+                
+                donnees.majVictoire(true);
+                donnees.notifierObservateur(TypeMisAJour.Victoire);
+                donnees.notifierObservateur(TypeMisAJour.Peindre);
+
+            } else if (!donnees.obtenirEtatOptions()) {
+
+                // Si on est dans le jeu ou dans la carte de l'éditeur de carte (pas dans le menu)
+                // On maintient le clic
+                if (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && donnees.obtenirStatutSouris().obtenirX() < donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU)) {
+                    if (donnees.obtenirStatutSouris().obtenirClicGauche())
+                        click(donnees.obtenirStatutSouris().obtenirX(), donnees.obtenirStatutSouris().obtenirY(), false);
+                }
+                if (donnees.getScene().equals("Jeu")) { // Si on est en jeu
+
+                    /* Recharge au fur et à mesure
+                    Cellule caseJoueur = donnees.obtenirCellules()[donnees.obtenirJoueur().obtenirDerniereCase()[0]][donnees.obtenirJoueur().obtenirDerniereCase()[1]];
+                    if (caseJoueur.obtenirSymbole().type == TypeSymbole.ENERGIE && caseJoueur.obtenirSymbole().obtenirEstVisible()) {
+                        donnees.obtenirJoueur().maintenance(caseJoueur.obtenirSymbole().type);
+                        donnees.obtenirJoueur().actualiseVP();
+                    }
+                    */
+
+                    // Si on est en train d'afficher une notification au joueur
+                    // Et qu'il est temps de supprimer la notification:
+                    if (!donnees.obtenirInformerJoueur().equals("")
+                        && System.currentTimeMillis() - donnees.obteniChronometreNotification() > Options.DUREE_NOTIFICATION) {
+                        donnees.majInformerJoueur("");
+                        donnees.notifierObservateur(TypeMisAJour.InformerJoueur);
+                    }
+                    
+                    switch (donnees.obtenirEtatMiniJeuExtraction()) {
+                        case ON:
+                            break;
+                        case IN: // On fait varier la position du curseur entre 0 et 1
+                            
+                            if (donnees.obtenirSensVariationExtraction()) { //On déplace le curseur vers la droite
+                                donnees.majPositionCurseurExtraction(donnees.obtenirPositionCurseurExtraction() + Options.INCREMENT_CURSEUR);
+                                if (donnees.obtenirPositionCurseurExtraction() > 1) {
+                                    donnees.majPositionCurseurExtraction(1);
+                                    donnees.majSensVariationExtraction(false);
+                                    donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
+                                }
+                            } else { // On déplace le curseur vers la gauche
+                                donnees.majPositionCurseurExtraction(donnees.obtenirPositionCurseurExtraction() - Options.INCREMENT_CURSEUR);
+                                if (donnees.obtenirPositionCurseurExtraction() < 0) {
+                                    donnees.majPositionCurseurExtraction(0);
+                                    donnees.majSensVariationExtraction(true);
+                                    donnees.notifierObservateur(TypeMisAJour.SensVariationExtraction);
+                                }
+                            }
+                            donnees.notifierObservateur(TypeMisAJour.PositionCurseurExtraction);
+                            break;
+                        case OUT: // Si on est en train d'afficher le score
+                            if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) { // Si on doit fermer la fenêtre du minijeu
+                                donnees.majEtatMinijeuExtraction(Etat.OFF);
+                                donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
+                                desactiverCompetence();
+                            }
+                            break;
+                        case OFF:
+                            break;
+                    }
+
+                    switch (donnees.obtenirEtatMiniJeuLaser()) {
+                        case ON:
+                            
+                            // Si il est temps de démarrer le mini-jeu
+                            if (System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser() > donnees.obtenirTempsAvantChrono()) {
+                                donnees.majEtatMinijeuLaser(Etat.IN);
+                                donnees.majRepereMinijeuLaser(System.currentTimeMillis()); // On met à jour le repère de temps
+                                donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+                            }
+                            // On met à jour l'affichage du temps
+                            donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0000").format((System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser()) / 1000.) + " secondes");
+                            donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+                            break;
+                        case IN:
+                            // On arrondie le temps (en seconde) au millième
+                            donnees.majChronometreMinijeuLaser(new DecimalFormat("0.0000").format((System.currentTimeMillis() - donnees.obtenirRepereMinijeuLaser()) / 1000.) + " secondes");
+                            donnees.notifierObservateur(TypeMisAJour.ChronometreLaser);
+                            break;
+                        case OUT:
+                            if (System.currentTimeMillis() - donnees.obtenirChronometreSuppresion() > Options.TEMPS_AVANT_SUPPRESSION_MINIJEU) {
+                                donnees.majEtatMinijeuLaser(Etat.OFF);
+                                donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+                                desactiverCompetence();
+                            }
+                            break;
+                        case OFF:
+                            break;
+                    }
+                    donnees.obtenirJoueur().move();
+
+                    // Si on a changé de case
+                    if (donnees.obtenirJoueur().obtenirCasePrecedente()[0] != donnees.obtenirJoueur().obtenirCase()[0] || donnees.obtenirJoueur().obtenirCasePrecedente()[1] != donnees.obtenirJoueur().obtenirCase()[1]) {
+                        effetCase(donnees.obtenirJoueur().obtenirDerniereCase());
+                        Cellule[] voisins = Voisins.obtenirVoisins(donnees.obtenirCellules(), donnees.obtenirJoueur().obtenirDerniereCase()[0], donnees.obtenirJoueur().obtenirDerniereCase()[1], Options.RAYON_DECOUVERTE);
+                        for (int i=0; i < voisins.length; i++) {
+                            if (!voisins[i].estDecouverte())
+                                voisins[i].majEstDecouverte(true);
+                                donnees.obtenirJoueur().majCasesExplorees();
+                        }
+                    }
+                        
+
+                    donnees.obtenirJoueur().rafraichirImage();
+                    int dx = -donnees.obtenirJoueur().getDx();
+                    int dy = -donnees.obtenirJoueur().getDy();
+                    if (dx != 0 || dy != 0) {
+                        donnees.obtenirArrierePlan().translate(dx, dy);
+                        for (int i=0; i < donnees.obtenirCellules().length; i++) {
+                            for (int j=0; j < donnees.obtenirCellules()[i].length; j++)
+                                donnees.obtenirCellules()[i][j].translate(dx, dy);
+                        }
+                        donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
+                    }
+                    donnees.notifierObservateur(TypeMisAJour.Peindre);
+                }
             }
         }
 	}
@@ -296,7 +314,13 @@ public class Controleur {
         // Chargement des cartes
         try {
             Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
-            donnees.majCartes(ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES));
+            HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES);
+            HashMap<String, List<String[]>> cartesEnCache = new HashMap<String, List<String[]>>();
+
+            for (Map.Entry<String, InputStream> paire: cartes.entrySet())
+                cartesEnCache.put(paire.getKey(), CSV.cacheInputStream(paire.getValue()));
+            
+            donnees.majCartes(cartesEnCache);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
@@ -811,7 +835,7 @@ public class Controleur {
         }
     }
 
-    public void editer(String nomCarte, InputStream carte) {
+    public void editer(String nomCarte, List<String[]> carte) {
 
         donnees.majNomCarte(nomCarte);
         final int LARGEUR_MENU = (int)(donnees.obtenirLargeur()/Options.RATIO_LARGEUR_MENU);
@@ -1091,8 +1115,7 @@ public class Controleur {
 		}
 		
         try {
-            //System.out.println("Enregistrement de "+donnees.obtenirNomCarte()+".csv");
-            InputStream inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart());
+            List<String[]> inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart());
             // On charge la carte enregistrée
             donnees.obtenirCartes().put(donnees.obtenirNomCarte(), inputStream);
         } catch (IOException e) {
@@ -1104,6 +1127,8 @@ public class Controleur {
         donnees.majScene("Choix du mode");
         donnees.notifierObservateur(TypeMisAJour.Scene);
         donnees.majCelluleDepart(null);
+        donnees.majVictoire(false);
+        donnees.majDefaite(false);
     }
 
     public void majPositionCurseurExtraction(double positionCurseurExtraction) {
@@ -1121,15 +1146,15 @@ public class Controleur {
 
     // Gestion des cartes
 
-    public void cloner(String nouveauNom, InputStream carte) throws IOException {
+    public void cloner(String nouveauNom, List<String[]> carte) throws IOException {
         String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
         nouveauNom = Formes.stripAccents(nouveauNom);
         File file = new File(dossier+"/"+nouveauNom+".csv");
         if (file.exists())
             throw new java.io.IOException("Ce nom est déjà utilisé !");
         else {
-            InputStream inputStream = CSV.ecrireFichierDepuisFlux(nouveauNom, carte);
-            donnees.obtenirCartes().put(nouveauNom, inputStream);
+            CSV.ecrireFichierDepuisCache(nouveauNom, carte, false);
+            donnees.obtenirCartes().put(nouveauNom, carte);
             donnees.notifierObservateur(TypeMisAJour.Cartes);
         }
     }
@@ -1153,35 +1178,30 @@ public class Controleur {
             * Or ici on a des fichiers générés dynamiquement
             * On modifie donc directement la liste de cartes
             */
-            InputStream inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null);
-            donnees.obtenirCartes().put(nom, inputStream);
+            List<String[]> csv = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null);
+            donnees.obtenirCartes().put(nom, csv);
             donnees.notifierObservateur(TypeMisAJour.Cartes);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     
-    public void renommer(String ancienNom, String nouveauNom, InputStream carte) throws IOException {
+    public void renommer(String ancienNom, String nouveauNom, List<String[]> carte) throws IOException {
         String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
         nouveauNom = Formes.stripAccents(nouveauNom);
         File file = new File(dossier+"/"+nouveauNom+".csv");
         if (file.exists())
             throw new java.io.IOException("Ce nom est déjà utilisé !");
 
-        carte.close(); // On ferme le flux de données pour pouvoir éditer le fichier
-
         Path source = Paths.get(dossier+"/"+ancienNom+".csv");
         Files.move(source, source.resolveSibling(nouveauNom+".csv"));
 
-        InputStream inputStream = new FileInputStream(file);
-        donnees.obtenirCartes().put(nouveauNom, inputStream);
+        donnees.obtenirCartes().put(nouveauNom, carte);
         donnees.obtenirCartes().remove(ancienNom);
         donnees.notifierObservateur(TypeMisAJour.Cartes);
     }
 
-    public void supprimer(String nom, InputStream carte) throws IOException {
-
-        carte.close(); // On ferme le flux de données pour pouvoir éditer le fichier
+    public void supprimer(String nom, List<String[]> carte) throws IOException {
 
         String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom+".csv", "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
         File fichier = new File(chemin);

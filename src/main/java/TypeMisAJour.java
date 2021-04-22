@@ -16,6 +16,8 @@ public enum TypeMisAJour {
     Joueur,
     Competences,
     RayonDeSelection,
+    Defaite,
+    Victoire,
 
     // Editeur de carte
     BoutonsType,

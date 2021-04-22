@@ -301,7 +301,7 @@ public class Robot extends Avatar {
                 break;
         }
     }
-    
+
     public boolean isDead(){
         boolean GAME_OVER = false;
         int nbVrouges;

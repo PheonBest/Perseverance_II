@@ -27,7 +27,7 @@ public class CSV {
 		return escapedData;
 	}
 	
-	public static InputStream givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart) throws IOException {
+	public static List<String[]> givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart) throws IOException {
 		List<String[]> data = dataLines (carteCellules);//carte
 		String [] robot;
 		if (joueur!= null) {
@@ -45,26 +45,17 @@ public class CSV {
 		}
 
 		data.add(robot);
-
-		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
-		String chemin = dossier+"/"+filename+".csv";
-
-		File dir = new File(dossier);
-		if (!dir.exists()) dir.mkdirs();
-
-		File csvOutputFile = new File(chemin);
-		if (!csvOutputFile.exists() || ecrireParDessus) {
-			csvOutputFile.createNewFile();
-			try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
-				data.stream().map(CSV::convertToCSV).forEach(pw::println);
-				pw.close();
-			}
-			if(!csvOutputFile.exists()){
-				System.out.println("Erreur: Le fichier de destination ne peut pas être créé");
-			}
-		}
-		return new FileInputStream(csvOutputFile);
+		CSV.ecrireFichierDepuisCache(filename, data, ecrireParDessus);
+		return data;
 	}
+
+	public static List<String[]> changeDataFormat(List<List<String>> data) {
+		List<String[]> resultat = new ArrayList<>();
+		for (List<String> s: data)
+			resultat.add(s.toArray(new String[0])); // équivalent à new String[list.size()], mais est plus rapide
+		return resultat;
+	}
+
 	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, Robot joueur) throws IOException {
 		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur, null);
 	}
@@ -80,28 +71,25 @@ public class CSV {
 		}
 		return cheminVersRoot+nom; // Si on est pas dans un fichier compressé, on retourne au niveau du root
 	}
-	public static InputStream ecrireFichierDepuisFlux(String filename, InputStream carte) {
+	public static void ecrireFichierDepuisCache(String filename, List<String[]> carte, boolean ecrireParDessus) {
 		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
 		String chemin = dossier+"/"+filename+".csv";
 		File dir = new File(dossier);
 		if (!dir.exists()) dir.mkdirs();
 		File csvOutputFile = new File(chemin);
-        try {
-            csvOutputFile.createNewFile();
-            //System.out.println("Ecriture de "+filename+".csv");
-            byte[] buffer = new byte[carte.available()];
-            carte.read(buffer);
-            OutputStream outStream = new FileOutputStream(csvOutputFile);
-            outStream.write(buffer);
-			outStream.close(); // On ferme le stream pour pouvoir éditer le fichier postérieurement
-			return new FileInputStream(csvOutputFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if(!csvOutputFile.exists())
-            System.out.println("Erreur: Le fichier de destination ne peut pas être créé");
-		return null;
+		if (!csvOutputFile.exists() || ecrireParDessus) {
+			try {
+				csvOutputFile.createNewFile();
+			
+				PrintWriter pw = new PrintWriter(csvOutputFile);
+				carte.stream().map(CSV::convertToCSV).forEach(pw::println);
+				pw.close();
+				if (!csvOutputFile.exists())
+					System.out.println("Erreur: Le fichier de destination ne peut pas être créé");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public static List<String[]> dataLines (Cellule[][]carte){ // convertit la carte
@@ -119,7 +107,7 @@ public class CSV {
 	
 	
 /////////////////////////////////////////////////////////////////////////////////////////////Méthodes de lecture du fichier CSV
-	public static Reception lecture(InputStream csv, int dx, int dy, HashMap<String, Image> images, ArrayList<ArrayList<Image>> imagesJoueur ){
+	public static List<String[]> cacheInputStream(InputStream csv) {
 		List<List<String>> records = new ArrayList<>();
 		try {
 			Scanner scanner = new Scanner(csv);
@@ -128,7 +116,11 @@ public class CSV {
 			}
 			scanner.close();
 		} catch(Exception e){e.printStackTrace();}
-		
+		return CSV.changeDataFormat(records);
+	}	
+
+	public static Reception lecture(List<String[]> records, int dx, int dy, HashMap<String, Image> images, ArrayList<ArrayList<Image>> imagesJoueur ){
+
 		Reception jeu = dataLines(records,images,imagesJoueur);
 		Cellule[][] cellules = jeu.getCellule();
 		for (int i=0; i < cellules.length; i++) {
@@ -151,7 +143,7 @@ public class CSV {
 		return values;
 	}
 
-	public static Reception dataLines (List<List<String>> liste, HashMap<String, Image> imagesSymboles, ArrayList<ArrayList<Image>> imagesJoueur){ //methode surchargée qui change la liste de listes en un tableau 2D
+	public static Reception dataLines (List<String[]> liste, HashMap<String, Image> imagesSymboles, ArrayList<ArrayList<Image>> imagesJoueur){ //methode surchargée qui change la liste de listes en un tableau 2D
 		//carte
 		Cellule[][] carte = new Cellule[liste.size()-1][];
 		TypeCase type = null;
@@ -159,9 +151,9 @@ public class CSV {
 		boolean estVisible = false;
 		boolean symboleVisible = false;
 		for(int i=0;i<liste.size()-1;i++){
-			Cellule[] cellules = new Cellule[liste.get(i).size()];
-			for(int j=0;j<liste.get(i).size();j++){
-				String [] ds = liste.get(i).get(j).split(";");
+			Cellule[] cellules = new Cellule[liste.get(i).length];
+			for(int j=0;j<liste.get(i).length;j++){
+				String [] ds = liste.get(i)[j].split(";");
 				symbole = null;
 				type = null;
 				for (TypeCase t : TypeCase.values()) {   //lecture du type cellule
@@ -189,10 +181,10 @@ public class CSV {
 		}
 		//robot
 		int l = liste.size()-1;
-		int [] joueur = new int[]{Integer.parseInt(liste.get(l).get(0)), Integer.parseInt(liste.get(l).get(1)), Integer.parseInt(liste.get(l).get(2)), Integer.parseInt(liste.get(l).get(3)),
-			Integer.parseInt(liste.get(l).get(4)), Integer.parseInt(liste.get(l).get(5)), Integer.parseInt(liste.get(l).get(6)), Integer.parseInt(liste.get(l).get(7)), Integer.parseInt(liste.get(l).get(8)), Integer.parseInt(liste.get(l).get(9)), Integer.parseInt(liste.get(l).get(10)),
-				Integer.parseInt(liste.get(l).get(11)), Integer.parseInt(liste.get(l).get(12)), Integer.parseInt(liste.get(l).get(13)), Integer.parseInt(liste.get(l).get(14)), Integer.parseInt(liste.get(l).get(15)), Integer.parseInt(liste.get(l).get(16)), Integer.parseInt(liste.get(l).get(17)),
-					Integer.parseInt(liste.get(l).get(18)), Integer.parseInt(liste.get(l).get(19)), Integer.parseInt(liste.get(l).get(20)), Integer.parseInt(liste.get(l).get(21))};
+		int [] joueur = new int[]{Integer.parseInt(liste.get(l)[0]), Integer.parseInt(liste.get(l)[1]), Integer.parseInt(liste.get(l)[2]), Integer.parseInt(liste.get(l)[3]),
+			Integer.parseInt(liste.get(l)[4]), Integer.parseInt(liste.get(l)[5]), Integer.parseInt(liste.get(l)[6]), Integer.parseInt(liste.get(l)[7]), Integer.parseInt(liste.get(l)[8]), Integer.parseInt(liste.get(l)[9]), Integer.parseInt(liste.get(l)[10]),
+				Integer.parseInt(liste.get(l)[11]), Integer.parseInt(liste.get(l)[12]), Integer.parseInt(liste.get(l)[13]), Integer.parseInt(liste.get(l)[14]), Integer.parseInt(liste.get(l)[15]), Integer.parseInt(liste.get(l)[16]), Integer.parseInt(liste.get(l)[17]),
+					Integer.parseInt(liste.get(l)[18]), Integer.parseInt(liste.get(l)[19]), Integer.parseInt(liste.get(l)[20]), Integer.parseInt(liste.get(l)[21])};
 		Reception jeu = new Reception (carte, joueur, imagesJoueur);
 		return jeu;
 	}
