@@ -49,6 +49,7 @@ public class Dessiner extends JPanel {
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
     private String informerJoueur = "";
+    private JButton quitter;
     private boolean victoire = false;
     private boolean defaite = false;
 
@@ -136,7 +137,11 @@ public class Dessiner extends JPanel {
             });
 			add(panneauPause);
 
-           
+            // bouton pour quitter le jeu
+            quitter= new JButton("QUITTER");
+            quitter.setBounds(735,60, 100, 50);
+            add(quitter);
+            //quitter.addActionListener(this);
         }
 
         largeurRectangle = (int) (largeurEcran/MINIJEU_EXTRACTION_LARGEUR_ECRAN);
