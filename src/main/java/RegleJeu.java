@@ -9,13 +9,11 @@ public class RegleJeu extends JFrame implements ActionListener {
 	
 		private int largeur;
 		private int hauteur;
-		private JPanel panneau1;
-		private JPanel panneau;
-		private JLabel regle;
+	
         private JScrollPane texteDeroulant;
         private JLabel texteRegle;
 		private JButton quitter;
-		private JLabel monImage;
+	
 		
 		public RegleJeu() {
 			
@@ -27,7 +25,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			
 			//panneau haut 
 			
-			panneau1= new JPanel();
+			JPanel panneau1= new JPanel();
 			panneau1.setLayout(null);
 			panneau1.setBounds(0,0,650,75);
 			panneau1.setBackground(new Color(175,175,175));
@@ -37,7 +35,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			
 			// texte règles du jeu
 			
-			regle= new JLabel("REGLES DU JEU");
+			JLabel regle= new JLabel("REGLES DU JEU");
 			regle.setFont(new Font("Serif", Font.BOLD, 30));
 			regle.setForeground(Color.BLACK);
 			regle.setBounds(175, 5, 300, 70);
@@ -46,7 +44,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			
 			//panneau bas
 			
-			panneau= new JPanel();
+			JPanel panneau= new JPanel();
 			panneau.setLayout(null);
 			panneau.setBounds(0,75,650,800);
 			panneau.setBackground(new Color(220,220,220));
@@ -96,15 +94,6 @@ public class RegleJeu extends JFrame implements ActionListener {
 			panneau.add(quitter);
 			quitter.addActionListener(this);
 			
-			// IMAGE ROVER
-			/*
-			monImage = new JLabel(new ImageIcon("./res/images/rover.png"));
-			monImage.setBounds(350,50,100,100);
-			panneau.add(monImage);
-			*/
-	
-			//monImage.setIcon(new ImageIcon(new ImageIcon("./res/images/rover.png").getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT)));
-			//panneau.add(monImage);
 			
 		
 		}
