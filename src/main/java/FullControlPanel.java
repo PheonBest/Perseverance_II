@@ -22,11 +22,11 @@ public class FullControlPanel extends JFrame implements ActionListener{
     
     // Panneaux principaux de la fenêtre
     private JPanel cg; // panneau principal de gauche
-    private AntiBugPanel cp; // panneau principal global
+    private AntiBugPanel cp; // panneau principal global, évite les bugs de clignotement
     
     // Partie de gauche - Panneaux de données
     private JLabel titre;
-    private int ecartY = 20; // écart entre les panneaux de gauche
+    private int ecartY = 20; // écart vertical entre les panneaux de gauche
     
     // Panneau de la batterie
     private JPanel panneauBat;
@@ -51,7 +51,7 @@ public class FullControlPanel extends JFrame implements ActionListener{
     // Partie de droite - Images
     private Image imageP;
     private Image imageR;
-    
+     
     //------------------------------------------------------------------ Constructeur
 
     public FullControlPanel(int x, int y, Robot r, Image imageP, Image imageR){
@@ -167,6 +167,7 @@ public class FullControlPanel extends JFrame implements ActionListener{
         cg.add(panneauVoyants);
         cg.add(stat);
         cp.add(cg);
+        
         this.add(cp);
         setVisible(true);
     }

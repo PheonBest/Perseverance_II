@@ -37,6 +37,7 @@ public class AntiBugPanel extends JPanel{
         
     }
     
+    // Dessine les composants dessinables de la fenêtre de contrôle sur le JPanel
     public void paint(Graphics g){
         super.paint(g);
         
@@ -82,6 +83,16 @@ public class AntiBugPanel extends JPanel{
         g.drawImage(imageP,lx/2 +10,7,this);
         g.drawImage(imageR,lx/2 -115, 100, this);
         
+        // Message de rèle
+        g.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 17));
+        g.setColor(Color.WHITE);
+        g.drawLine(lx/2 + 15, 70, lx - 30, 70);
+        g.drawString("  Surveillez bien l'état du robot :",lx/2 + 25, 100);
+        g.drawString("   si 2 voyants de mêmes types ou",lx/2 + 25, 120);
+        g.drawString("  si 2 voyants du panneau de contrôle",lx/2 + 25, 140);
+        g.drawString("virent au rouge, la partie est perdue !",lx/2 + 25, 160);
+        g.drawLine(lx/2 + 15, 190, lx - 30, 190);
+
         // Warnings robots;
         int xc;
         int yc;

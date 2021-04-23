@@ -24,8 +24,8 @@ public class Options {
     public static final int ALERTE_MAX = 2;
     public static final int USURE_MIN = 0;
     public static final int USURE_MAX = 100;
-    public static final double USURE_PAR_KM = 0.1;
-    public static final int USURE_PAR_UTILISATION = 30; // bras, capteurs
+    public static final double USURE_PAR_KM = 0.01;
+    public static final int USURE_PAR_UTILISATION = 10; // bras, capteurs
     public static final int CHANCE_DEGRADATION_JAMBES = 1; // en %
     public static final int CHANCE_DEGRADATION_AUTRES = 10; // en %
     public static final int PANNES_MAX = 2;

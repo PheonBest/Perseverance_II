@@ -20,7 +20,7 @@ public class Robot extends Avatar {
     private double kmTot;
     private double comptKm;
     private int nbCasesExplorees = 0;  
-    private int nbCasesTotales = 1;
+    private int nbCasesTotales = Options.HAUTEUR_CARTE*Option.LARGEUR_CARTE;
     private int[] derniereCase = null;
     //Compétences
     private boolean surChenilles = false;
@@ -160,14 +160,14 @@ public class Robot extends Avatar {
     public void majCasesExplorees(){
         if(this.nbCasesExplorees>=0 && this.nbCasesExplorees<nbCasesTotales)this.nbCasesExplorees += 1;
     }
-    public void majCasesExplorees(int nbCasesExplorees){
-        if(nbCasesExplorees>=0 && nbCasesExplorees<nbCasesTotales) this.nbCasesExplorees = nbCasesExplorees;
+    public void majCasesExplorees(int nbCasesExplorees2){
+        if(nbCasesExplorees2>=0 && nbCasesExplorees2<nbCasesTotales) this.nbCasesExplorees = nbCasesExplorees2;
     }
     public int obtenirPExploration(){
         return ((int)((((double)this.nbCasesExplorees)/((double)nbCasesTotales))*100));
     }
     public void majDimensionsCarte(int largeurCarte, int hauteurCarte) {
-        nbCasesTotales = largeurCarte*hauteurCarte;
+        this.nbCasesTotales = largeurCarte*hauteurCarte;
     }
     
     public int obtenirNombrePont() {

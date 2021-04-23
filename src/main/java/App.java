@@ -26,11 +26,12 @@ public class App
             public void run() {
                 Dimension tailleEcran = Toolkit.getDefaultToolkit().getScreenSize();
 
-                // Mode:  Partie de l'écran
+                // Mode 1 :  Partie de l'écran
+                
                 // int largeur = (int) (tailleEcran.getWidth() * 3 / 4);
                 // int hauteur = (int) (tailleEcran.getHeight() * 3 / 4);
 
-                // Mode: Fullscreen
+                // Mode 2 : Fullscreen
              
                 int largeur = (int) tailleEcran.getWidth();
                 int hauteur = (int) tailleEcran.getHeight();
