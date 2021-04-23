@@ -94,7 +94,7 @@ public class Donnees implements Observable {
         }
 
         try {
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "Campagne", this.obtenirJoueur(), this.obtenirSymbolesDecouverts());
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "Campagne", this.obtenirJoueur());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -460,10 +460,6 @@ public class Donnees implements Observable {
     public HashMap<TypeSymbole, Boolean> obtenirSymbolesDecouverts() {
         return symbolesDecouverts;
     }
-    
-    public void majSymbolesDecouverts(HashMap<TypeSymbole, Boolean> newSymbolesDecouverts){
-		this.symbolesDecouverts = newSymbolesDecouverts;
-	}
 
     public HashMap<String, List<String[]>> obtenirCartes() {
         return cartes;

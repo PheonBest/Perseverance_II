@@ -141,7 +141,6 @@ public class Controleur {
         Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, Donnees.imagesSymboles, donnees.getImagesJoueur());
         donnees.majCellules(jeu.getCellule());
         donnees.majJoueur(jeu.getJoueur());
-        donnees.majSymbolesDecouverts(jeu.getHashMap());
         placerJoueur(jeu.getJoueur().obtenirCase()[0], jeu.getJoueur().obtenirCase()[1]);
 
         //Compétences
@@ -1116,7 +1115,7 @@ public class Controleur {
 		}
 		
         try {
-            List<String[]> inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart(), donnees.obtenirSymbolesDecouverts());
+            List<String[]> inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart());
             // On charge la carte enregistrée
             donnees.obtenirCartes().put(donnees.obtenirNomCarte(), inputStream);
         } catch (IOException e) {
@@ -1179,7 +1178,7 @@ public class Controleur {
             * Or ici on a des fichiers générés dynamiquement
             * On modifie donc directement la liste de cartes
             */
-            List<String[]> csv = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null, donnees.obtenirSymbolesDecouverts());
+            List<String[]> csv = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null);
             donnees.obtenirCartes().put(nom, csv);
             donnees.notifierObservateur(TypeMisAJour.Cartes);
         } catch (IOException e) {
