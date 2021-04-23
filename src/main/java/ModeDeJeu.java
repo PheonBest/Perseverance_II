@@ -82,7 +82,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		presentation.add(titre);		
 		
 		JLabel titre2 = new JLabel();
-		titre2.setText(" Pour plus d'informations concernant les regles du jeu, n'hesitez pas a cliquer sur le bouton AIDE ");
+		titre2.setText(" Pour plus d'informations concernant les règles du jeu, n'hésitez pas à cliquer sur le bouton AIDE");
 		titre2.setFont(new Font("Serif", Font.BOLD+Font.ITALIC, 19));
         titre2.setForeground(Color.WHITE);
 		titre2.setBounds(0, hauteur/5, largeur, 70);
@@ -111,14 +111,14 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		supprimer.addActionListener(this);
 		
 		
-		creer = new JButton("CREER UNE CARTE");
+		creer = new JButton("CRÉER UNE CARTE");
 		creer.setBounds(3*largeur/5, 3*hauteur/5,250,70);
 		creer.setBackground(Color.GRAY);
 		creer.setForeground(Color.WHITE);
 		presentation.add(creer);
 		creer.addActionListener(this);
 		
-		editer = new JButton("Editer");
+		editer = new JButton("Éditer");
 		editer.setBounds(3*largeur/5, 3*hauteur/5+80,120,70);
 		editer.setBackground(Color.WHITE);
 		editer.setForeground(Color.gray);
@@ -147,7 +147,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		presentation.add(quitter);
 		quitter.addActionListener(this);
 		
-		JLabel selectionCarte= new JLabel("SELECTION DE LA CARTE");
+		JLabel selectionCarte= new JLabel("SÉLECTION DE LA CARTE");
 		selectionCarte.setBounds(0, hauteur/3, largeur, 60);
 		selectionCarte.setForeground(new Color(220,220,220));
 		selectionCarte.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,12));

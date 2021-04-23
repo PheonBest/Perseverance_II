@@ -9,6 +9,7 @@ public enum TypeMisAJour {
     Scene,
     Zoom,
     Cartes,
+    Reinitialisable,
     ArrierePlan,
     InformerJoueur,
 
@@ -18,6 +19,8 @@ public enum TypeMisAJour {
     RayonDeSelection,
     Defaite,
     Victoire,
+    Bacterie,
+    Minerai,
 
     // Editeur de carte
     BoutonsType,

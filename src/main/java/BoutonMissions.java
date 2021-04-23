@@ -32,19 +32,23 @@ public class BoutonMissions extends JPanel implements ActionListener {
 			panneauMission.setVisible(true);
 		}
     }
-    
-	public void majTaille(int largeur, int hauteur){
-		this.setSize(largeur,hauteur);
-		this.largeur=largeur;
-		this.hauteur=hauteur;
-	}
 
 	public JButton obtenirBouton() {
 		return mission;
 	}
-	/*
-	public void majJoueur(Robot joueur) {
-        this.joueur = joueur;
-    }*/
+
+  public JFrame obtenirFenetre() {
+    return panneauMission;
+  }
+	
+	public void majExploration(int pourcentage) {
+        panneauMission.majExploration(pourcentage);
+    }
+    public void majBacterie() {
+        panneauMission.majBacterie();
+    }
+    public void majMinerai() {
+		panneauMission.majMinerai();
+	}
 }
 

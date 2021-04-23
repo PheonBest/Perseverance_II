@@ -21,7 +21,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			this.setSize(635,600);
 			this.setLocation(largeur/2,hauteur/2);
 			this.setLayout(null);
-			this.setTitle("Regles du jeu");
+			this.setTitle("Règles du jeu");
 			
 			//panneau haut 
 			
@@ -35,7 +35,7 @@ public class RegleJeu extends JFrame implements ActionListener {
 			
 			// texte règles du jeu
 			
-			JLabel regle= new JLabel("REGLES DU JEU");
+			JLabel regle= new JLabel("RÈGLES DU JEU");
 			regle.setFont(new Font("Serif", Font.BOLD, 30));
 			regle.setForeground(Color.BLACK);
 			regle.setBounds(175, 5, 300, 70);
@@ -84,6 +84,7 @@ public class RegleJeu extends JFrame implements ActionListener {
             
             texteDeroulant = new JScrollPane(texteRegle);
             texteDeroulant.setBounds(10,10,600,400);
+			texteDeroulant.getVerticalScrollBar().setUnitIncrement(16); // On change la vitesse de déplacement vertical (vitesse de scroll)
 			panneau.add(texteDeroulant);
 			
 			//bouton quitter 

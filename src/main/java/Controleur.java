@@ -143,6 +143,9 @@ public class Controleur {
         donnees.obtenirJoueur().majCase(ligne, colonne);
     }
 	public void jouer(String nomCarte, List<String[]> carte) {
+        donnees.majReinitialisable(donnees.obtenirCartesParDefaut().containsKey(nomCarte)); // Carte réinitialisable ou non
+        donnees.notifierObservateur(TypeMisAJour.Reinitialisable);
+
         donnees.majNomCarte(nomCarte);
         Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, Donnees.imagesSymboles, donnees.getImagesJoueur());
         donnees.majCellules(jeu.getCellule());
@@ -183,7 +186,7 @@ public class Controleur {
         }
         if (donnees.obtenirJoueur().obtenirPExploration() >= 70) {
             donnees.majEtatExploration(true);
-            rafraichirVictoire();
+            rafraichirVictoire(false); // 'false' signifie qu'on joue pas de son si on a bien exploré plus de 70% de la carte
         }
 
         donnees.notifierObservateur(TypeMisAJour.Scene);
@@ -194,16 +197,20 @@ public class Controleur {
 	}
 
     private void rafraichirVictoire() {
+        rafraichirVictoire(true);
+    }
+    private void rafraichirVictoire(boolean effetAudio) {
         if (!donnees.obtenirVictoire()) {
             if ( donnees.obtenirSymbolesDecouverts().get(TypeSymbole.BACTERIE) && donnees.obtenirSymbolesDecouverts().get(TypeSymbole.MINERAI) && donnees.obtenirEtatExploration()) {
-                jouerEffet("win_game");
+                if (effetAudio)
+                    jouerEffet("win_game");
                 donnees.majVictoire(true);
                 donnees.majEtatMinijeuExtraction(Etat.OFF);
                 donnees.majEtatMinijeuLaser(Etat.OFF);
                 donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
                 donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
                 donnees.notifierObservateur(TypeMisAJour.Victoire);
-            } else {
+            } else if (effetAudio) {
                 jouerEffet("achievement");
             }
         }
@@ -530,6 +537,10 @@ public class Controleur {
                         if (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type == TypeSymbole.BACTERIE || donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type == TypeSymbole.MINERAI) {
                             if (!donnees.obtenirSymbolesDecouverts().get(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type)) {
                                 donnees.obtenirSymbolesDecouverts().put(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type, true); // On ajoute le symbole à la liste des symboles découverts
+                                if (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type == TypeSymbole.BACTERIE)
+                                    donnees.notifierObservateur(TypeMisAJour.Bacterie);
+                                else
+                                    donnees.notifierObservateur(TypeMisAJour.Minerai);
                                 rafraichirVictoire();
                             }
                         } else {
@@ -1140,6 +1151,14 @@ public class Controleur {
             donnees.majEffet(indexEffet);
         }
     }
+    public void pauseMusique() {
+        donnees.pauseMusique();
+        //donnees.boucleMusique();
+    }
+    public void musiquePrecedente() {
+        donnees.musiquePrecedente();
+        donnees.boucleMusique();
+    }
     public void musiqueSuivante() {
         donnees.musiqueSuivante();
         donnees.boucleMusique();
@@ -1213,6 +1232,18 @@ public class Controleur {
     }
 
     // Gestion des cartes
+
+    public boolean reinitialiser() {
+        if (donnees.obtenirCartesParDefaut().containsKey(donnees.obtenirNomCarte())) {
+            CSV.ecrireFichierDepuisCache(donnees.obtenirNomCarte(), donnees.obtenirCartesParDefaut().get(donnees.obtenirNomCarte()), true);
+            donnees.obtenirCartes().put(donnees.obtenirNomCarte(), donnees.obtenirCartesParDefaut().get(donnees.obtenirNomCarte()));
+            donnees.notifierObservateur(TypeMisAJour.Cartes);
+            jouerEffet("confirmation");
+            return true;
+        }
+        jouerEffet("error");
+        return false;
+    }
 
     public void cloner(String nouveauNom, List<String[]> carte) throws IOException {
         String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");

@@ -13,11 +13,13 @@ public class ControlPanel extends JPanel implements ActionListener{
     private Robot joueur;
     private JButton details;
     private FullControlPanel panneauComplet;
+    private Controleur controleur;
     private Image imageP;
     private Image imageR;
     
-    public ControlPanel(int x0, int y0){
+    public ControlPanel(Controleur controleur, int x0, int y0){
         super();
+        this.controleur = controleur;
         setLayout(null);
         setSize(lx,ly);
         setLocation(x0,y0);
@@ -84,7 +86,14 @@ public class ControlPanel extends JPanel implements ActionListener{
     }
     
     public void actionPerformed(ActionEvent e){
+        controleur.jouerEffet("maximize");
         panneauComplet = new FullControlPanel(getWidth()/2,getHeight()/2, joueur, imageP, imageR);
+        panneauComplet.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                controleur.jouerEffet("minimize");
+            }
+        });
     }
 
     public JButton obtenirBouton() {

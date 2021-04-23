@@ -20,6 +20,7 @@ public class Son {
     private String[] audioNames;
     private AudioInputStream[] audioStreams;
     private boolean concurrentClip = false; // Si "vrai": Crée un nouveau clip à chaque son joué. Si "faux": ré-utilise le même clip.
+    private boolean pause = false;
     private int volume;
     private ArrayList<Clip> clipList = new ArrayList<Clip>();
     private ArrayList<FloatControl> gainControlList = new ArrayList<FloatControl>();
@@ -65,6 +66,13 @@ public class Son {
         }
         if (index != audioNames.length)
             play(index);
+    }
+    public void playBackwards() throws IOException, LineUnavailableException {
+
+        index = index-1;
+        if (index < 0)
+            index = audioStreams.length-1;
+        play(index);
     }
     public void play() throws IOException, LineUnavailableException {
         index = (index+1)%audioStreams.length;
@@ -139,7 +147,15 @@ public class Son {
             clipList.get(clipList.size()-1).close();
         }
     }
+    public void pauseOrResume(){
+        if (pause) {
+            resume();
+            loop();
+        } else
+            pause();
+    }
     public void pause(){
+        pause = !pause;
         if (concurrentClip) {
             for (Clip c: clipList) {
                 // On met la son joué sur pause  
@@ -151,6 +167,7 @@ public class Son {
         }
     }
     public void resume(){
+        pause = !pause;
         if (concurrentClip) {
             int i = 0;
             for (Clip c: clipList) {

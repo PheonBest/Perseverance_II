@@ -15,6 +15,9 @@ public class Missions extends JFrame {
     private int ly = 600;
     private JPanel panneauTitre;
     private JLabel titre;
+    private JLabel labelBacterie;
+    private JLabel labelMinerai;
+    private JLabel labelExploration;
     //private Robot joueur;
     //------------------------------------------------------------------ Constructeur
 
@@ -23,6 +26,7 @@ public class Missions extends JFrame {
         super();
         //this.joueur = r;
         setLayout(null);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setLocation(x,y);
         setSize(lx+20,ly+40);
         setTitle("MISSIONS");
@@ -52,55 +56,78 @@ public class Missions extends JFrame {
 		panneauObjectif.setLayout(null);
 		panneauFond.add(panneauObjectif);
        
-        JLabel texteMission= new JLabel("  N'oubliez pas: l'arrivee des futurs colons depend de la reussite de vos missions!" );
+        JLabel texteMission= new JLabel("  N'oubliez pas: l'arrivée des futurs colons dépend de la réussite de vos missions!" );
         texteMission.setBounds(0,20,lx-20,20);
         texteMission.setFont(new Font("Courier",Font.BOLD,12));
         texteMission.setHorizontalAlignment(SwingConstants.CENTER);
         //texteMission.setVerticalAlignment(SwingConstants.CENTER);
         panneauObjectif.add(texteMission);
         
-        JPanel mission1= new JPanel();
-        mission1.setBounds(10,155,lx-20,200);
-		mission1.setBackground(new Color(220,220,220));
-        mission1.setLayout(null);
-        panneauFond.add(mission1);
+        final int BORDURE = 10;
+        final int LARGEUR_PANNEAU = (int)((lx-BORDURE)/2-BORDURE); //Largeur = lx/2 -largeurGauche - largeurDroite
+        JPanel missionBacterie= new JPanel();
+        missionBacterie.setBounds(BORDURE,155,LARGEUR_PANNEAU,200);
+		missionBacterie.setBackground(new Color(220,220,220));
+        missionBacterie.setLayout(null);
+        panneauFond.add(missionBacterie);
+
+        JPanel missionMinerai= new JPanel();
+        missionMinerai.setBounds((int)((lx+BORDURE)/2),155,LARGEUR_PANNEAU,200);
+		missionMinerai.setBackground(new Color(220,220,220));
+        missionMinerai.setLayout(null);
+        panneauFond.add(missionMinerai);
         
-        JPanel mission2= new JPanel();
-        mission2.setBounds(10,355+10,lx-20,200);
-		mission2.setBackground(new Color(220,220,220));
-        mission2.setLayout(null);
-        panneauFond.add(mission2);
+        JPanel missionExploration= new JPanel();
+        missionExploration.setBounds(10,155+200+BORDURE,lx-2*BORDURE,200);
+		missionExploration.setBackground(new Color(220,220,220));
+        missionExploration.setLayout(null);
+        panneauFond.add(missionExploration);
        
-		JLabel premMission= new JLabel("MISSION 1: decouvrir les symboles suivants: minerais et bacteries");
-		premMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,15));
-		premMission.setBounds(5,5,lx,20);
-		mission1.add(premMission);
+		labelBacterie= new JLabel("<html><font color='red'>X</font> MISSION 1:<br>Découvrir une forme<br>de vie bactérienne :</html>");
+		labelBacterie.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,15));
+		labelBacterie.setBounds(5,10,lx,60);
+		missionBacterie.add(labelBacterie);
+
+        final Image IMAGE_BACTERIE = TailleImage.resizeImage(Donnees.imagesSymboles.get(TypeSymbole.BACTERIE.name()),100,100,true);
+		JLabel conteneurImageBacterie = new JLabel(new ImageIcon(IMAGE_BACTERIE));
+		conteneurImageBacterie.setBounds((LARGEUR_PANNEAU-100)/2,65,100,100);
+		missionBacterie.add(conteneurImageBacterie);
+
+        labelMinerai= new JLabel("<html><font color='red'>X</font> MISSION 2:<br>Découvrir un minerai :</html>");
+		labelMinerai.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,15));
+		labelMinerai.setBounds(5,10,lx,40);
+		missionMinerai.add(labelMinerai);
 		
-		final Image IMG = TailleImage.resizeImage(Donnees.imagesSymboles.get(TypeSymbole.MINERAI.name()),100,100,true);
-		JLabel monImage1 = new JLabel(new ImageIcon(IMG));
-		monImage1.setBounds(160,50,100,100);
-		mission1.add(monImage1);
-		
-		final Image IMG2 = TailleImage.resizeImage(Donnees.imagesSymboles.get(TypeSymbole.BACTERIE.name()),100,100,true);
-		JLabel monImage2 = new JLabel(new ImageIcon(IMG2));
-		monImage2.setBounds(370,50,100,100);
-		mission1.add(monImage2);
-		
-		
-		
-		JLabel deuMission= new JLabel("MISSION 2: parcourir au moins 70% de la carte ");
-		deuMission.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,15));
-		deuMission.setBounds(5,5,lx,20);
-		mission2.add(deuMission);
+		final Image IMAGE_MINERAI = TailleImage.resizeImage(Donnees.imagesSymboles.get(TypeSymbole.MINERAI.name()),100,100,true);
+		JLabel conteneurImageMinerai = new JLabel(new ImageIcon(IMAGE_MINERAI));
+		conteneurImageMinerai.setBounds((LARGEUR_PANNEAU-100)/2,65,100,100);
+		missionMinerai.add(conteneurImageMinerai);
+
+		labelExploration = new JLabel("<html><font color='red'>X</font> MISSION 3: parcourir au moins 70% de la carte<br>Exploration de la planète : <html><font style='font-weight: bold'>0 %</font></html>");
+		labelExploration.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,15));
+		labelExploration.setBounds(5,10,lx,40);
+		missionExploration.add(labelExploration);
 		/*
 		JLabel nbKmTot = new JLabel("Distance totale parcourue : "+(joueur.obtenirPExploration()+" km"));
         nbKmTot.setLayout(null);
         nbKmTot.setLocation(30,50);
         nbKmTot.setSize(400,30);
         nbKmTot.setFont(new Font("Courier", Font.BOLD + Font.ITALIC, 16));
-        mission2.add(nbKmTot);
+        missionExploration.add(nbKmTot);
         */
 	}
+    public void majExploration(int pourcentage) {
+        String color = "red";
+        if (pourcentage >= 70)
+            color = "green";
+        labelExploration.setText("<html><font color='"+color+"'>✔</font> MISSION 3: parcourir au moins 70% de la carte<br>Exploration de la planète : <html><font style='font-weight: bold'>"+pourcentage+" %</font></html>");
+    }
+    public void majBacterie() {
+        labelBacterie.setText("<html><font color='lime'>✔</font> MISSION 1:<br>Découvrir une forme<br>de vie bactérienne :</html>");
+    }
+    public void majMinerai() {
+        labelMinerai.setText("<html><font color='lime'>✔</font> MISSION 2:<br>Découvrir un minerai :</html>");
+    }
 	
 }
         

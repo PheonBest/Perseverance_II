@@ -22,7 +22,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class Affichage extends JFrame implements Observateur, ActionListener, KeyListener {
     private Controleur controleur;
@@ -185,13 +188,42 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                 controleur.interactionClavier(KeyEvent.VK_ESCAPE);
             }
         });
-        
         ((JButton)(panneauPause.obtenirComposants().get(PanneauPause.MENU))).addActionListener(new AbstractAction("Menu") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 controleur.interactionClavier(KeyEvent.VK_ESCAPE);
                 controleur.enregistrer();
                 controleur.retourMenu();
+            }
+        });
+        ((JSlider)(panneauPause.obtenirComposants().get(PanneauPause.VOLUME_MUSIQUE))).addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                int value = ((JSlider)panneauPause.obtenirComposants().get(PanneauPause.VOLUME_MUSIQUE)).getValue();
+                controleur.majVolumeMusique(value);
+            }
+        });
+        ((JSlider)(panneauPause.obtenirComposants().get(PanneauPause.VOLUME_EFFETS))).addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                int value = ((JSlider)panneauPause.obtenirComposants().get(PanneauPause.VOLUME_EFFETS)).getValue();
+                controleur.majVolumeEffets(value);
+            }
+        });
+        ((JButton)(panneauPause.obtenirComposants().get(PanneauPause.PRECEDENT))).addActionListener(new AbstractAction("Precedent") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controleur.musiquePrecedente();
+            }
+        });
+        ((JButton)(panneauPause.obtenirComposants().get(PanneauPause.SUIVANT))).addActionListener(new AbstractAction("Suivant") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controleur.musiqueSuivante();
+            }
+        });
+        ((JButton)(panneauPause.obtenirComposants().get(PanneauPause.PAUSE))).addActionListener(new AbstractAction("Pause") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controleur.pauseMusique();
             }
         });
     }
@@ -266,6 +298,9 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
             case Cartes:
                 ((ModeDeJeu) modeDeJeu).majCartes((HashMap<String, List<String[]>>) nouveau);
                 break;
+            case Reinitialisable:
+                ((Dessiner) jeu).majReinitialiser((boolean) nouveau);
+                break;
             case ArrierePlan:
                 if (scene.equals("Jeu"))
                     ((Dessiner)jeu).majArrierePlan((ArrierePlan) nouveau);
@@ -292,6 +327,12 @@ public class Affichage extends JFrame implements Observateur, ActionListener, Ke
                 break;
             case Defaite:
                 ((Dessiner)jeu).majDefaite((boolean) nouveau);
+                break;
+            case Bacterie:
+                ((Dessiner)jeu).majBacterie();
+                break;
+            case Minerai:
+                ((Dessiner)jeu).majMinerai();
                 break;
             
             // Editeur de carte

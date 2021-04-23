@@ -33,8 +33,7 @@ public class Dessiner extends JPanel {
     private List<BoutonCercle> competences = new LinkedList<BoutonCercle>();
     private boolean affichagePanneauDeControle;
     private String informerJoueur = "";
-    private boolean victoire = false;
-    private boolean defaite = false;
+    private boolean estParDefaut = false;
 
     // Minimap
     private int[] tailleMinimap = {100,100};
@@ -103,11 +102,26 @@ public class Dessiner extends JPanel {
         this.affichagePanneauDeControle = affichagePanneauDeControle;
         if (affichagePanneauDeControle) {
 
-            panneauDeControle = new ControlPanel(10,10);
+            panneauDeControle = new ControlPanel(controleur, 10,10);
             add(panneauDeControle);
 
             // Panneau Missions
             panneauMission = new BoutonMissions(625,10);
+            panneauMission.obtenirBouton().addActionListener(new AbstractAction("majExploration") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    panneauMission.majExploration(joueur.obtenirPExploration());
+                    controleur.jouerEffet("maximize");
+                }
+            });
+            panneauMission.obtenirFenetre().addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    panneauMission.obtenirFenetre().setVisible(false);
+                    controleur.jouerEffet("minimize");
+                }
+            });
+
             add(panneauMission);
 
             panneauPause = new JButton("PAUSE");
@@ -192,6 +206,7 @@ public class Dessiner extends JPanel {
         }
 
         if (affichagePanneauDeControle && joueur != null) {
+
             // Affichage du joueur
             joueur.dessiner(g2d);
 
@@ -394,6 +409,7 @@ public class Dessiner extends JPanel {
 
     public void majReinitialiser(boolean estParDefaut) {
         // Si la carte est par défaut, on peut la réinitialiser
+        this.estParDefaut = estParDefaut;
     }
 
     public void majCellules(Cellule[][] cellules) {
@@ -530,61 +546,96 @@ public class Dessiner extends JPanel {
         this.informerJoueur = informerJoueur;
     }
     public void majVictoire(boolean victoire) {
-        this.victoire = victoire;
-        System.out.println("victoire !");
         // Affichage du panneau de victoire
         
-        JPanel p = new JPanel();
-		p.setBounds (10,200,470,360);
-		p.setLayout(null);
-		p.setBackground(Color.orange);
+        JPanel panneauVictoire = new JPanel();
+        final int LARGEUR_PANNEAU = 470;
+        final int HAUTEUR_PANNEAU = 360;
+		panneauVictoire.setBounds ((int)(largeurEcran-LARGEUR_PANNEAU)/2,(int)(hauteurEcran-HAUTEUR_PANNEAU)/2, LARGEUR_PANNEAU, HAUTEUR_PANNEAU);
+		panneauVictoire.setLayout(null);
+		panneauVictoire.setBackground(Color.orange);
 		
-		JPanel p2 = new JPanel();
-		p2.setBounds (10,10,450,340);
-		p2.setLayout(null);
-		p2.setBackground(Color.yellow);
-		p.add(p2);
+		JPanel panneauInterne = new JPanel();
+		panneauInterne.setBounds (10,10,450,340);
+		panneauInterne.setLayout(null);
+		panneauInterne.setBackground(Color.yellow);
 		
-		JLabel Text = new JLabel();
-		Text.setText("<html><center> Vous avez validé toutes vos missions ! Des colons pourront bientôt<br>venir vivre sur cette planète!");
-		Text.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
-		Text.setLayout(null);
-		Text.setBounds (0,10,450,300);
-		Text.setHorizontalAlignment(SwingConstants.CENTER);
+		JLabel labelInformations = new JLabel("<html><center> Vous avez validé toutes vos missions ! Des colons pourront bientôt<br>venir vivre sur cette planète!");
+		labelInformations.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
+		labelInformations.setLayout(null);
+		labelInformations.setBounds (0,10,450,300);
+		labelInformations.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		JLabel Text2 = new JLabel();
-		Text2.setText("VOUS AVEZ GAGNE !");
-		Text2.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,26));
-		Text2.setBounds (0,30,450,30);
-		Text2.setHorizontalAlignment(SwingConstants.CENTER);
-		Text2.setForeground(Color.red);
-		Text2.setLayout(null);
+		JLabel labelVictoire = new JLabel("VOUS AVEZ GAGNÉ !");
+		labelVictoire.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,26));
+		labelVictoire.setBounds (0,30,450,30);
+		labelVictoire.setHorizontalAlignment(SwingConstants.CENTER);
+		labelVictoire.setForeground(Color.red);
+		labelVictoire.setLayout(null);
 		
 		// les trois boutons
 		
-		JButton menu= new JButton("MENU");
-		menu.setBounds(300,260,130,50);
+		JButton menu = new JButton("MENU");
 		menu.setBackground(Color.orange);
-		p2.add(menu);
+		panneauInterne.add(menu);
 		
-		JButton reinitialiser= new JButton("REINITIALISER");
-		reinitialiser.setBounds(20,260,130,50);
-		reinitialiser.setBackground(Color.orange);
-		p2.add(reinitialiser);
+		JButton reinitialiser;
 		
-		JButton continuer= new JButton("CONTINUER");
-		continuer.setBounds(160,260,130,50);
+		JButton continuer = new JButton("CONTINUER");
 		continuer.setBackground(Color.orange);
-		p2.add(continuer);
-		
-		p2.add(Text);
-		p2.add(Text2);
-		p.add(p2);
-		add(p);
+		panneauInterne.add(continuer);
+
+        if (estParDefaut) { // Si la carte peut être réinitialisée:
+            reinitialiser = new JButton("RÉINITIALISER");
+            reinitialiser.setBackground(Color.orange);
+            panneauInterne.add(reinitialiser);
+
+            reinitialiser.setBounds(20,260,130,50);
+            continuer.setBounds(160,260,130,50);
+            menu.setBounds(300,260,130,50);
+
+            reinitialiser.addActionListener(new AbstractAction("Reinitialiser") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (controleur.reinitialiser()) {
+                        panneauVictoire.setVisible(false);
+                        controleur.retourMenu();
+                    }
+                }
+            });
+        } else {
+            continuer.setBounds(90,260,130,50);
+            menu.setBounds(230,260,130,50);
+        }
+
+        menu.addActionListener(new AbstractAction("Menu") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panneauVictoire.setVisible(false);
+                controleur.enregistrer();
+                controleur.retourMenu();
+            }
+        });
+        continuer.addActionListener(new AbstractAction("Continuer") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panneauVictoire.setVisible(false);
+            }
+        });
+
+		panneauInterne.add(labelInformations);
+		panneauInterne.add(labelVictoire);
+
+		panneauVictoire.add(panneauInterne);
+		add(panneauVictoire);
     }
     public void majDefaite(boolean defaite) {
-        this.defaite = defaite;
-        System.out.println("Défaite !");
         // Affichage du panneau de défaite
+    }
+    public void majBacterie() {
+        panneauMission.majBacterie();
+    }
+    public void majMinerai() {
+        panneauMission.majMinerai();
     }
 }

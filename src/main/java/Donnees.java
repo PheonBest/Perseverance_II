@@ -48,6 +48,7 @@ public class Donnees implements Observable {
     // CSV des cartes && éditeur
     private HashMap<String, List<String[]>> cartes;
     private HashMap<String, List<String[]>> cartesParDefaut;
+    private boolean estParDefaut = false;
     private String nomCarte;
     private int[] celluleDepart = null;
 
@@ -158,6 +159,9 @@ public class Donnees implements Observable {
                 case Cartes:
                     obs.mettreAJour(TypeMisAJour.Cartes, cartes);
                     break;
+                case Reinitialisable:
+                    obs.mettreAJour(TypeMisAJour.Reinitialisable, estParDefaut);
+                    break;
                 case ArrierePlan:
                     obs.mettreAJour(TypeMisAJour.ArrierePlan, arrierePlan);
                     break;
@@ -180,6 +184,12 @@ public class Donnees implements Observable {
                     break;
                 case Defaite:
                     obs.mettreAJour(TypeMisAJour.Defaite, defaite);
+                    break;
+                case Bacterie:
+                    obs.mettreAJour(TypeMisAJour.Bacterie, null);
+                    break;
+                case Minerai:
+                    obs.mettreAJour(TypeMisAJour.Minerai, null);
                     break;
 
                 // Editeur de carte
@@ -410,6 +420,16 @@ public class Donnees implements Observable {
         }
     }
 
+    public void pauseMusique() {
+        lecteurMusique.pauseOrResume();
+    }
+    public void musiquePrecedente() {
+        try {
+            lecteurMusique.playBackwards();
+        } catch (IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
+    }
     public void musiqueSuivante() {
         try {
             lecteurMusique.play();
@@ -453,6 +473,9 @@ public class Donnees implements Observable {
 
     public HashMap<String, List<String[]>> obtenirCartes() {
         return cartes;
+    }
+    public HashMap<String, List<String[]>> obtenirCartesParDefaut() {
+        return cartesParDefaut;
     }
 
     public void majCompetences(List<BoutonCercle> competences) {
@@ -614,5 +637,9 @@ public class Donnees implements Observable {
 
     public void majCartesParDefaut(HashMap<String, List<String[]>> cartesParDefaut) {
         this.cartesParDefaut = cartesParDefaut;
+    }
+
+    public void majReinitialisable(boolean estParDefaut) {
+        this.estParDefaut = estParDefaut;
     }
 }

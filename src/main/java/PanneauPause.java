@@ -15,11 +15,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class PanneauPause extends JDialog implements ActionListener {
+public class PanneauPause extends JDialog {
 
 	public static final int RETOUR = 0;
-	public static final int VOLUME = 1;
-	public static final int VOLUME2 = 2;
+	public static final int VOLUME_MUSIQUE = 1;
+	public static final int VOLUME_EFFETS = 2;
 	public static final int MENU = 3;
 	public static final int PAUSE = 4;
 	public static final int SUIVANT = 5;
@@ -37,13 +37,14 @@ public class PanneauPause extends JDialog implements ActionListener {
 	private JButton suivant;
 	private JButton precedent;
 	private JSlider volume;
-	private JSlider volume2;
+	private JSlider volumeEffet;
 	private JPanel panneauBas;
 	private JLabel son;
 	private JLabel titreSon;
 	private JLabel titreEffet;
 	private int largeur;
 	private int hauteur;
+	private final Color COULEUR_BOUTONS = new Color(255,174,33);
 	
 	public PanneauPause(int largeur, int hauteur) {
 		super();
@@ -75,18 +76,16 @@ public class PanneauPause extends JDialog implements ActionListener {
 		retour = new JButton("RETOUR");
         retour.setLocation(lx-140,ly-60);
         retour.setSize(120,50);
-        retour.setBackground(new Color(255,140,0));
+        retour.setBackground(COULEUR_BOUTONS);
         retour.setFont(new Font("Courier",Font.ITALIC+Font.BOLD,16));
-        retour.addActionListener(this);
         rouge.add(retour);
         //menu principal
         menu= new JButton("MENU ");
         menu.setLocation(lx-140,ly-160);
         menu.setSize(120,90);
-        menu.setBackground(new Color(255,140,0));
+        menu.setBackground(COULEUR_BOUTONS);
         menu.setFont(new Font("Courier",Font.ITALIC+Font.BOLD,16));
         menu.setVisible(true);
-        //menu.addActionListener(this);
         rouge.add(menu);
       
         
@@ -94,7 +93,7 @@ public class PanneauPause extends JDialog implements ActionListener {
 		panneauBas= new JPanel();
         panneauBas.setLayout(null);
 		panneauBas.setBounds(10,ly-160,150,150);
-		panneauBas.setBackground(new Color(255,140,0));
+		panneauBas.setBackground(COULEUR_BOUTONS);
 		panneauBas.setVisible(true);
 		rouge.add(panneauBas);
 		
@@ -113,8 +112,9 @@ public class PanneauPause extends JDialog implements ActionListener {
 		panneauBas.add(titreSon);
 		
 		volume= new JSlider();
+		volume.setValue(Options.MUSIQUE_VOLUME_INIT);
         volume.setBounds(25,55,100,20);
-        volume.setBackground(new Color(255,140,0));
+        volume.setBackground(COULEUR_BOUTONS);
         panneauBas.add(volume);
         
 		titreEffet= new JLabel("volume effets");
@@ -123,15 +123,16 @@ public class PanneauPause extends JDialog implements ActionListener {
 		titreEffet.setBackground(Color.BLACK);
 		panneauBas.add(titreEffet);
 		
-		volume2= new JSlider();
-        volume2.setBounds(25,100,100,20);
-        volume2.setBackground(new Color(255,140,0));
-        panneauBas.add(volume2);
+		volumeEffet= new JSlider();
+		volumeEffet.setValue(Options.EFFETS_VOLUME_INIT);
+        volumeEffet.setBounds(25,100,100,20);
+        volumeEffet.setBackground(COULEUR_BOUTONS);
+        panneauBas.add(volumeEffet);
         
         JPanel panneauDroite= new JPanel();
         panneauDroite.setLayout(null);
 		panneauDroite.setBounds(10+150+10,ly-160,280,150);
-		panneauDroite.setBackground(new Color(255,140,0));
+		panneauDroite.setBackground(COULEUR_BOUTONS);
 		panneauDroite.setVisible(true);
 		rouge.add(panneauDroite);
 		
@@ -156,7 +157,6 @@ public class PanneauPause extends JDialog implements ActionListener {
 		}
 		pause.setBounds(110,45,60,60);
 		panneauDroite.add(pause);
-		pause.addActionListener(this);
 		
 		
         suivant= new JButton();
@@ -169,7 +169,6 @@ public class PanneauPause extends JDialog implements ActionListener {
 		}
 		suivant.setBounds(180,45,60,60);
 		panneauDroite.add(suivant);
-		suivant.addActionListener(this);
 		
         precedent=new JButton();
          try {
@@ -194,26 +193,13 @@ public class PanneauPause extends JDialog implements ActionListener {
         });
     }
 
-	public void actionPerformed(ActionEvent e){
-		if(e.getSource()==retour){
-			this.setVisible(false);
-			/*
-		}else if(e.getSource()==suivant){
-			musiqueSuivante();
-		}else if(e.getSource()==pause){
-		*/
-		}
-		
-		
-    }
-
 	public LinkedList<JComponent> obtenirComposants() {
 		// Retourne la liste des composants
 		// Auquel on doit ajouter un keylistener
 		LinkedList<JComponent> composants = new LinkedList<JComponent>();
 		composants.add(retour);
 		composants.add(volume);
-		composants.add(volume2);
+		composants.add(volumeEffet);
 		composants.add(menu);
 		composants.add(pause);
 		composants.add(suivant);
