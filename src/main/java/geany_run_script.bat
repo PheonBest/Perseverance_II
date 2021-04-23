@@ -1,4 +1,4 @@
-java "PanneauPause"
+java "App"
 
 pause
 del "%0"
