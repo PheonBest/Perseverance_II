@@ -20,7 +20,7 @@ public class Robot extends Avatar {
     private double kmTot;
     private double comptKm;
     private int nbCasesExplorees = 0;  
-    private int nbCasesTotales = Options.HAUTEUR_CARTE*Option.LARGEUR_CARTE;
+    private int nbCasesTotales = Options.HAUTEUR_CARTE*Options.LARGEUR_CARTE;
     private int[] derniereCase = null;
     //Compétences
     private boolean surChenilles = false;
