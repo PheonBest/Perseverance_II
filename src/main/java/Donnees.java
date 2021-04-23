@@ -47,6 +47,7 @@ public class Donnees implements Observable {
     
     // CSV des cartes && éditeur
     private HashMap<String, List<String[]>> cartes;
+    private HashMap<String, List<String[]>> cartesParDefaut;
     private String nomCarte;
     private int[] celluleDepart = null;
 
@@ -83,20 +84,6 @@ public class Donnees implements Observable {
         // Initialisation de la hashmap des symboles découverts
         for (TypeSymbole type: TypeSymbole.values())
             symbolesDecouverts.put(type, false);
-            
-        // Création d'une carte par défaut si elle n'existe pas déjà
-
-        cellules = new Cellule[Options.LARGEUR_CARTE][Options.HAUTEUR_CARTE];
-        for (int i=0; i < cellules.length; i++) {
-            for (int j=0; j < cellules[i].length; j++)
-                cellules[i][j] = new Cellule(i,j);
-        }
-
-        try {
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "Campagne", this.obtenirJoueur(), this.obtenirSymbolesDecouverts());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     // Getters et setters
@@ -623,5 +610,9 @@ public class Donnees implements Observable {
     }
     public void majEtatExploration(boolean etatExploration) {
         this.etatExploration = etatExploration;
+    }
+
+    public void majCartesParDefaut(HashMap<String, List<String[]>> cartesParDefaut) {
+        this.cartesParDefaut = cartesParDefaut;
     }
 }

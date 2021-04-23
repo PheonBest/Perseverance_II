@@ -181,8 +181,10 @@ public class Controleur {
                 donnees.obtenirJoueur().majCasesExplorees();
             }
         }
-        if (donnees.obtenirJoueur().obtenirPExploration() >= 70)
+        if (donnees.obtenirJoueur().obtenirPExploration() >= 70) {
             donnees.majEtatExploration(true);
+            rafraichirVictoire();
+        }
 
         donnees.notifierObservateur(TypeMisAJour.Scene);
         donnees.notifierObservateur(TypeMisAJour.Joueur);   // On transmet une unique fois la référence à l'objet Joueur (la valeur de l'objet joueur est un pointeur)
@@ -191,32 +193,37 @@ public class Controleur {
         donnees.notifierObservateur(TypeMisAJour.ArrierePlan);
 	}
 
-    private boolean hasWon() {
-        return donnees.obtenirSymbolesDecouverts().get(TypeSymbole.BACTERIE) && donnees.obtenirSymbolesDecouverts().get(TypeSymbole.MINERAI) && donnees.obtenirEtatExploration();
+    private void rafraichirVictoire() {
+        if (!donnees.obtenirVictoire()) {
+            if ( donnees.obtenirSymbolesDecouverts().get(TypeSymbole.BACTERIE) && donnees.obtenirSymbolesDecouverts().get(TypeSymbole.MINERAI) && donnees.obtenirEtatExploration()) {
+                jouerEffet("win_game");
+                donnees.majVictoire(true);
+                donnees.majEtatMinijeuExtraction(Etat.OFF);
+                donnees.majEtatMinijeuLaser(Etat.OFF);
+                donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
+                donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+                donnees.notifierObservateur(TypeMisAJour.Victoire);
+            } else {
+                jouerEffet("achievement");
+            }
+        }
     }
 
 	public void rafraichir() {
-        
-        if (donnees.getScene().equals("Jeu")) {
-            // Si le joueur n'a pas gagné ou perdu, on rafraichit l'affichage
-            if (!donnees.obtenirVictoire() && !donnees.obtenirDefaite()) {
-                // Si le joueur vient de perdre, on affiche le panneau de défaite
-                if (donnees.obtenirJoueur().isDead()) {
-                    jouerEffet("loose_game");
-                    donnees.majDefaite(true);
-                    donnees.notifierObservateur(TypeMisAJour.Defaite);
-                    donnees.notifierObservateur(TypeMisAJour.Peindre);
-                }
-                // Si le joueur vient de gagner, on affiche le panneau de victoire
-                else if (hasWon()) {
-                    jouerEffet("win_game");
-                    donnees.majVictoire(true);
-                    donnees.notifierObservateur(TypeMisAJour.Victoire);
-                    donnees.notifierObservateur(TypeMisAJour.Peindre);
-                }
+        // Si le joueur vient de perdre, on affiche le panneau de défaite
+        if (donnees.getScene().equals("Jeu") && !donnees.obtenirDefaite()) {
+            if (donnees.obtenirJoueur().isDead()) {
+                jouerEffet("loose_game");
+                donnees.majDefaite(true);
+                donnees.majEtatMinijeuExtraction(Etat.OFF);
+                donnees.majEtatMinijeuLaser(Etat.OFF);
+                donnees.notifierObservateur(TypeMisAJour.MinijeuExtraction);
+                donnees.notifierObservateur(TypeMisAJour.MinijeuLaser);
+                donnees.notifierObservateur(TypeMisAJour.Defaite);
+                donnees.notifierObservateur(TypeMisAJour.Peindre);
             }
         }
-        if (!donnees.obtenirEtatOptions() && !donnees.obtenirVictoire() && !donnees.obtenirDefaite()) {
+        if (!donnees.obtenirEtatOptions() && !donnees.obtenirDefaite()) {
             // Si on est dans le jeu ou dans la carte de l'éditeur de carte (pas dans le menu)
             // On maintient le clic
             if (donnees.getScene().equals("Jeu") || (donnees.getScene().equals("Editeur de carte") && donnees.obtenirStatutSouris().obtenirX() < donnees.obtenirLargeur()*(Options.RATIO_LARGEUR_MENU-1)/Options.RATIO_LARGEUR_MENU)) {
@@ -311,13 +318,14 @@ public class Controleur {
                     effetCase(donnees.obtenirJoueur().obtenirDerniereCase());
                     Cellule[] voisins = Voisins.obtenirVoisins(donnees.obtenirCellules(), donnees.obtenirJoueur().obtenirDerniereCase()[0], donnees.obtenirJoueur().obtenirDerniereCase()[1], Options.RAYON_DECOUVERTE);
                     for (int i=0; i < voisins.length; i++) {
-                        if (!voisins[i].estDecouverte())
+                        if (!voisins[i].estDecouverte()) {
                             voisins[i].majEstDecouverte(true);
                             donnees.obtenirJoueur().majCasesExplorees();
-                            if (!donnees.obtenirEtatExploration() && donnees.obtenirJoueur().obtenirPExploration() >= 70 && !hasWon()) {
-                                donnees.majEtatExploration(true);
-                                jouerEffet("achievement");
-                            }
+                        }
+                    }
+                    if (!donnees.obtenirEtatExploration() && donnees.obtenirJoueur().obtenirPExploration() >= 70) {
+                        donnees.majEtatExploration(true);
+                        rafraichirVictoire();
                     }
                 }
                     
@@ -341,8 +349,8 @@ public class Controleur {
     public void charger() {
 
         // Chargement des cartes
+        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
         try {
-            Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
             HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES);
             HashMap<String, List<String[]>> cartesEnCache = new HashMap<String, List<String[]>>();
 
@@ -354,8 +362,25 @@ public class Controleur {
             e.printStackTrace();
         }
 
+        // Ajout éventuel des cartes par défaut
+        pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES_PAR_DEFAUT+"\\b.*\\.(?:csv)");
+        try {
+            HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_CARTES_PAR_DEFAUT+"/");
+            HashMap<String, List<String[]>> cartesEnCache = new HashMap<String, List<String[]>>();
+            for (Map.Entry<String, InputStream> paire: cartes.entrySet()) {
+                if (!donnees.obtenirCartes().containsKey(paire.getKey())) {
+                    donnees.obtenirCartes().put(paire.getKey(), CSV.cacheInputStream(paire.getValue()));
+                    CSV.ecrireFichierDepuisCache(paire.getKey(), donnees.obtenirCartes().get(paire.getKey()), false);
+                    cartesEnCache.put(paire.getKey(), donnees.obtenirCartes().get(paire.getKey()));
+                }
+                donnees.majCartesParDefaut(cartesEnCache);
+            }
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+        }
+
         // Chargement des images et de l'arrière plan
-        Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_IMAGES+"\\b.*\\.(?:jpg|gif|png)");
+        pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_IMAGES+"\\b.*\\.(?:jpg|gif|png)");
         try {
             HashMap<String, Image> images = ObtenirRessources.getImagesAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_IMAGES+"/");
             donnees.majArrierePlan(new ArrierePlan(images.get("surface_texture")));
@@ -483,7 +508,7 @@ public class Controleur {
     }
 
     public void click(int x, int y, boolean estDansMenu) {
-        if (!donnees.obtenirEtatOptions() && !donnees.obtenirVictoire() && !donnees.obtenirDefaite()) { // Si on est pas en pause et que le jeu n'est pas terminé
+        if (!donnees.obtenirEtatOptions() && !donnees.obtenirDefaite()) { // Si on est pas en pause et que le jeu n'est pas terminé
             boolean estModifie = false;
 
             if (!aucunJeuEnCours()) {
@@ -501,37 +526,34 @@ public class Controleur {
                         jouerEffet("loose");
                     } else {
                         resultat = "Réussite ! "+resultat;
-                        donnees.obtenirSymbolesDecouverts().put(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type, true); // On ajoute le symbole à la liste des symboles découverts
                         jouerEffet("break");
-                        switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
-                            case PONT: // Si on extrait 1 pont, c'est comme si on extrayait du bois
-                            case BOIS:
-                                // On a extrait 1 de bois, donc on peut construire 1 pont
-                                int i = 0;
-                                while (i < donnees.obtenirCompetences().size() && !donnees.obtenirCompetences().get(i).obtenirEffet().equals("Pont")) {
-                                    i++;
-                                }
-                                if (i < donnees.obtenirCompetences().size())
-                                    donnees.obtenirCompetences().get(i).majDisponible(true);
-                                donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()+1);
-                                jouerEffet("win");
-                                break;
-                            case CHENILLES:
-                                donnees.obtenirJoueur().majSurChenilles(true);
-                                jouerEffet("win");
-                                break;
-                            case BACTERIE:
-                            case MINERAI:
-                                if (!donnees.obtenirSymbolesDecouverts().get(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) && !hasWon())
-                                    jouerEffet("achievement");
-                                else
-                                    jouerEffet("win");
-                                break;
-                            default:
-                                jouerEffet("win");
-                                break;
+                        if (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type == TypeSymbole.BACTERIE || donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type == TypeSymbole.MINERAI) {
+                            if (!donnees.obtenirSymbolesDecouverts().get(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type)) {
+                                donnees.obtenirSymbolesDecouverts().put(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type, true); // On ajoute le symbole à la liste des symboles découverts
+                                rafraichirVictoire();
+                            }
+                        } else {
+                            jouerEffet("win");
+                            donnees.obtenirSymbolesDecouverts().put(donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type, true); // On ajoute le symbole à la liste des symboles découverts
+                            switch (donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().type) {
+                                case PONT: // Si on extrait 1 pont, c'est comme si on extrayait du bois
+                                case BOIS:
+                                    // On a extrait 1 de bois, donc on peut construire 1 pont
+                                    int i = 0;
+                                    while (i < donnees.obtenirCompetences().size() && !donnees.obtenirCompetences().get(i).obtenirEffet().equals("Pont")) {
+                                        i++;
+                                    }
+                                    if (i < donnees.obtenirCompetences().size())
+                                        donnees.obtenirCompetences().get(i).majDisponible(true);
+                                    donnees.obtenirJoueur().majNombrePonts(donnees.obtenirJoueur().obtenirNombrePont()+1);
+                                    break;
+                                case CHENILLES:
+                                    donnees.obtenirJoueur().majSurChenilles(true);
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                        
                         donnees.obtenirDerniereCelluleMinijeu().obtenirSymbole().majSymbole(TypeSymbole.VIDE, null); // On enlève le symbole
                     }
                     donnees.majResultat(resultat);
@@ -1051,7 +1073,7 @@ public class Controleur {
     }
 
     public void ajusterZoom(int notches, Point point) {
-        if (aucunJeuEnCours() && !donnees.obtenirEtatOptions() && !donnees.obtenirVictoire() && !donnees.obtenirDefaite()) {
+        if (aucunJeuEnCours() && !donnees.obtenirEtatOptions() && !donnees.obtenirDefaite()) {
             // convert target coordinates to zoomTarget coordinates
             if (notches < 1) {
                 double tmpZoom = donnees.obtenirZoom()/Options.MULTIPLICATEUR_ZOOM;

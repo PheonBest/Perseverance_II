@@ -101,4 +101,5 @@ public class Options {
     public static final int TEMPS_DE_REACTION_MIN = 360;
     public static final int PRECISION_MIN = 85;
     public static final double PROBABILITE_CELLULE_VISIBLE = 0.4; // Probabilité qu'un symbole soit visible
+    public static final String NOM_DOSSIER_CARTES_PAR_DEFAUT = "cartesParDefaut";
 }

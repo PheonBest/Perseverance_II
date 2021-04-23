@@ -1,38 +1,19 @@
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.TexturePaint;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.DecimalFormat;
-import java.awt.RenderingHints;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.BasicStroke;
-import java.awt.Font;
-import java.awt.FontMetrics;
-
-import java.util.ArrayList;
 
 public class Dessiner extends JPanel {
     private Controleur controleur;
@@ -135,8 +116,6 @@ public class Dessiner extends JPanel {
                 }
             });
 			add(panneauPause);
-
-           
         }
 
         largeurRectangle = (int) (largeurEcran/MINIJEU_EXTRACTION_LARGEUR_ECRAN);
@@ -282,7 +261,6 @@ public class Dessiner extends JPanel {
                 }
             }
 
-            if (!victoire && !defaite) {
             ((Graphics2D) g2d).setTransform(transformationInitiale);
             
             // MINI-JEU EXTRACTION -------------
@@ -345,8 +323,8 @@ public class Dessiner extends JPanel {
                 Formes.dessinerTexteCentre(g2d, "Cliquez pour contrôler\nle bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
                 if (etatMinijeuExtraction.equals(Etat.OUT)) // On affiche le score
                     Formes.dessinerTexteCentre(g2d, resultat, (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
-                }
             }
+        
             // MINI-JEU EXTRACTION -------------
 
             // MINI-JEU LASER -------------
@@ -409,14 +387,10 @@ public class Dessiner extends JPanel {
                 Formes.dessinerTexteCentre(g2d, informerJoueur, (int)(largeurEcran/2), (int)(hauteurEcran*4./5.), Options.POLICE_PLAIN);
             }
         }
+    }
 
-        if (victoire) {
-            // Affichage du panneau de victoire (appelé une unique fois)
-        }
-        else if (defaite) {
-            // Affichage du panneau de défaite (appelé une unique fois)
-        }
-
+    public void majReinitialiser(boolean estParDefaut) {
+        // Si la carte est par défaut, on peut la réinitialiser
     }
 
     public void majCellules(Cellule[][] cellules) {
@@ -554,8 +528,12 @@ public class Dessiner extends JPanel {
     }
     public void majVictoire(boolean victoire) {
         this.victoire = victoire;
+        System.out.println("victoire !");
+        // Affichage du panneau de victoire
     }
     public void majDefaite(boolean defaite) {
         this.defaite = defaite;
+        System.out.println("Défaite !");
+        // Affichage du panneau de défaite
     }
 }
