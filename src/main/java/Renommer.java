@@ -21,10 +21,16 @@ public class Renommer extends JFrame implements ActionListener{
 	private Controleur controleur;
 	private String nomCarte ;
 	private List<String[]> carte; 
+	private boolean cloner;
 	
 	public Renommer(Controleur controleur, int largeur, int hauteur){
+		this(controleur, largeur, hauteur, false);
+	}
+	public Renommer(Controleur controleur, int largeur, int hauteur, boolean cloner){
 		super();
+
 		this.controleur = controleur;
+		this.cloner = cloner;
         setLayout(null);
         setLocation(largeur, hauteur);
         setSize(lx+20,ly);
@@ -66,7 +72,10 @@ public class Renommer extends JFrame implements ActionListener{
 				nom.setText("");
 			} else if (e.getSource() == valider) {
 				try {
-					controleur.renommer(nomCarte, nom.getText(), carte);
+					if (cloner)
+						controleur.cloner(nom.getText(), carte);
+					else
+						controleur.renommer(nomCarte, nom.getText(), carte);
 					setVisible(false);
 				} catch(IOException ex){
 					ex.printStackTrace();

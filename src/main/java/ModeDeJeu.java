@@ -43,10 +43,10 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	private JLabel selection;
 	private JScrollPane j;
 	private JButton aide;
-	private RegleJeu maFenetre2;
-	private Renommer maFenetre3;
-	private Renommer maFenetre4;
-	private CreationCarte maFenetre5;
+	private RegleJeu regleJeu;
+	private Renommer fenetreRenommer;
+	private Renommer fenetreCloner;
+	private CreationCarte fenetreCreer;
 	private JLabel presentation;
 	private JButton renommer;
 	private JButton supprimer;
@@ -61,10 +61,10 @@ public class ModeDeJeu extends JPanel implements ActionListener {
         this.controleur = controleur;
         this.setLayout(null);
         // creation des nouvelles fenetres qui vont apparaitre quand on clique sur les boutons
-        this.maFenetre2 = new RegleJeu();
-        this.maFenetre3 = new Renommer(controleur, 2*largeur/5-270,3*hauteur/5);
-        this.maFenetre4 = new Renommer(controleur, 3*largeur/5-20, 3*hauteur/5);
-        this.maFenetre5= new CreationCarte(controleur, 3*largeur/5-20, 3*hauteur/5);
+        this.regleJeu = new RegleJeu();
+        this.fenetreRenommer = new Renommer(controleur, 2*largeur/5-270,3*hauteur/5);
+        this.fenetreCloner = new Renommer(controleur, 3*largeur/5-20, 3*hauteur/5, true);
+        this.fenetreCreer= new CreationCarte(controleur, 3*largeur/5-20, 3*hauteur/5);
 
 		// fond d'ecran image
 		presentation = new JLabel();
@@ -189,13 +189,14 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	
 	 public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==aide){
-			maFenetre2.setVisible(true);
+			regleJeu.setVisible(true);
 		}
 		if(e.getSource()==quitter){
-			//system.exit(0);
+			System.exit(0);
 		}
 		if(e.getSource()==creer){
-			maFenetre5.setVisible(true);
+			controleur.jouerEffet("maximize");
+			fenetreCreer.setVisible(true);
 		}
 		if(liste.getSelectedValue()!=null){
 			if (e.getSource() == jouer)
@@ -203,8 +204,9 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 			else if (e.getSource() == editer)
 				controleur.editer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 			else if (e.getSource() == renommer) {
-				maFenetre3.initialiser(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
-				maFenetre3.setVisible(true);
+				controleur.jouerEffet("maximize");
+				fenetreRenommer.initialiser(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+				fenetreRenommer.setVisible(true);
 			} else if (e.getSource() == supprimer) {
 				try {
 					controleur.supprimer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
@@ -212,12 +214,9 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 					e1.printStackTrace();
 				}
 			} else if (e.getSource() == cloner) {
-				maFenetre4.setVisible(true);
-				try {
-					controleur.cloner("Copie de "+liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				controleur.jouerEffet("maximize");
+				fenetreCloner.initialiser(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
+				fenetreCloner.setVisible(true);
 			}
 		}
 	}

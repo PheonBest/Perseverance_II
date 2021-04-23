@@ -43,6 +43,7 @@ public class Donnees implements Observable {
     private long chronometreNotification = 0;
     private boolean victoire = false;
     private boolean defaite = false;
+    private boolean etatExploration = false;
     
     // CSV des cartes && éditeur
     private HashMap<String, List<String[]>> cartes;
@@ -615,5 +616,12 @@ public class Donnees implements Observable {
     }
     public boolean obtenirDefaite() {
         return defaite;
+    }
+
+    public boolean obtenirEtatExploration() {
+        return etatExploration;
+    }
+    public void majEtatExploration(boolean etatExploration) {
+        this.etatExploration = etatExploration;
     }
 }

@@ -209,13 +209,7 @@ public class Dessiner extends JPanel {
             }
         }
 
-        if (victoire) {
-            // Affichage du panneau de victoire (appelé une unique fois)
-        }
-        else if (defaite) {
-            // Affichage du panneau de défaite (appelé une unique fois)
-        }
-        else if (affichagePanneauDeControle && joueur != null) {
+        if (affichagePanneauDeControle && joueur != null) {
             // Affichage du joueur
             joueur.dessiner(g2d);
 
@@ -288,6 +282,7 @@ public class Dessiner extends JPanel {
                 }
             }
 
+            if (!victoire && !defaite) {
             ((Graphics2D) g2d).setTransform(transformationInitiale);
             
             // MINI-JEU EXTRACTION -------------
@@ -350,6 +345,7 @@ public class Dessiner extends JPanel {
                 Formes.dessinerTexteCentre(g2d, "Cliquez pour contrôler\nle bras mécanique avec précision", (int)(largeurEcran/2), (int)(hauteurEcran/2-HAUTEUR_CLAVETTE), Options.POLICE_PLAIN);
                 if (etatMinijeuExtraction.equals(Etat.OUT)) // On affiche le score
                     Formes.dessinerTexteCentre(g2d, resultat, (int)(largeurEcran/2), (int)(hauteurEcran/2+2*HAUTEUR_CLAVETTE), Options.police);
+                }
             }
             // MINI-JEU EXTRACTION -------------
 
@@ -414,6 +410,13 @@ public class Dessiner extends JPanel {
             }
         }
 
+        if (victoire) {
+            // Affichage du panneau de victoire (appelé une unique fois)
+        }
+        else if (defaite) {
+            // Affichage du panneau de défaite (appelé une unique fois)
+        }
+
     }
 
     public void majCellules(Cellule[][] cellules) {
@@ -423,7 +426,6 @@ public class Dessiner extends JPanel {
 
     public void majJoueur(Robot joueur) {
         this.joueur = joueur;
-        System.out.println(joueur);
         if (affichagePanneauDeControle)
             panneauDeControle.majJoueur(joueur);
     }

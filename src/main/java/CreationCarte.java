@@ -9,12 +9,13 @@ import java.util.List;
 
 public class CreationCarte extends JFrame implements ActionListener{
 	int lx=300;
-	int ly=270;
+	int ly=395;
 	int largeur;
 	int hauteur;
 	private Controleur controleur;
-	private JTextField nombre;
-	private JTextField nombre2;
+    private JTextField inputNom;
+	private JTextField inputLignes;
+	private JTextField inputColonnes;
 	private JButton valider;
 	private JButton effacer;
 	
@@ -34,45 +35,61 @@ public class CreationCarte extends JFrame implements ActionListener{
         fond.setBounds(0,0,lx,ly);
         fond.setLayout(null);
         this.add(fond);
+
+        JLabel nomCarte= new JLabel("Veuillez saisir un nom");
+        nomCarte.setBounds(0,20,lx,15);
+        nomCarte.setHorizontalAlignment(SwingConstants.CENTER);
+        fond.add(nomCarte);
+
+        inputNom= new JTextField();
+        inputNom.setBounds(50,50, 200, 50);
+        fond.add(inputNom);
         
-        JLabel texteChoix1= new JLabel("Veuillez saisir un nombre de lignes: ");
-        texteChoix1.setBounds(0,10,lx,15);
-        texteChoix1.setHorizontalAlignment(SwingConstants.CENTER);
-        fond.add(texteChoix1);
+        JLabel nbLignes= new JLabel("Veuillez saisir un nombre de lignes: ");
+        nbLignes.setBounds(0,110,lx,15);
+        nbLignes.setHorizontalAlignment(SwingConstants.CENTER);
+        fond.add(nbLignes);
         
-        nombre= new JTextField();
-        nombre.setBounds(50,30, 200, 50);
-        fond.add(nombre);
+        inputLignes= new JTextField();
+        inputLignes.setBounds(50,140, 200, 50);
+        fond.add(inputLignes);
         
-        JLabel texteChoix2= new JLabel("Veuillez saisir un nombre de colonnes: ");
-        texteChoix2.setBounds(0,95,lx,15);
-        texteChoix2.setHorizontalAlignment(SwingConstants.CENTER);
-        fond.add(texteChoix2);
+        JLabel nbColonnes= new JLabel("Veuillez saisir un nombre de colonnes: ");
+        nbColonnes.setBounds(0,205,lx,15);
+        nbColonnes.setHorizontalAlignment(SwingConstants.CENTER);
+        fond.add(nbColonnes);
 		
-		nombre2= new JTextField();
-        nombre2.setBounds(50,115, 200, 50);
-        fond.add(nombre2);
+		inputColonnes= new JTextField();
+        inputColonnes.setBounds(50,225, 200, 50);
+        fond.add(inputColonnes);
         
         effacer= new JButton("EFFACER");
-        effacer.setBounds(50,180,95,45);
+        effacer.setBounds(50,290,95,45);
         effacer.setBackground(new Color(175,175,175));
         fond.add(effacer);
         effacer.addActionListener(this);
         
         
         valider= new JButton("VALIDER");
-        valider.setBounds(155,180,95,45);
+        valider.setBounds(155,290,95,45);
         valider.setBackground(new Color(175,175,175));
         fond.add(valider);
-       
-		
+        valider.addActionListener(this);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-			if (e.getSource()== effacer){
-				nombre.setText("");
-				nombre2.setText("");
-			}
+        if (e.getSource()== effacer){
+            inputLignes.setText("");
+            inputColonnes.setText("");
+        } else if (e.getSource() == valider) {
+            try {
+                System.out.println("valider");
+                controleur.creerCarte(inputNom.getText(), Integer.parseInt(inputLignes.getText()), Integer.parseInt(inputColonnes.getText()));
+                setVisible(false);
+            } catch(IOException ex){
+                ex.printStackTrace();
+            }
+        }
 	}
 }
 

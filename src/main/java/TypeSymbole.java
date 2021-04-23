@@ -1,19 +1,21 @@
 public enum TypeSymbole{
+	//Symboles qu'on ne peut pas extraire
 	VIDE,
-	BACTERIE, 
-	MINERAI,
 	RAVIN,
-	SCANNER,
 	GRAPPIN,
 	INCONNUE,
+	SCANNER,
 	JAMBE,
 	BRAS,
 	CAPTEUR,
+	ENERGIE,
+	MONTAGNE,
+	FUSEE,
+	//Symboles qu'on peut extraire
+	BACTERIE,
+	MINERAI,
 	BOIS,
 	PONT,
-    ENERGIE,
-	CHENILLES,
-	MONTAGNE,
-	FUSEE
+	CHENILLES
 }
 
