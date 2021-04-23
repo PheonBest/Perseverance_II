@@ -27,16 +27,16 @@ public class CSV {
 		return escapedData;
 	}
 	
-	public static List<String[]> givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart) throws IOException {
+	public static List<String[]> givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart, HashMap<TypeSymbole, Boolean> obtenirSymbolesDecouverts) throws IOException {
 		List<String[]> data = dataLines (carteCellules);//carte
 		String [] robot;
 		if (joueur!= null) {
 			robot = new String []{Integer.toString(joueur.getBatterie()), Integer.toString(joueur.getNbRecharges()), Integer.toString(joueur.obtenirCase()[0]), Integer.toString(joueur.obtenirCase()[1]), 
 				Integer.toString(joueur.getJambes()[0].voyant.getEtat()), Integer.toString(joueur.getJambes()[1].voyant.getEtat()), Integer.toString(joueur.getBras()[0].voyant.getEtat()), Integer.toString(joueur.getBras()[1].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[0].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[1].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[2].voyant.getEtat()),
 					Integer.toString(joueur.getJambes()[0].getUsure()), Integer.toString(joueur.getJambes()[1].getUsure()), Integer.toString(joueur.getBras()[0].getUsure()), Integer.toString(joueur.getBras()[1].getUsure()), Integer.toString(joueur.getCapteurs()[0].getUsure()), Integer.toString(joueur.getCapteurs()[1].getUsure()), Integer.toString(joueur.getCapteurs()[2].getUsure()),
-						Integer.toString((int)(joueur.getKmParcourus())), Integer.toString((int)(joueur.getCompteurKm())), Integer.toString(joueur.obtenirNombrePont()), Integer.toString((joueur.obtenirSurChenilles())? 1 : 0)};
+						Integer.toString((int)(joueur.getKmParcourus())), Integer.toString((int)(joueur.getCompteurKm())), Integer.toString(joueur.obtenirNombrePont()), Integer.toString((joueur.obtenirSurChenilles())? 1 : 0), Integer.toString((obtenirSymbolesDecouverts.get(TypeSymbole.BACTERIE))? 1 : 0), Integer.toString((obtenirSymbolesDecouverts.get(TypeSymbole.MINERAI))? 1 : 0)};
 		} else {
-			robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
+			robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
 		}
 
 		if (celluleDepart != null) {
@@ -56,8 +56,8 @@ public class CSV {
 		return resultat;
 	}
 
-	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, Robot joueur) throws IOException {
-		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur, null);
+	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, Robot joueur, HashMap<TypeSymbole, Boolean> obtenirSymbolesDecouverts) throws IOException {
+		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur, null, obtenirSymbolesDecouverts);
 	}
 
 	// nom: nom du fichier cherché
@@ -184,7 +184,7 @@ public class CSV {
 		int [] joueur = new int[]{Integer.parseInt(liste.get(l)[0]), Integer.parseInt(liste.get(l)[1]), Integer.parseInt(liste.get(l)[2]), Integer.parseInt(liste.get(l)[3]),
 			Integer.parseInt(liste.get(l)[4]), Integer.parseInt(liste.get(l)[5]), Integer.parseInt(liste.get(l)[6]), Integer.parseInt(liste.get(l)[7]), Integer.parseInt(liste.get(l)[8]), Integer.parseInt(liste.get(l)[9]), Integer.parseInt(liste.get(l)[10]),
 				Integer.parseInt(liste.get(l)[11]), Integer.parseInt(liste.get(l)[12]), Integer.parseInt(liste.get(l)[13]), Integer.parseInt(liste.get(l)[14]), Integer.parseInt(liste.get(l)[15]), Integer.parseInt(liste.get(l)[16]), Integer.parseInt(liste.get(l)[17]),
-					Integer.parseInt(liste.get(l)[18]), Integer.parseInt(liste.get(l)[19]), Integer.parseInt(liste.get(l)[20]), Integer.parseInt(liste.get(l)[21])};
+					Integer.parseInt(liste.get(l)[18]), Integer.parseInt(liste.get(l)[19]), Integer.parseInt(liste.get(l)[20]), Integer.parseInt(liste.get(l)[21]), Integer.parseInt(liste.get(l)[22]), Integer.parseInt(liste.get(l)[23])};
 		Reception jeu = new Reception (carte, joueur, imagesJoueur);
 		return jeu;
 	}
@@ -226,8 +226,3 @@ public class CSV {
 		}
 	}
 }
-
-
-
-
-

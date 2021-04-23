@@ -1,8 +1,6 @@
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -94,7 +92,7 @@ public class Donnees implements Observable {
         }
 
         try {
-            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "Campagne", this.obtenirJoueur());
+            CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, "Campagne", this.obtenirJoueur(), this.obtenirSymbolesDecouverts());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -460,6 +458,10 @@ public class Donnees implements Observable {
     public HashMap<TypeSymbole, Boolean> obtenirSymbolesDecouverts() {
         return symbolesDecouverts;
     }
+    
+    public void majSymbolesDecouverts(HashMap<TypeSymbole, Boolean> newSymbolesDecouverts){
+		this.symbolesDecouverts = newSymbolesDecouverts;
+	}
 
     public HashMap<String, List<String[]>> obtenirCartes() {
         return cartes;

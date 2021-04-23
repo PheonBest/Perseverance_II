@@ -1,12 +1,12 @@
-import java.awt.Dimension;
 import java.awt.Image;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 
 public class Reception{
 	
 	private Cellule[][] carte;
 	private Robot joueur;
+	private HashMap<TypeSymbole, Boolean> symbolesDecouverts = new HashMap<TypeSymbole, Boolean>();
 	
 	public Reception (Cellule [][] map, int [] joueur, ArrayList<ArrayList<Image>> image){
 		carte = map;
@@ -18,6 +18,19 @@ public class Reception{
 		}else{
 			this.joueur.majSurChenilles(false);
 		}
+		boolean bacterie = false;
+		if(joueur[22]==1){
+			bacterie = true;
+		}
+		boolean minerai = false;
+		if(joueur[23]==1){
+			minerai = true;
+		}
+		
+		for (TypeSymbole type: TypeSymbole.values())
+            symbolesDecouverts.put(type, false);
+        symbolesDecouverts.put(TypeSymbole.BACTERIE,bacterie);
+        symbolesDecouverts.put(TypeSymbole.MINERAI,minerai);
 	}
 	
 	//-------------------------------------------------getters et setters
@@ -33,6 +46,8 @@ public class Reception{
 	public void majCarte (Cellule[][] map){
 		this.carte=map;
 	}
+	
+	public HashMap<TypeSymbole, Boolean> getHashMap(){
+		return symbolesDecouverts;
+	}
 }
-
-		

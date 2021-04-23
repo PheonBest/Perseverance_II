@@ -1088,8 +1088,7 @@ public class Controleur {
 	}
 
     public void enregistrer(boolean reinitialiserExploration) {
-
-		if(reinitialiserExploration==true){
+        if(reinitialiserExploration==true){
 			for (int i=0; i< donnees.obtenirCellules().length; i++) {
 				for (Cellule c: donnees.obtenirCellules()[i]) {
 					if (c.obtenirSymbole() != null) {
@@ -1112,10 +1111,13 @@ public class Controleur {
                     }
                 }
 			}
-		}
-		
+            HashMap<TypeSymbole, Boolean> symbolesDecouverts = new HashMap<TypeSymbole, Boolean>();
+            for (TypeSymbole type: TypeSymbole.values())
+                symbolesDecouverts.put(type, false);
+            donnees.majSymbolesDecouverts(symbolesDecouverts);
+        }
         try {
-            List<String[]> inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart());
+            List<String[]> inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart(), donnees.obtenirSymbolesDecouverts());
             // On charge la carte enregistrée
             donnees.obtenirCartes().put(donnees.obtenirNomCarte(), inputStream);
         } catch (IOException e) {
@@ -1178,7 +1180,7 @@ public class Controleur {
             * Or ici on a des fichiers générés dynamiquement
             * On modifie donc directement la liste de cartes
             */
-            List<String[]> csv = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null);
+            List<String[]> csv = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null, donnees.obtenirSymbolesDecouverts());
             donnees.obtenirCartes().put(nom, csv);
             donnees.notifierObservateur(TypeMisAJour.Cartes);
         } catch (IOException e) {
