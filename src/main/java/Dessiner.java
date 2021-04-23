@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -530,6 +533,33 @@ public class Dessiner extends JPanel {
         this.victoire = victoire;
         System.out.println("victoire !");
         // Affichage du panneau de victoire
+        JPanel p = new JPanel();
+		p.setBounds (10,200,370,260);
+		p.setLayout(null);
+		p.setBackground(Color.orange);
+		
+		JPanel p2 = new JPanel();
+		p2.setBounds (10,10,350,240);
+		p2.setLayout(null);
+		p2.setBackground(Color.yellow);
+		
+		JLabel Text = new JLabel();
+		Text.setText("<html><center> Vous avez validé toutes vos missions ! Des colons pourront bientôt<br>venir vivre sur cette planète!");
+		Text.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
+		Text.setLayout(null);
+		Text.setBounds (30,10,300,300);
+		
+		JLabel Text2 = new JLabel();
+		Text2.setText("VOUS AVEZ GAGNE !");
+		Text2.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,24));
+		Text2.setForeground(Color.red);
+		Text2.setLayout(null);
+		Text2.setBounds (60,30,300,30);
+		
+		p2.add(Text);
+		p2.add(Text2);
+		p.add(p2);
+		add(p);
     }
     public void majDefaite(boolean defaite) {
         this.defaite = defaite;
