@@ -46,11 +46,9 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	private RegleJeu maFenetre2;
 	private Renommer maFenetre3;
 	private Renommer maFenetre4;
-	private CreationCarte maFenetre5;
 	private JLabel presentation;
 	private JButton renommer;
 	private JButton supprimer;
-	private JButton quitter;
 	
 	
     public ModeDeJeu(Controleur controleur, int largeur, int hauteur) {
@@ -64,7 +62,6 @@ public class ModeDeJeu extends JPanel implements ActionListener {
         this.maFenetre2 = new RegleJeu();
         this.maFenetre3 = new Renommer(controleur, 2*largeur/5-270,3*hauteur/5);
         this.maFenetre4 = new Renommer(controleur, 3*largeur/5-20, 3*hauteur/5);
-        this.maFenetre5= new CreationCarte(controleur, 3*largeur/5-20, 3*hauteur/5);
 
 		// fond d'ecran image
 		presentation = new JLabel();
@@ -116,7 +113,7 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		creer.setBackground(Color.GRAY);
 		creer.setForeground(Color.WHITE);
 		presentation.add(creer);
-		creer.addActionListener(this);
+		//creer.addActionListener(this);
 		
 		editer = new JButton("Editer");
 		editer.setBounds(3*largeur/5, 3*hauteur/5+80,120,70);
@@ -134,26 +131,17 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 		
 		aide= new JButton("AIDE");
 		aide.setBounds(largeur-130,10,120,70);
-		aide.setBackground(Color.gray);
-		aide.setForeground(Color.white);
+		
+		aide.setBackground(Color.WHITE);
 		presentation.add(aide);
 		aide.addActionListener(this);
 		
-		quitter= new JButton("QUITTER");
-		//quitter.setBounds(largeur-130,90,120,70);
-		quitter.setBounds(10,10,120,70);
-		quitter.setBackground(Color.gray);
-		quitter.setForeground(Color.white);
-		presentation.add(quitter);
-		quitter.addActionListener(this);
-		
 		JLabel selectionCarte= new JLabel("SELECTION DE LA CARTE");
-		selectionCarte.setBounds(0, hauteur/3, largeur, 60);
+		selectionCarte.setBounds(0, hauteur/3, largeur, 50);
 		selectionCarte.setForeground(new Color(220,220,220));
 		selectionCarte.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,12));
 		selectionCarte.setHorizontalAlignment(SwingConstants.CENTER);
 		presentation.add(selectionCarte);
-		
 		
 		j=new JScrollPane(liste);
         final int LARGEUR_LISTE = 150;
@@ -190,14 +178,10 @@ public class ModeDeJeu extends JPanel implements ActionListener {
 	 public void actionPerformed(ActionEvent e) {
 		if(e.getSource()==aide){
 			maFenetre2.setVisible(true);
+		
+			
 		}
-		if(e.getSource()==quitter){
-			//system.exit(0);
-		}
-		if(e.getSource()==creer){
-			maFenetre5.setVisible(true);
-		}
-		if(liste.getSelectedValue()!=null){
+		 if(liste.getSelectedValue()!=null){
 			if (e.getSource() == jouer)
 				controleur.jouer(liste.getSelectedValue(), cartes.get(liste.getSelectedValue()));
 			else if (e.getSource() == editer)

@@ -21,7 +21,7 @@ public class Missions extends JFrame {
     public Missions(int x, int y){
         // Fenêtre
         super();
-        //this.joueur = r;
+        //joueur = r;
         setLayout(null);
         setLocation(x,y);
         setSize(lx+20,ly+40);
