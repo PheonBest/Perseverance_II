@@ -533,28 +533,49 @@ public class Dessiner extends JPanel {
         this.victoire = victoire;
         System.out.println("victoire !");
         // Affichage du panneau de victoire
+        
         JPanel p = new JPanel();
-		p.setBounds (10,200,370,260);
+		p.setBounds (10,200,470,360);
 		p.setLayout(null);
 		p.setBackground(Color.orange);
 		
 		JPanel p2 = new JPanel();
-		p2.setBounds (10,10,350,240);
+		p2.setBounds (10,10,450,340);
 		p2.setLayout(null);
 		p2.setBackground(Color.yellow);
+		p.add(p2);
 		
 		JLabel Text = new JLabel();
 		Text.setText("<html><center> Vous avez validé toutes vos missions ! Des colons pourront bientôt<br>venir vivre sur cette planète!");
 		Text.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
 		Text.setLayout(null);
-		Text.setBounds (30,10,300,300);
+		Text.setBounds (0,10,450,300);
+		Text.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		JLabel Text2 = new JLabel();
 		Text2.setText("VOUS AVEZ GAGNE !");
-		Text2.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,24));
+		Text2.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,26));
+		Text2.setBounds (0,30,450,30);
+		Text2.setHorizontalAlignment(SwingConstants.CENTER);
 		Text2.setForeground(Color.red);
 		Text2.setLayout(null);
-		Text2.setBounds (60,30,300,30);
+		
+		// les trois boutons
+		
+		JButton menu= new JButton("MENU");
+		menu.setBounds(300,260,130,50);
+		menu.setBackground(Color.orange);
+		p2.add(menu);
+		
+		JButton reinitialiser= new JButton("REINITIALISER");
+		reinitialiser.setBounds(20,260,130,50);
+		reinitialiser.setBackground(Color.orange);
+		p2.add(reinitialiser);
+		
+		JButton continuer= new JButton("CONTINUER");
+		continuer.setBounds(160,260,130,50);
+		continuer.setBackground(Color.orange);
+		p2.add(continuer);
 		
 		p2.add(Text);
 		p2.add(Text2);
