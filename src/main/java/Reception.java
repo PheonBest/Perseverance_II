@@ -2,13 +2,11 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.HashMap;
 
 public class Reception{
 	
 	private Cellule[][] carte;
 	private Robot joueur;
-	private HashMap<TypeSymbole, Boolean> symbolesDecouverts = new HashMap<TypeSymbole, Boolean>();
 	
 	public Reception (Cellule [][] map, int [] joueur, ArrayList<ArrayList<Image>> image){
 		carte = map;
@@ -20,21 +18,6 @@ public class Reception{
 		}else{
 			this.joueur.majSurChenilles(false);
 		}
-		boolean Bacterie = false;
-		if(joueur[22]==1){
-			Bacterie = true;
-		}
-		boolean Minerai = false;
-		if(joueur[23]==1){
-			Minerai = true;
-		}
-		
-		for (TypeSymbole type: TypeSymbole.values())
-            symbolesDecouverts.put(type, false);
-        symbolesDecouverts.replace(TypeSymbole.BACTERIE,false);
-        symbolesDecouverts.replace(TypeSymbole.MINERAI,false);
-        symbolesDecouverts.put(TypeSymbole.BACTERIE,Bacterie);
-        symbolesDecouverts.put(TypeSymbole.MINERAI,Minerai);
 	}
 	
 	//-------------------------------------------------getters et setters
@@ -49,10 +32,6 @@ public class Reception{
 	//-------------------------------------------------méthodes de MAJ
 	public void majCarte (Cellule[][] map){
 		this.carte=map;
-	}
-	
-	public HashMap<TypeSymbole, Boolean> getHashMap(){
-		return symbolesDecouverts;
 	}
 }
 
