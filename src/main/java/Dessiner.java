@@ -629,9 +629,87 @@ public class Dessiner extends JPanel {
 		panneauVictoire.add(panneauInterne);
 		add(panneauVictoire);
     }
+    
+    
     public void majDefaite(boolean defaite) {
         // Affichage du panneau de défaite
-    }
+        JPanel panneauDefaite = new JPanel();
+        final int LARGEUR_PANNEAU = 470;
+        final int HAUTEUR_PANNEAU = 360;
+		panneauDefaite.setBounds ((int)(largeurEcran-LARGEUR_PANNEAU)/2,(int)(hauteurEcran-HAUTEUR_PANNEAU)/2, LARGEUR_PANNEAU, HAUTEUR_PANNEAU);
+		panneauDefaite.setLayout(null);
+		panneauDefaite.setBackground(Color.orange);
+		add(panneauDefaite);
+		
+		JPanel panneauInterne = new JPanel();
+		panneauInterne.setBounds (10,10,450,340);
+		panneauInterne.setLayout(null);
+		panneauInterne.setBackground(Color.yellow);
+		panneauDefaite.add(panneauInterne);
+		
+		JLabel Text = new JLabel();
+		Text.setText("<html><center> Vous n'avez pas validé toutes vos missions ! Les colons ne pourront <br> pas venir vivre sur cette planète! <br> Retentez votre chance! ");
+		Text.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,18));
+		Text.setLayout(null);
+		Text.setBounds (0,10,450,300);
+		Text.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		
+		JLabel Text2 = new JLabel();
+		Text2.setText("VOUS AVEZ PERDU !");
+		Text2.setFont(new Font("Courier",Font.BOLD+Font.ITALIC,26));
+		Text2.setBounds (0,30,450,30);
+		Text2.setHorizontalAlignment(SwingConstants.CENTER);
+		Text2.setForeground(Color.red);
+		Text2.setLayout(null);
+		
+		panneauInterne.add(Text);
+		panneauInterne.add(Text2);
+		
+		//creation des deux boutons
+		
+		JButton menu = new JButton("MENU");
+		menu.setBackground(Color.orange);
+		panneauInterne.add(menu);
+		
+		JButton reinitialiser;
+		
+		 if (estParDefaut) { // Si la carte peut être réinitialisée:
+            reinitialiser = new JButton("RÉINITIALISER");
+            reinitialiser.setBackground(Color.orange);
+            panneauInterne.add(reinitialiser);
+
+            reinitialiser.setBounds(30,260,180,50);
+			menu.setBounds(240,260,180,50);
+			
+			reinitialiser.addActionListener(new AbstractAction("Reinitialiser") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (controleur.reinitialiser()) {
+                        panneauDefaite.setVisible(false);
+                        controleur.retourMenu();
+                    }
+                }
+            });
+            } else {
+				menu.setBounds(135,260,180,50);
+				
+			}
+			menu.addActionListener(new AbstractAction("Menu") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panneauDefaite.setVisible(false);
+                controleur.enregistrer();
+                controleur.retourMenu();
+            }
+        });
+		
+		
+			
+		}
+		
+		
+		
     public void majBacterie() {
         panneauMission.majBacterie();
     }
