@@ -42,12 +42,12 @@ public class Reception{
 		return joueur;
 	}
 	
+	public HashMap<TypeSymbole, Boolean> getHashMap(){
+		return symbolesDecouverts;
+	}
 	//-------------------------------------------------méthodes de MAJ
 	public void majCarte (Cellule[][] map){
 		this.carte=map;
 	}
 	
-	public HashMap<TypeSymbole, Boolean> getHashMap(){
-		return symbolesDecouverts;
-	}
 }
