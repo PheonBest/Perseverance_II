@@ -166,8 +166,8 @@ public class Robot extends Avatar {
     public int obtenirPExploration(){
         return ((int)((((double)this.nbCasesExplorees)/((double)nbCasesTotales))*100));
     }
-    public void majDimensionsCarte(int largeurCarte, int hauteurCarte) {
-        this.nbCasesTotales = largeurCarte*hauteurCarte;
+    public void majCasesTotales(int nbCasesTotales) {
+        this.nbCasesTotales = nbCasesTotales;
     }
     
     public int obtenirNombrePont() {

@@ -150,15 +150,23 @@ public class Controleur {
         Reception jeu = CSV.lecture(carte, -donnees.obtenirLargeur()/2, -donnees.obtenirHauteur()/2, Donnees.imagesSymboles, donnees.getImagesJoueur());
         donnees.majCellules(jeu.getCellule());
         donnees.majJoueur(jeu.getJoueur());
-        jeu.getJoueur().majDimensionsCarte(jeu.getCellule().length, jeu.getCellule()[0].length);
-
+        
+        // On veut que le total de cases à explorer ne prennent pas en compte les cases EAU
+        // Car on en peut pas aller sur les cases EAU
+        // Donc on compte le nombre total et on l'envoie au joueur
+        int nbCasesPasEau = 0;
         int nbCasesExplorees = 0;
         for (int i=0; i < jeu.getCellule().length; i++) {
             for (Cellule c: jeu.getCellule()[i]) {
-                if (c.estDecouverte())
-                    nbCasesExplorees++;
+                if (c.obtenirType() != TypeCase.EAU) {
+                    nbCasesPasEau++;
+                    if (c.estDecouverte())
+                        nbCasesExplorees++;
+                }
             }
         }
+
+        jeu.getJoueur().majCasesTotales(nbCasesPasEau);
         jeu.getJoueur().majCasesExplorees(nbCasesExplorees);
         placerJoueur(jeu.getJoueur().obtenirCase()[0], jeu.getJoueur().obtenirCase()[1]);
 
@@ -181,7 +189,8 @@ public class Controleur {
         for (int i=0; i < voisins.length; i++) {
             if (!voisins[i].estDecouverte()){
                 voisins[i].majEstDecouverte(true);
-                donnees.obtenirJoueur().majCasesExplorees();
+                if (voisins[i].obtenirType() != TypeCase.EAU)
+                    donnees.obtenirJoueur().majCasesExplorees();
             }
         }
         if (donnees.obtenirJoueur().obtenirPExploration() >= 70) {
@@ -327,7 +336,8 @@ public class Controleur {
                     for (int i=0; i < voisins.length; i++) {
                         if (!voisins[i].estDecouverte()) {
                             voisins[i].majEstDecouverte(true);
-                            donnees.obtenirJoueur().majCasesExplorees();
+                            if (voisins[i].obtenirType() != TypeCase.EAU)
+                                donnees.obtenirJoueur().majCasesExplorees();
                         }
                     }
                     if (!donnees.obtenirEtatExploration() && donnees.obtenirJoueur().obtenirPExploration() >= 70) {
