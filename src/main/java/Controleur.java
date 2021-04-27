@@ -375,10 +375,11 @@ public class Controleur {
             HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_CARTES_PAR_DEFAUT+"/");
             HashMap<String, List<String[]>> cartesEnCache = new HashMap<String, List<String[]>>();
             for (Map.Entry<String, InputStream> paire: cartes.entrySet()) {
+                List<String[]> carteTemporaire = CSV.cacheInputStream(paire.getValue());
+                cartesEnCache.put(paire.getKey(), carteTemporaire);
                 if (!donnees.obtenirCartes().containsKey(paire.getKey())) {
-                    donnees.obtenirCartes().put(paire.getKey(), CSV.cacheInputStream(paire.getValue()));
-                    CSV.ecrireFichierDepuisCache(paire.getKey(), donnees.obtenirCartes().get(paire.getKey()), false);
-                    cartesEnCache.put(paire.getKey(), donnees.obtenirCartes().get(paire.getKey()));
+                    donnees.obtenirCartes().put(paire.getKey(), carteTemporaire);
+                    CSV.ecrireFichierDepuisCache(paire.getKey(), carteTemporaire, false);
                 }
                 donnees.majCartesParDefaut(cartesEnCache);
             }
