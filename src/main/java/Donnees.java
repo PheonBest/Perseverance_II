@@ -456,20 +456,10 @@ public class Donnees implements Observable {
     }
 
     public void majCartes(HashMap<String, List<String[]>> cartes) {
-        System.out.println("Cartes -------------");
-        for (String i : cartes.keySet())
-            System.out.println("Nom du CSV : " + i);
-        System.out.println("Cartes -------------");
-
         this.cartes = cartes;
     }
 
     public void majCartesParDefaut(HashMap<String, List<String[]>> cartesParDefaut) {
-        System.out.println("CartesParDefaut -------------");
-        for (String i : cartesParDefaut.keySet())
-            System.out.println("Nom du CSV : " + i);
-        System.out.println("CartesParDefaut -------------");
-
         this.cartesParDefaut = cartesParDefaut;
     }
 

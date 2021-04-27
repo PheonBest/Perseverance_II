@@ -83,7 +83,6 @@ public class CreationCarte extends JFrame implements ActionListener{
             inputColonnes.setText("");
         } else if (e.getSource() == valider) {
             try {
-                System.out.println("valider");
                 controleur.creerCarte(inputNom.getText(), Integer.parseInt(inputLignes.getText()), Integer.parseInt(inputColonnes.getText()));
                 setVisible(false);
             } catch(IOException ex){

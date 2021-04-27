@@ -77,10 +77,10 @@ public class CSV {
 		File dir = new File(dossier);
 		if (!dir.exists()) dir.mkdirs();
 		File csvOutputFile = new File(chemin);
-		System.out.println("Préparation de l'écriture");
+		//System.out.println("Préparation de l'écriture");
 		if (!csvOutputFile.exists() || ecrireParDessus) {
 			try {
-				System.out.println("Écriture de "+chemin);
+				//System.out.println("Écriture de "+chemin);
 				csvOutputFile.createNewFile();
 			
 				PrintWriter pw = new PrintWriter(csvOutputFile);

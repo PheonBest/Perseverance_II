@@ -363,7 +363,7 @@ public class Controleur {
 
             for (Map.Entry<String, InputStream> paire: cartes.entrySet()) {
                 cartesEnCache.put(paire.getKey(), CSV.cacheInputStream(paire.getValue()));
-                System.out.println(paire.getKey());
+                //System.out.println(paire.getKey());
             }
             
             donnees.majCartes(cartesEnCache);
@@ -379,9 +379,7 @@ public class Controleur {
             for (Map.Entry<String, InputStream> paire: cartesParDefaut.entrySet()) {
                 List<String[]> carteTemporaire = CSV.cacheInputStream(paire.getValue());
                 cartesEnCacheParDefaut.put(paire.getKey(), carteTemporaire);
-                System.out.println("Doit-on remplacer "+paire.getKey()+" ?");
                 if (!donnees.obtenirCartes().containsKey(paire.getKey())) {
-                    System.out.println("Remplacement de "+paire.getKey());
                     donnees.obtenirCartes().put(paire.getKey(), carteTemporaire);
                     CSV.ecrireFichierDepuisCache(paire.getKey(), carteTemporaire, false);
                 }
@@ -435,7 +433,7 @@ public class Controleur {
             e.printStackTrace();
         }
 
-        // Chargement des images du joueur=
+        // Chargement des images du joueur
         Charger threadWorkerChargement = new Charger();
         threadWorkerChargement.execute();
     }
@@ -466,8 +464,10 @@ public class Controleur {
                                                                                                                                     .map(Map.Entry::getValue)
                                                                                                                                     .collect(Collectors.toList());
                 images.add(new ArrayList<Image>());
-                for (Image img: tmp)
-                    images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null))), false) );                avancementChargement +=tmp.size();
+                for (Image img: tmp) {
+                    images.get(i).add( TailleImage.resizeImage( img, Options.JOUEUR_LARGEUR, (int)((double)Options.JOUEUR_LARGEUR*((double)img.getHeight(null)/(double)img.getWidth(null))), false) );
+                }
+                avancementChargement +=tmp.size();
                 publish((int)(100.*avancementChargement/nombreImages)); // On publie l'avancement du chargement (résultat intermédiaire)
                 
             }
