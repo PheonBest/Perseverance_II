@@ -20,7 +20,7 @@ public class Editeur extends JPanel {
         menu.setLayout(null);
         carte.setLayout(null);
         carte.setBackground(Color.DARK_GRAY);
-        menu.setBackground(Color.LIGHT_GRAY);
+        menu.setBackground(new Color(102,102,102));
         
         add(carte);
         add(menu);

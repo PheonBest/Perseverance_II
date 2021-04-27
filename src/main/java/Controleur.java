@@ -367,8 +367,9 @@ public class Controleur {
 
         // Chargement des cartes
         Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/res/");
         try {
-            HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_CARTES+"/");
+            HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, dossier);
             HashMap<String, List<String[]>> cartesEnCache = new HashMap<String, List<String[]>>();
 
             for (Map.Entry<String, InputStream> paire: cartes.entrySet()) {
