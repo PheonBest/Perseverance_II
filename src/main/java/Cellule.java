@@ -107,16 +107,22 @@ public class Cellule extends Polygon implements Dessin {
             if (agrandissement != 1)
                 facteurDeTaille = agrandissement;
 
-            
+            // Quand on agrandit la cellule, elle devient plus grande mais conserve
+            // son coin en haut à gauche comme origine. On translate donc de manière
+            // à ce que la cellule conserve son centre.
+            // en X: on translate par la moitié de la différence de largeur
+            // en Y: on translate par la moitié de la différence de largeur
             final AffineTransform ANCIENNE_TRANSFORMATION = g2d.getTransform();
-            final double[] CENTRE = {xpoints[0]+largeur/4, ypoints[0]+hauteur/2};
-            final double[] COIN_EN_HAUT_A_GAUCHE = {xpoints[0]-largeur/4, ypoints[0]};
+            
             final double DELTA_LARGEUR = largeur*(facteurDeTaille-1)/2.;
             final double DELTA_HAUTEUR = hauteur*(facteurDeTaille-1)/2.;
+            final double[] COIN_EN_HAUT_A_GAUCHE = {xpoints[0]-largeur/4, ypoints[0]};
 
             translate((int)(-COIN_EN_HAUT_A_GAUCHE[0]), (int)(-COIN_EN_HAUT_A_GAUCHE[1]));
             AffineTransform at = g2d.getTransform();
+            // On applique la translation (transformation affine)
             at.translate(COIN_EN_HAUT_A_GAUCHE[0]-DELTA_LARGEUR,COIN_EN_HAUT_A_GAUCHE[1]-DELTA_HAUTEUR);
+            // On applique l'agrandissement (transformation affine)
             at.scale(facteurDeTaille, facteurDeTaille);
             g2d.setTransform(at);
 

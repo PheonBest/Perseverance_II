@@ -1201,7 +1201,7 @@ public class Controleur {
             donnees.majSymbolesDecouverts(symbolesDecouverts);
         }
         try {
-            List<String[]> inputStream = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart(), donnees.obtenirSymbolesDecouverts());
+            List<String[]> inputStream = CSV.ecrireCSV(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart(), donnees.obtenirSymbolesDecouverts());
             // On charge la carte enregistrée
             donnees.obtenirCartes().put(donnees.obtenirNomCarte(), inputStream);
         } catch (IOException e) {
@@ -1282,7 +1282,7 @@ public class Controleur {
             * Or ici on a des fichiers générés dynamiquement
             * On modifie donc directement la liste de cartes
             */
-            List<String[]> csv = CSV.givenDataArray_whenConvertToCSV_thenOutputCreated(cellules, nom, true, null, null, donnees.obtenirSymbolesDecouverts());
+            List<String[]> csv = CSV.ecrireCSV(cellules, nom, true, null, null, donnees.obtenirSymbolesDecouverts());
             jouerEffet("confirmation");
             donnees.obtenirCartes().put(nom, csv);
             donnees.notifierObservateur(TypeMisAJour.Cartes);

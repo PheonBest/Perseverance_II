@@ -27,14 +27,14 @@ public class CSV {
 		return escapedData;
 	}
 	
-	public static List<String[]> givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart, HashMap<TypeSymbole, Boolean> obtenirSymbolesDecouverts) throws IOException {
+	public static List<String[]> ecrireCSV(Cellule[][] carteCellules, String filename, boolean ecrireParDessus, Robot joueur, int[] celluleDepart, HashMap<TypeSymbole, Boolean> symbolesDecouverts) throws IOException {
 		List<String[]> data = dataLines (carteCellules);//carte
 		String [] robot;
 		if (joueur!= null) {
 			robot = new String []{Integer.toString(joueur.getBatterie()), Integer.toString(joueur.getNbRecharges()), Integer.toString(joueur.obtenirCase()[0]), Integer.toString(joueur.obtenirCase()[1]), 
 				Integer.toString(joueur.getJambes()[0].voyant.getEtat()), Integer.toString(joueur.getJambes()[1].voyant.getEtat()), Integer.toString(joueur.getBras()[0].voyant.getEtat()), Integer.toString(joueur.getBras()[1].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[0].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[1].voyant.getEtat()), Integer.toString(joueur.getCapteurs()[2].voyant.getEtat()),
 					Integer.toString(joueur.getJambes()[0].getUsure()), Integer.toString(joueur.getJambes()[1].getUsure()), Integer.toString(joueur.getBras()[0].getUsure()), Integer.toString(joueur.getBras()[1].getUsure()), Integer.toString(joueur.getCapteurs()[0].getUsure()), Integer.toString(joueur.getCapteurs()[1].getUsure()), Integer.toString(joueur.getCapteurs()[2].getUsure()),
-						Integer.toString((int)(joueur.getKmParcourus())), Integer.toString((int)(joueur.getCompteurKm())), Integer.toString(joueur.obtenirNombrePont()), Integer.toString((joueur.obtenirSurChenilles())? 1 : 0), Integer.toString((obtenirSymbolesDecouverts.get(TypeSymbole.BACTERIE))? 1 : 0), Integer.toString((obtenirSymbolesDecouverts.get(TypeSymbole.MINERAI))? 1 : 0)};
+						Integer.toString((int)(joueur.getKmParcourus())), Integer.toString((int)(joueur.getCompteurKm())), Integer.toString(joueur.obtenirNombrePont()), Integer.toString((joueur.obtenirSurChenilles())? 1 : 0), Integer.toString((symbolesDecouverts.get(TypeSymbole.BACTERIE))? 1 : 0), Integer.toString((symbolesDecouverts.get(TypeSymbole.MINERAI))? 1 : 0)};
 		} else {
 			robot = new String []{Integer.toString(Options.BATTERIE_MAX),"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"};
 		}
@@ -56,8 +56,8 @@ public class CSV {
 		return resultat;
 	}
 
-	public static void givenDataArray_whenConvertToCSV_thenOutputCreated(Cellule[][] carteCellules, String filename, Robot joueur, HashMap<TypeSymbole, Boolean> obtenirSymbolesDecouverts) throws IOException {
-		givenDataArray_whenConvertToCSV_thenOutputCreated(carteCellules, filename, false, joueur, null, obtenirSymbolesDecouverts);
+	public static void ecrireCSV(Cellule[][] carteCellules, String filename, Robot joueur, HashMap<TypeSymbole, Boolean> symbolesDecouverts) throws IOException {
+		ecrireCSV(carteCellules, filename, false, joueur, null, symbolesDecouverts);
 	}
 
 	// nom: nom du fichier cherché
@@ -187,42 +187,5 @@ public class CSV {
 					Integer.parseInt(liste.get(l)[18]), Integer.parseInt(liste.get(l)[19]), Integer.parseInt(liste.get(l)[20]), Integer.parseInt(liste.get(l)[21]), Integer.parseInt(liste.get(l)[22]), Integer.parseInt(liste.get(l)[23])};
 		Reception jeu = new Reception (carte, joueur, imagesJoueur);
 		return jeu;
-	}
-	
-	public static Image obtenirImageSymbole(String nomSymbole, HashMap<String, Image> images){  //trouver l'image associee a chaque symbole
-		switch( nomSymbole){
-			case "BACTERIE":
-				return images.get("BACTERIE");
-			case "MINERAI":
-				return images.get("MINERAI"); // correspondance type de hashmap
-			case "RAVIN":
-				return images.get("RAVIN");
-			case "SCANNER":
-				return images.get("SCANNER");
-			case "GRAPPIN":
-				return images.get("GRAPPIN");
-			case "INCONNUE":
-				return images.get("INCONNUE");
-			case "JAMBE":
-				return images.get("JAMBE");
-			case "BRAS":
-				return images.get("BRAS");
-			case "CAPTEUR":
-				return images.get("CAPTEUR");
-			case "BOIS":
-				return images.get("BOIS");
-			case "PONT":
-				return images.get("PONT");
-			case "ENERGIE":
-				return images.get("ENERGIE");
-			case "CHENILLES":
-				return images.get("CHENILLES");
-			case "MONTAGNE":
-				return images.get("MONTAGNE");
-			case "FUSEE":
-				return images.get("FUSEE");
-			default:
-				return null;
-		}
 	}
 }

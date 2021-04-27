@@ -90,7 +90,7 @@ public class ObtenirRessources{
                         }
                     }
                 }
-            } else if (url.getProtocol().equals("jar")) {
+            } else if (url.getProtocol().equals("jar")) { // Si le fichier est dans une archive compressée
                 String dirname = directoryName + "/";
                 String path = url.getPath();
                 String jarPath = path.substring(5, path.indexOf("!"));
@@ -112,10 +112,13 @@ public class ObtenirRessources{
                             if (accept) {
                                 // On veut récupèrer le nom du fichier
                                 // Or on obtient le chemin
-                                // ex: G:\Documents\GitHub\Perseverance_Trip\Perseverance_II\target\classes\res\symboles\checkbox.png
+                                // ex: G:\Documents\GitHub\Perseverance_Trip\Perseverance_II.jar!\target\classes\res\symboles\checkbox.png
                                 // Ici on veut obtenir "checkbox"
                                 // On utilise donc le patterne Regex suivant: [ \w-]+?(?=\.)
                                 // A la fin on tronque le caractère "."
+                                // CEPENDANT on remarque qu'il y a marqué "Perseverance_II.jar!" dans le chemin du fichier
+                                // On exclue donc l'extension .jar (et .exe et .dmg) de la recherche Regex
+                                // On obtient:le patterne [ \\w-]+?(?=\\.(?!exe|jar|dmg))
                                 
                                 filenameMatcher = filenamePattern.matcher(resource.toString());
                                 if (filenameMatcher.find())

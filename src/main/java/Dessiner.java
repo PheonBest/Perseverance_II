@@ -210,7 +210,7 @@ public class Dessiner extends JPanel {
             // Affichage du joueur
             joueur.dessiner(g2d);
 
-            // Affichage de la minimap
+            // On réinitialise la transformation affine
             g2d.setTransform(transformationMinimap);
 
             // On dessine les compétences utilisables par le joueur
@@ -248,13 +248,14 @@ public class Dessiner extends JPanel {
                 (Options.POSITION_X_MINIMAP*largeurEcran - (cellules[0][0].xpoints[0] + Options.LARGEUR_CASE/4)*Options.ZOOM_MINIMAP),
                 (Options.POSITION_Y_MINIMAP*hauteurEcran - (cellules[0][0].ypoints[0])*Options.ZOOM_MINIMAP)
             );
-
+            // On dézoom toute la carte
             transformationMinimap.scale(Options.ZOOM_MINIMAP, Options.ZOOM_MINIMAP);
             ((Graphics2D) g2d).setTransform(transformationMinimap);
             if (typeMoyen.length > 0) {
                 int index = 0;
                 TypeCase ancienType;
                 TypeSymbole ancienSymbole;
+                // On dessine une cellule par pas de Options.INCREMENT_MINIMAP
                 for (int i=0; i < cellules.length; i+=Options.INCREMENT_MINIMAP) {
                     for (int j=0; j < cellules[i].length; j+=Options.INCREMENT_MINIMAP) {
                         ancienType = cellules[i][j].obtenirType();
@@ -440,14 +441,14 @@ public class Dessiner extends JPanel {
         // On met à jour les cellules sélectionnées pour être affichées dans la minimap
         final int NOMBRE_ECHANTILLONS = (int)(Math.ceil(cellules.length/(double)Options.INCREMENT_MINIMAP) * Math.ceil(cellules[0].length/(double)Options.INCREMENT_MINIMAP));
         typeMoyen = new TypeCase[NOMBRE_ECHANTILLONS];
-        symboleMoyen = new TypeSymbole[NOMBRE_ECHANTILLONS];
+        //symboleMoyen = new TypeSymbole[NOMBRE_ECHANTILLONS];
         int index = 0;
         Cellule[] voisins;
         for (int i=0; i < cellules.length; i+=Options.INCREMENT_MINIMAP) {
             for (int j=0; j < cellules[i].length; j+=Options.INCREMENT_MINIMAP) {
                 voisins = Voisins.obtenirVoisins(cellules, i, j, 2);
                 typeMoyen[index] = obtenirTypeRepresentatif(voisins);
-                symboleMoyen[index] = obtenirSymboleRepresentatif(voisins);
+                //symboleMoyen[index] = obtenirSymboleRepresentatif(voisins);
                 
                 index ++;
             }
