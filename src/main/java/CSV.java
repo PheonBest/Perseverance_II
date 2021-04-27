@@ -72,13 +72,15 @@ public class CSV {
 		return cheminVersRoot+nom; // Si on est pas dans un fichier compressé, on retourne au niveau du root
 	}
 	public static void ecrireFichierDepuisCache(String filename, List<String[]> carte, boolean ecrireParDessus) {
-		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
+		String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/res/");
 		String chemin = dossier+"/"+filename+".csv";
 		File dir = new File(dossier);
 		if (!dir.exists()) dir.mkdirs();
 		File csvOutputFile = new File(chemin);
+		System.out.println("Préparation de l'écriture");
 		if (!csvOutputFile.exists() || ecrireParDessus) {
 			try {
+				System.out.println("Écriture de "+chemin);
 				csvOutputFile.createNewFile();
 			
 				PrintWriter pw = new PrintWriter(csvOutputFile);

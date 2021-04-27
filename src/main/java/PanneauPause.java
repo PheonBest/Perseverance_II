@@ -146,38 +146,21 @@ public class PanneauPause extends JDialog {
                 
   
         pause= new JButton();
-      
-		try {
-			Image img1 = TailleImage.resizeImage(ImageIO.read(getClass().getResource("./res/symboles/PAUSE.png")),50,50,true);
-			pause.setIcon(new ImageIcon(img1
-			));
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		Image imagePause = TailleImage.resizeImage(Donnees.imagesMenu.get("RESUME"),50,50,true);
+		pause.setIcon(new ImageIcon(imagePause));
 		pause.setBounds(110,45,60,60);
 		panneauDroite.add(pause);
 		
 		
         suivant= new JButton();
-        
-        try {
-			Image img = TailleImage.resizeImage(ImageIO.read(getClass().getResource("./res/symboles/SUIVANT.png")),50,50,true);
-			suivant.setIcon(new ImageIcon(img));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+        Image imageSuivant = TailleImage.resizeImage(Donnees.imagesMenu.get("SUIVANT"),50,50,true);
+		suivant.setIcon(new ImageIcon(imageSuivant));
 		suivant.setBounds(180,45,60,60);
 		panneauDroite.add(suivant);
 		
         precedent=new JButton();
-         try {
-			Image img = TailleImage.resizeImage(ImageIO.read(getClass().getResource("./res/symboles/PRECEDENT.png")),50,50,true);
-			precedent.setIcon(new ImageIcon(img));
-			TailleImage.resizeImage(img,50,50,true);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+        Image imgPrecedent = TailleImage.resizeImage(Donnees.imagesMenu.get("PRECEDENT"),50,50,true);
+		precedent.setIcon(new ImageIcon(imgPrecedent));
 		precedent.setBounds(40,45,60,60);
 		panneauDroite.add(precedent);
 		

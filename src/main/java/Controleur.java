@@ -358,11 +358,13 @@ public class Controleur {
         // Chargement des cartes
         Pattern pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES+"\\b.*\\.(?:csv)");
         try {
-            HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, Options.NOM_DOSSIER_CARTES);
+            HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_CARTES+"/");
             HashMap<String, List<String[]>> cartesEnCache = new HashMap<String, List<String[]>>();
 
-            for (Map.Entry<String, InputStream> paire: cartes.entrySet())
+            for (Map.Entry<String, InputStream> paire: cartes.entrySet()) {
                 cartesEnCache.put(paire.getKey(), CSV.cacheInputStream(paire.getValue()));
+                System.out.println(paire.getKey());
+            }
             
             donnees.majCartes(cartesEnCache);
         } catch (URISyntaxException | IOException e) {
@@ -372,17 +374,19 @@ public class Controleur {
         // Ajout éventuel des cartes par défaut
         pattern = Pattern.compile("^.*\\b"+Options.NOM_DOSSIER_CARTES_PAR_DEFAUT+"\\b.*\\.(?:csv)");
         try {
-            HashMap<String, InputStream> cartes = ObtenirRessources.getStreamsAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_CARTES_PAR_DEFAUT+"/");
-            HashMap<String, List<String[]>> cartesEnCache = new HashMap<String, List<String[]>>();
-            for (Map.Entry<String, InputStream> paire: cartes.entrySet()) {
+            HashMap<String, InputStream> cartesParDefaut = ObtenirRessources.getStreamsAndFilenames(pattern, "res/"+Options.NOM_DOSSIER_CARTES_PAR_DEFAUT+"/");
+            HashMap<String, List<String[]>> cartesEnCacheParDefaut = new HashMap<String, List<String[]>>();
+            for (Map.Entry<String, InputStream> paire: cartesParDefaut.entrySet()) {
                 List<String[]> carteTemporaire = CSV.cacheInputStream(paire.getValue());
-                cartesEnCache.put(paire.getKey(), carteTemporaire);
+                cartesEnCacheParDefaut.put(paire.getKey(), carteTemporaire);
+                System.out.println("Doit-on remplacer "+paire.getKey()+" ?");
                 if (!donnees.obtenirCartes().containsKey(paire.getKey())) {
+                    System.out.println("Remplacement de "+paire.getKey());
                     donnees.obtenirCartes().put(paire.getKey(), carteTemporaire);
                     CSV.ecrireFichierDepuisCache(paire.getKey(), carteTemporaire, false);
                 }
-                donnees.majCartesParDefaut(cartesEnCache);
             }
+            donnees.majCartesParDefaut(cartesEnCacheParDefaut);
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
@@ -1202,9 +1206,9 @@ public class Controleur {
             donnees.majSymbolesDecouverts(symbolesDecouverts);
         }
         try {
-            List<String[]> inputStream = CSV.ecrireCSV(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart(), donnees.obtenirSymbolesDecouverts());
+            List<String[]> carteEnCache = CSV.ecrireCSV(donnees.obtenirCellules(), donnees.obtenirNomCarte(), true, donnees.obtenirJoueur(), donnees.obtenirCelluleDepart(), donnees.obtenirSymbolesDecouverts());
             // On charge la carte enregistrée
-            donnees.obtenirCartes().put(donnees.obtenirNomCarte(), inputStream);
+            donnees.obtenirCartes().put(donnees.obtenirNomCarte(), carteEnCache);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1247,7 +1251,7 @@ public class Controleur {
     }
 
     public void cloner(String nouveauNom, List<String[]> carte) throws IOException {
-        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/res/");
         nouveauNom = Formes.stripAccents(nouveauNom);
         File file = new File(dossier+"/"+nouveauNom+".csv");
         if (file.exists()) {
@@ -1261,7 +1265,7 @@ public class Controleur {
     }
 
     public void creerCarte(String nom, int nombreLignes, int nombreColonnes) throws IOException {
-        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/res/");
         nom = Formes.stripAccents(nom);
         File file = new File(dossier+"/"+nom+".csv");
         if (file.exists()) {
@@ -1294,7 +1298,7 @@ public class Controleur {
     }
     
     public void renommer(String ancienNom, String nouveauNom, List<String[]> carte) throws IOException {
-        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
+        String dossier = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES, "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/res/");
         nouveauNom = Formes.stripAccents(nouveauNom);
         File file = new File(dossier+"/"+nouveauNom+".csv");
         if (file.exists()) {
@@ -1314,7 +1318,7 @@ public class Controleur {
 
     public void supprimer(String nom, List<String[]> carte) throws IOException {
 
-        String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom+".csv", "res/"+Options.NOM_DOSSIER_IMAGES+"/", "src/main/java/");
+        String chemin = CSV.fichierExterne(Options.NOM_DOSSIER_CARTES+"/"+nom+".csv", "res/"+Options.NOM_DOSSIER_IMAGES+"/", "res/");
         File fichier = new File(chemin);
 
         if (!fichier.delete()) {
