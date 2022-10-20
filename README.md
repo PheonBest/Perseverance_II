@@ -1,7 +1,7 @@
 ![HOME PAGE](doc/home.png "Home page")
 
-- [EN](#rules)
-- [FR](#regles)
+- [EN](#rules-)
+- [FR](#règles-)
 
 
 -----------------------
@@ -52,7 +52,7 @@ In the rover's original capsule, we've loaded boxes of robotic components and sp
 
 But they seem to have deteriorated as the capsule approached the planet ... and all this equipment was scattered across the map. Find them quickly if you want to maintain contact with the robot!
 
-## Symbols
+## SYMBOLS
 Bacteria, ores, tools and supply boxes are present on the map in the form of question marks '?'.
 
 To find out what symbol is hidden behind these '?', you will have to scan them with the Scan tool, then use the grapple to extract them. 
@@ -70,7 +70,7 @@ You can create bridges after extracting wood:
 ![CREATE BRIDGE 1](doc/create_bridge_1.png)
 ![CREATE BRIDGE 2](doc/create_bridge_2.png)
 
-# Features
+# FEATURES
 After discovering the game, you can create your own map!
 In the main menu, click on the 'Create' button:
 ![CREATE MAP](doc/map_parameters_filled.png "Fill map creation parameters")
@@ -139,7 +139,7 @@ Dans la capsule d'origine du rover, nous avons chargé des caisses de composants
 
 Mais ils emble que la capsule se soit détériorée à l'approche de l'expoplanète ... et tous ces équipements se sont éparpillés sur la carte. Retrouvez-les vite si vous voulez maintenir le contact avec le robot !
 
-## Symboles
+## SYMBOLES
 Les sources de vie bactériennes, minerais, objets et caisses de ravitaillements sont présents sur la carte sous la forme de points d'interrogation '?'.
 
 Pour découvrir quel symbole se cache derrière ces '?', vous allez devoir les scanner à l'aide de l'outil Scanner, puis utiliser le grappin pour les extraire. 
@@ -157,7 +157,7 @@ Vous pouvez notamment créer des ponts après avoir extrait du bois:
 ![CREATE BRIDGE 1](doc/create_bridge_1.png)
 ![CREATE BRIDGE 2](doc/create_bridge_2.png)
 
-# Fonctionnalités
+# FONCTIONNALITÉS
 Après avoir découvert le jeu, vous pouvez créer votre propre carte !
 Dans le menu principal, cliquez sur le bouton 'Créer':
 ![CREATE MAP](doc/map_parameters_filled.png "Fill map creation parameters")
